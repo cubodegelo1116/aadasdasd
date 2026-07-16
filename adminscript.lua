@@ -21,6 +21,8 @@ local ScreenGui = {
 }
 
 ScreenGui.ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ScreenGui.ResetOnSpawn = false -- NÃO RESETAR AO MORRER
+
 ScreenGui.ComandtxtFrame.Parent = ScreenGui.ScreenGui
 ScreenGui.CMDBOX.Parent = ScreenGui.ComandtxtFrame
 ScreenGui.CmdsLIST.Parent = ScreenGui.ScreenGui
@@ -30,7 +32,6 @@ ScreenGui.TextLabel.Parent = ScreenGui.Dragbar
 ScreenGui.ScrollingFrame.Parent = ScreenGui.CmdsLIST
 
 ScreenGui.ScreenGui.Name = "ScreenGui"
-ScreenGui.ScreenGui.ResetOnSpawn = true
 ScreenGui.ScreenGui.IgnoreGuiInset = false
 ScreenGui.ScreenGui.DisplayOrder = 0
 
@@ -169,7 +170,7 @@ ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 local function showPopup(text)
 	if not Config.Popups then return end
-
+	
 	local popup = Instance.new("Frame")
 	popup.Parent = ScreenGui.ScreenGui
 	popup.Size = UDim2.new(0, 300, 0, 40)
@@ -180,7 +181,7 @@ local function showPopup(text)
 	popup.BackgroundTransparency = 0
 	popup.Visible = true
 	popup.ZIndex = 10
-
+	
 	local label = Instance.new("TextLabel")
 	label.Parent = popup
 	label.Size = UDim2.new(1, 0, 1, 0)
@@ -192,7 +193,7 @@ local function showPopup(text)
 	label.TextXAlignment = Enum.TextXAlignment.Center
 	label.TextYAlignment = Enum.TextYAlignment.Center
 	label.ZIndex = 11
-
+	
 	task.wait(2)
 	popup:Destroy()
 end
@@ -204,26 +205,26 @@ end
 local function findPlayer(name)
 	local found = {}
 	local lowerName = string.lower(name)
-
+	
 	for _, player in ipairs(game.Players:GetPlayers()) do
 		local lowerPlayerName = string.lower(player.Name)
 		local lowerDisplayName = string.lower(player.DisplayName)
-
+		
 		if lowerPlayerName == lowerName or lowerDisplayName == lowerName then
 			return player
 		end
-
+		
 		if string.find(lowerPlayerName, lowerName, 1, true) or string.find(lowerDisplayName, lowerName, 1, true) then
 			table.insert(found, player)
 		end
 	end
-
+	
 	if #found == 1 then
 		return found[1]
 	elseif #found > 1 then
-		return found -- Retorna a lista se tiver mais de um
+		return found
 	end
-
+	
 	return nil
 end
 
@@ -240,8 +241,10 @@ local noclipConn = nil
 -- Speed e Jump
 local speedLoopActive = false
 local speedLoopConn = nil
+local speedLoopValue = nil
 local jumpLoopActive = false
 local jumpLoopConn = nil
+local jumpLoopValue = nil
 local infJumpActive = false
 local infJumpData = nil
 
@@ -286,43 +289,43 @@ local function toggleFly(enable)
 	local player = game.Players.LocalPlayer
 	local character = player.Character
 	if not character then return end
-
+	
 	local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
 	local humanoid = character:FindFirstChild("Humanoid")
 	if not torso or not humanoid then return end
-
+	
 	if enable and not flyActive then
 		flyActive = true
-
+		
 		local bg = Instance.new("BodyGyro", torso)
 		local bv = Instance.new("BodyVelocity", torso)
-
+		
 		bg.P = 9e4
 		bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
 		bg.CFrame = torso.CFrame
-
+		
 		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 		bv.Velocity = Vector3.new(0, 0.1, 0)
-
+		
 		humanoid.PlatformStand = true
-
+		
 		local ctrl = {f = 0, b = 0, l = 0, r = 0}
 		local spd = 50
-
+		
 		local function onKeyDown(key)
 			if key == "w" then ctrl.f = 1 end
 			if key == "s" then ctrl.b = -1 end
 			if key == "a" then ctrl.l = -1 end
 			if key == "d" then ctrl.r = 1 end
 		end
-
+		
 		local function onKeyUp(key)
 			if key == "w" then ctrl.f = 0 end
 			if key == "s" then ctrl.b = 0 end
 			if key == "a" then ctrl.l = 0 end
 			if key == "d" then ctrl.r = 0 end
 		end
-
+		
 		local connections = {}
 		connections.KeyDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.Keyboard then
@@ -330,35 +333,35 @@ local function toggleFly(enable)
 				onKeyDown(key)
 			end
 		end)
-
+		
 		connections.KeyUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.Keyboard then
 				local key = string.lower(input.KeyCode.Name)
 				onKeyUp(key)
 			end
 		end)
-
+		
 		local renderConn
 		renderConn = game:GetService("RunService").RenderStepped:Connect(function()
 			if not flyActive or not character or not character.Parent then
 				toggleFly(false)
 				return
 			end
-
+			
 			local cam = workspace.CurrentCamera
 			local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
 			if not torso then return end
-
+			
 			local bg = torso:FindFirstChild("BodyGyro")
 			local bv = torso:FindFirstChild("BodyVelocity")
-
+			
 			if bg and bv then
 				local speed = (ctrl.f + ctrl.b)
 				local strafe = (ctrl.r + ctrl.l)
 				local forward = cam.CFrame.LookVector * (speed * spd)
 				local right = cam.CFrame.RightVector * (strafe * spd)
 				local up = Vector3.new(0, 0.1, 0)
-
+				
 				if ctrl.f == 0 and ctrl.b == 0 and ctrl.l == 0 and ctrl.r == 0 then
 					bv.Velocity = Vector3.new(0, 0.1, 0)
 				else
@@ -367,7 +370,7 @@ local function toggleFly(enable)
 				bg.CFrame = cam.CFrame
 			end
 		end)
-
+		
 		flyData = {
 			bodyGyro = bg,
 			bodyVelocity = bv,
@@ -376,12 +379,12 @@ local function toggleFly(enable)
 			ctrl = ctrl,
 			spd = spd
 		}
-
+		
 		showPopup("Fly ativado")
-
+		
 	elseif not enable and flyActive then
 		flyActive = false
-
+		
 		if flyData.bodyGyro then flyData.bodyGyro:Destroy() end
 		if flyData.bodyVelocity then flyData.bodyVelocity:Destroy() end
 		if flyData.connections then
@@ -389,11 +392,11 @@ local function toggleFly(enable)
 			if flyData.connections.KeyUp then flyData.connections.KeyUp:Disconnect() end
 		end
 		if flyData.renderConn then flyData.renderConn:Disconnect() end
-
+		
 		if character and character:FindFirstChild("Humanoid") then
 			character.Humanoid.PlatformStand = false
 		end
-
+		
 		flyData = {}
 		showPopup("Fly desativado")
 	end
@@ -407,33 +410,33 @@ local function toggleNoclip(enable)
 	local player = game.Players.LocalPlayer
 	local character = player.Character
 	if not character then return end
-
+	
 	if enable and not noclipActive then
 		noclipActive = true
-
+		
 		noclipConn = game:GetService("RunService").Stepped:Connect(function()
 			if not noclipActive or not character or not character.Parent then
 				toggleNoclip(false)
 				return
 			end
-
+			
 			for _, part in ipairs(character:GetDescendants()) do
 				if part:IsA("BasePart") then
 					part.CanCollide = false
 				end
 			end
 		end)
-
+		
 		showPopup("Noclip ativado")
-
+		
 	elseif not enable and noclipActive then
 		noclipActive = false
-
+		
 		if noclipConn then
 			noclipConn:Disconnect()
 			noclipConn = nil
 		end
-
+		
 		if character then
 			for _, part in ipairs(character:GetDescendants()) do
 				if part:IsA("BasePart") then
@@ -441,7 +444,7 @@ local function toggleNoclip(enable)
 				end
 			end
 		end
-
+		
 		showPopup("Noclip desativado")
 	end
 end
@@ -455,7 +458,7 @@ local function setSpeed(value)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid then return end
-
+	
 	if value then
 		humanoid.WalkSpeed = value
 		showPopup("Velocidade: " .. value)
@@ -470,7 +473,7 @@ local function setJump(value)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid then return end
-
+	
 	if value then
 		humanoid.JumpPower = value
 		showPopup("Pulo: " .. value)
@@ -481,66 +484,102 @@ local function setJump(value)
 end
 
 -- ============================================
--- FUNÇÕES LOOP
+-- FUNÇÕES LOOP (COM REAPLICAÇÃO AO MORRER)
 -- ============================================
 
 local function toggleSpeedLoop(value)
 	local player = game.Players.LocalPlayer
-
+	
 	if speedLoopActive then
 		if speedLoopConn then
 			speedLoopConn:Disconnect()
 			speedLoopConn = nil
 		end
 		speedLoopActive = false
+		speedLoopValue = nil
 		showPopup("Loop speed desativado")
 		return
 	end
-
+	
 	if not value then
 		showPopup("Use: loopspeed [numero]")
 		return
 	end
-
+	
 	speedLoopActive = true
-	speedLoopConn = game:GetService("RunService").RenderStepped:Connect(function()
+	speedLoopValue = value
+	
+	local function applySpeedLoop()
 		local character = player.Character
 		local humanoid = character and character:FindFirstChild("Humanoid")
-		if humanoid then
-			humanoid.WalkSpeed = value
+		if humanoid and speedLoopActive then
+			humanoid.WalkSpeed = speedLoopValue
+		end
+	end
+	
+	speedLoopConn = game:GetService("RunService").RenderStepped:Connect(applySpeedLoop)
+	
+	-- Também aplica quando o personagem mudar (respawn)
+	player.CharacterAdded:Connect(function()
+		if speedLoopActive and speedLoopValue then
+			task.wait(0.1)
+			local character = player.Character
+			local humanoid = character and character:FindFirstChild("Humanoid")
+			if humanoid then
+				humanoid.WalkSpeed = speedLoopValue
+			end
 		end
 	end)
-
+	
+	applySpeedLoop()
 	showPopup("Loop speed ativado: " .. value)
 end
 
 local function toggleJumpLoop(value)
 	local player = game.Players.LocalPlayer
-
+	
 	if jumpLoopActive then
 		if jumpLoopConn then
 			jumpLoopConn:Disconnect()
 			jumpLoopConn = nil
 		end
 		jumpLoopActive = false
+		jumpLoopValue = nil
 		showPopup("Loop jump desativado")
 		return
 	end
-
+	
 	if not value then
 		showPopup("Use: loopjump [numero]")
 		return
 	end
-
+	
 	jumpLoopActive = true
-	jumpLoopConn = game:GetService("RunService").RenderStepped:Connect(function()
+	jumpLoopValue = value
+	
+	local function applyJumpLoop()
 		local character = player.Character
 		local humanoid = character and character:FindFirstChild("Humanoid")
-		if humanoid then
-			humanoid.JumpPower = value
+		if humanoid and jumpLoopActive then
+			humanoid.JumpPower = jumpLoopValue
+		end
+	end
+	
+	jumpLoopConn = game:GetService("RunService").RenderStepped:Connect(applyJumpLoop)
+	
+	-- Também aplica quando o personagem mudar (respawn)
+	player.CharacterAdded:Connect(function()
+		if jumpLoopActive and jumpLoopValue then
+			task.wait(0.1)
+			local character = player.Character
+			local humanoid = character and character:FindFirstChild("Humanoid")
+			if humanoid then
+				humanoid.JumpPower = jumpLoopValue
+			end
 		end
 	end)
-
+	
+	applyJumpLoop()
 	showPopup("Loop jump ativado: " .. value)
 end
 
@@ -553,23 +592,24 @@ local function toggleInfJump(enable)
 	local character = player.Character
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid then return end
-
+	
 	if enable and not infJumpActive then
 		infJumpActive = true
-
+		
 		local conn
 		conn = game:GetService("UserInputService").JumpRequest:Connect(function()
-			if infJumpActive and character and character.Parent then
-				local hum = character:FindFirstChild("Humanoid")
+			if infJumpActive then
+				local char = player.Character
+				local hum = char and char:FindFirstChild("Humanoid")
 				if hum then
 					hum:ChangeState(Enum.HumanoidStateType.Jumping)
 				end
 			end
 		end)
-
+		
 		infJumpData = conn
 		showPopup("Pulo infinito ativado")
-
+		
 	elseif not enable and infJumpActive then
 		infJumpActive = false
 		if infJumpData then
@@ -589,14 +629,14 @@ local function teleportTo(target)
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 	if not rootPart then return end
-
+	
 	local targetChar = target.Character
 	local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
 	if not targetRoot then
 		showPopup("Jogador sem personagem")
 		return
 	end
-
+	
 	rootPart.CFrame = targetRoot.CFrame + Vector3.new(0, 2, 0)
 	showPopup("Teleportado para " .. target.Name)
 end
@@ -606,14 +646,14 @@ local function bringPlayer(target)
 	local character = player.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 	if not rootPart then return end
-
+	
 	local targetChar = target.Character
 	local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
 	if not targetRoot then
 		showPopup("Jogador sem personagem")
 		return
 	end
-
+	
 	targetRoot.CFrame = rootPart.CFrame + Vector3.new(0, 2, 0)
 	showPopup(target.Name .. " trazido até você")
 end
@@ -621,7 +661,7 @@ end
 local function toggleView(target)
 	local player = game.Players.LocalPlayer
 	local camera = workspace.CurrentCamera
-
+	
 	if viewActive then
 		if viewConn then
 			viewConn:Disconnect()
@@ -633,36 +673,36 @@ local function toggleView(target)
 		showPopup("View desativado")
 		return
 	end
-
+	
 	if not target then
 		showPopup("Use: view [nome]")
 		return
 	end
-
+	
 	local targetChar = target.Character
 	local targetHead = targetChar and targetChar:FindFirstChild("Head")
 	if not targetHead then
 		showPopup("Jogador sem personagem")
 		return
 	end
-
+	
 	viewActive = true
 	viewTarget = target
 	camera.CameraSubject = targetHead
-
+	
 	viewConn = game:GetService("RunService").RenderStepped:Connect(function()
 		if not viewActive or not viewTarget or not viewTarget.Parent then
 			toggleView(nil)
 			return
 		end
-
+		
 		local char = viewTarget.Character
 		local head = char and char:FindFirstChild("Head")
 		if head then
 			camera.CameraSubject = head
 		end
 	end)
-
+	
 	showPopup("Observando " .. target.Name)
 end
 
@@ -674,7 +714,7 @@ local function createCommandButtons()
 	local yOffset = 5
 	local buttonHeight = 25
 	local spacing = 3
-
+	
 	for i, cmdData in ipairs(commands) do
 		local cmdButton = Instance.new("TextButton")
 		cmdButton.Parent = ScreenGui.ScrollingFrame
@@ -691,17 +731,17 @@ local function createCommandButtons()
 		cmdButton.Font = Enum.Font.SourceSans
 		cmdButton.BorderColor3 = Color3.fromRGB(185,185,185)
 		cmdButton.BorderSizePixel = 3
-
+		
 		cmdButton.MouseButton1Click:Connect(function()
 			ScreenGui.CMDBOX.Text = cmdData.cmd
 			ScreenGui.CmdsLIST.Visible = false
 			task.wait(0.1)
 			ScreenGui.CMDBOX:CaptureFocus()
 		end)
-
+		
 		yOffset = yOffset + buttonHeight + spacing
 	end
-
+	
 	ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset + 10)
 end
 
@@ -715,7 +755,7 @@ local function executeCommand(cmd, args)
 	if cmd == "cmds" then
 		ScreenGui.CmdsLIST.Visible = not ScreenGui.CmdsLIST.Visible
 		return true
-
+		
 	elseif cmd == "prefix" then
 		if #args > 0 then
 			prefix = args[1]
@@ -724,11 +764,11 @@ local function executeCommand(cmd, args)
 			showPopup("Use: prefix [novo prefixo]")
 		end
 		return true
-
+		
 	elseif cmd == "vprefix" then
 		showPopup("Prefixo atual: " .. prefix)
 		return true
-
+		
 	elseif cmd == "popup" then
 		if #args > 0 then
 			if args[1] == "true" then
@@ -743,23 +783,23 @@ local function executeCommand(cmd, args)
 			showPopup("Use: popup true ou popup false")
 		end
 		return true
-
+		
 	elseif cmd == "fly" then
 		toggleFly(true)
 		return true
-
+		
 	elseif cmd == "unfly" then
 		toggleFly(false)
 		return true
-
+		
 	elseif cmd == "noclip" then
 		toggleNoclip(true)
 		return true
-
+		
 	elseif cmd == "clip" then
 		toggleNoclip(false)
 		return true
-
+		
 	elseif cmd == "speed" then
 		if #args > 0 then
 			local value = tonumber(args[1])
@@ -772,7 +812,7 @@ local function executeCommand(cmd, args)
 			setSpeed(nil)
 		end
 		return true
-
+		
 	elseif cmd == "jump" then
 		if #args > 0 then
 			local value = tonumber(args[1])
@@ -785,7 +825,7 @@ local function executeCommand(cmd, args)
 			setJump(nil)
 		end
 		return true
-
+		
 	elseif cmd == "loopspeed" then
 		if #args > 0 then
 			local value = tonumber(args[1])
@@ -798,11 +838,11 @@ local function executeCommand(cmd, args)
 			toggleSpeedLoop(nil)
 		end
 		return true
-
+		
 	elseif cmd == "unloopspeed" then
 		toggleSpeedLoop(nil)
 		return true
-
+		
 	elseif cmd == "loopjump" then
 		if #args > 0 then
 			local value = tonumber(args[1])
@@ -815,19 +855,19 @@ local function executeCommand(cmd, args)
 			toggleJumpLoop(nil)
 		end
 		return true
-
+		
 	elseif cmd == "unloopjump" then
 		toggleJumpLoop(nil)
 		return true
-
+		
 	elseif cmd == "infjump" then
 		toggleInfJump(true)
 		return true
-
+		
 	elseif cmd == "uninfjump" then
 		toggleInfJump(false)
 		return true
-
+		
 	elseif cmd == "goto" then
 		if #args > 0 then
 			local target = findPlayer(args[1])
@@ -842,7 +882,7 @@ local function executeCommand(cmd, args)
 			showPopup("Use: goto [nome]")
 		end
 		return true
-
+		
 	elseif cmd == "bring" then
 		if #args > 0 then
 			local target = findPlayer(args[1])
@@ -857,7 +897,7 @@ local function executeCommand(cmd, args)
 			showPopup("Use: bring [nome]")
 		end
 		return true
-
+		
 	elseif cmd == "view" then
 		if #args > 0 then
 			local target = findPlayer(args[1])
@@ -872,12 +912,12 @@ local function executeCommand(cmd, args)
 			showPopup("Use: view [nome]")
 		end
 		return true
-
+		
 	elseif cmd == "unview" then
 		toggleView(nil)
 		return true
 	end
-
+	
 	return false
 end
 
@@ -892,17 +932,17 @@ ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 		for part in string.gmatch(fullCommand, "%S+") do
 			table.insert(parts, part)
 		end
-
+		
 		local cmd = parts[1] or ""
 		local args = {}
 		for i = 2, #parts do
 			table.insert(args, parts[i])
 		end
-
+		
 		if string.sub(cmd, 1, 1) == prefix then
 			cmd = string.sub(cmd, 2)
 		end
-
+		
 		executeCommand(cmd, args)
 		ScreenGui.CMDBOX.Text = ""
 	end
@@ -917,13 +957,13 @@ game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 	for part in string.gmatch(message, "%S+") do
 		table.insert(parts, part)
 	end
-
+	
 	local cmd = parts[1] or ""
 	local args = {}
 	for i = 2, #parts do
 		table.insert(args, parts[i])
 	end
-
+	
 	if string.sub(cmd, 1, 1) == prefix then
 		cmd = string.sub(cmd, 2)
 		executeCommand(cmd, args)
@@ -950,7 +990,7 @@ ScreenGui.Dragbar.InputBegan:Connect(function(input)
 		dragging = true
 		dragStart = input.Position
 		startPos = ScreenGui.CmdsLIST.Position
-
+		
 		input.Changed:Connect(function()
 			if input.UserInputState == Enum.UserInputState.End then
 				dragging = false
@@ -982,12 +1022,6 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 	if noclipActive then
 		toggleNoclip(false)
-	end
-	if speedLoopActive then
-		toggleSpeedLoop(nil)
-	end
-	if jumpLoopActive then
-		toggleJumpLoop(nil)
 	end
 	if infJumpActive then
 		toggleInfJump(false)
