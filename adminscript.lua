@@ -1,12 +1,8 @@
 -- FRVGMXNT GUI2LUA CONVERTER 1.2. Like pls!
 
--- ============================================
--- CONFIGURAÇÕES
--- ============================================
-
 local Config = {
-	Prefix = "/", -- Prefixo dos comandos
-	Popups = true, -- true = mostra popups, false = não mostra
+	Prefix = "/",
+	Popups = true,
 }
 
 local ScreenGui = {
@@ -34,10 +30,6 @@ ScreenGui.ScrollingFrame.Parent = ScreenGui.CmdsLIST
 ScreenGui.ScreenGui.Name = "ScreenGui"
 ScreenGui.ScreenGui.IgnoreGuiInset = false
 ScreenGui.ScreenGui.DisplayOrder = 0
-
--- ============================================
--- CMDBOX - CANTO INFERIOR DIREITO
--- ============================================
 
 ScreenGui.ComandtxtFrame.Name = "ComandtxtFrame"
 ScreenGui.ComandtxtFrame.ZIndex = 1
@@ -75,10 +67,6 @@ ScreenGui.CMDBOX.ClipsDescendants = false
 ScreenGui.CMDBOX.PlaceholderText = "digite 'cmds' para ver os comandos"
 ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CMDBOX.BorderSizePixel = 3
-
--- ============================================
--- LISTA DE COMANDOS
--- ============================================
 
 ScreenGui.CmdsLIST.Name = "CmdsLIST"
 ScreenGui.CmdsLIST.ZIndex = 1
@@ -164,10 +152,6 @@ ScreenGui.ScrollingFrame.ScrollingEnabled = true
 ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
--- ============================================
--- POPUP NOTIFICATION
--- ============================================
-
 local function showPopup(text)
 	if not Config.Popups then return end
 	
@@ -200,10 +184,6 @@ local function showPopup(text)
 	end)
 end
 
--- ============================================
--- FUNÇÃO PARA ENCONTRAR JOGADOR
--- ============================================
-
 local function findPlayer(name)
 	local found = {}
 	local lowerName = string.lower(name)
@@ -230,17 +210,11 @@ local function findPlayer(name)
 	return nil
 end
 
--- ============================================
--- CONFIG
--- ============================================
-
 local prefix = Config.Prefix
 local flyActive = false
 local flyData = {}
 local noclipActive = false
 local noclipConn = nil
-
--- Speed e Jump
 local speedLoopActive = false
 local speedLoopConn = nil
 local speedLoopValue = nil
@@ -249,19 +223,12 @@ local jumpLoopConn = nil
 local jumpLoopValue = nil
 local infJumpActive = false
 local infJumpData = nil
-
--- View
 local viewActive = false
 local viewConn = nil
 local viewTarget = nil
-
--- TP Tool
 local tpToolActive = false
 local tpTool = nil
-
--- ============================================
--- LISTA DE COMANDOS
--- ============================================
+local tpToolConn = nil
 
 local commands = {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
@@ -281,62 +248,76 @@ local commands = {
 	{cmd = "unloopjump", desc = "Desativa loop do pulo"},
 	{cmd = "infjump", desc = "Ativa pulo infinito"},
 	{cmd = "uninfjump", desc = "Desativa pulo infinito"},
-	{cmd = "goto [nome]", desc = "Teleporta até o jogador"},
-	{cmd = "bring [nome]", desc = "Puxa o jogador até você"},
+	{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
+	{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
 	{cmd = "view [nome]", desc = "Observa o jogador"},
 	{cmd = "unview", desc = "Para de observar"},
-	{cmd = "tptool", desc = "Dá uma tool de teleporte"},
+	{cmd = "tptool", desc = "Da uma tool de teleporte"},
 	{cmd = "untptool", desc = "Remove a tool de teleporte"},
 }
-
--- ============================================
--- FUNÇÃO TP TOOL (SEM POPUPS)
--- ============================================
 
 local function toggleTPTool(enable)
 	local player = game.Players.LocalPlayer
 	local backpack = player:FindFirstChild("Backpack")
 	
 	if enable and not tpToolActive then
-		-- Remove tool antiga se existir
 		if tpTool then
 			tpTool:Destroy()
 			tpTool = nil
 		end
+		if tpToolConn then
+			tpToolConn:Disconnect()
+			tpToolConn = nil
+		end
 		
-		-- Criar a tool
 		local tool = Instance.new("Tool")
 		tool.Name = "TP Tool"
 		tool.RequiresHandle = false
 		tool.CanBeDropped = false
 		tool.ToolTip = "Clique em algum lugar para teleportar"
 		tool.Parent = backpack
-		
-		-- Tool invisível (sem handle)
-		tool.Handle = nil
-		
-		-- Não levanta o braço
 		tool.Grip = CFrame.new(0, 0, 0)
 		
-		-- Função de clique (SEM POPUP)
-		local function onActivated()
-			local mouse = player:GetMouse()
+		local mouse = player:GetMouse()
+		local currentConn = nil
+		
+		local function onMouseClick()
+			local character = player.Character
+			local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+			if not rootPart then return end
+			
 			local target = mouse.Target
 			local hit = mouse.Hit
 			
 			if target and hit then
 				local position = hit.Position
-				local character = player.Character
-				local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-				
-				if rootPart then
-					rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
-				end
+				rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
 			end
 		end
 		
-		tool.Activated:Connect(onActivated)
+		-- Quando equipar, ativa o clique
+		tool.Equipped:Connect(function()
+			if currentConn then
+				currentConn:Disconnect()
+				currentConn = nil
+			end
+			currentConn = mouse.Button1Down:Connect(onMouseClick)
+		end)
 		
+		-- Quando desequipar, remove a conexão
+		tool.Unequipped:Connect(function()
+			if currentConn then
+				currentConn:Disconnect()
+				currentConn = nil
+			end
+		end)
+		
+		-- Se já estiver equipado, ativa
+		if player.Character and player.Character:FindFirstChild(tool.Name) then
+			currentConn = mouse.Button1Down:Connect(onMouseClick)
+		end
+		
+		tpToolConn = currentConn
 		tpTool = tool
 		tpToolActive = true
 		
@@ -345,13 +326,13 @@ local function toggleTPTool(enable)
 			tpTool:Destroy()
 			tpTool = nil
 		end
+		if tpToolConn then
+			tpToolConn:Disconnect()
+			tpToolConn = nil
+		end
 		tpToolActive = false
 	end
 end
-
--- ============================================
--- FUNÇÃO FLY
--- ============================================
 
 local function toggleFly(enable)
 	local player = game.Players.LocalPlayer
@@ -470,10 +451,6 @@ local function toggleFly(enable)
 	end
 end
 
--- ============================================
--- FUNÇÃO NOCLIP
--- ============================================
-
 local function toggleNoclip(enable)
 	local player = game.Players.LocalPlayer
 	local character = player.Character
@@ -517,10 +494,6 @@ local function toggleNoclip(enable)
 	end
 end
 
--- ============================================
--- FUNÇÕES SPEED E JUMP
--- ============================================
-
 local function setSpeed(value)
 	local player = game.Players.LocalPlayer
 	local character = player.Character
@@ -550,10 +523,6 @@ local function setJump(value)
 		showPopup("Pulo normal")
 	end
 end
-
--- ============================================
--- FUNÇÕES LOOP
--- ============================================
 
 local function toggleSpeedLoop(value)
 	local player = game.Players.LocalPlayer
@@ -649,10 +618,6 @@ local function toggleJumpLoop(value)
 	showPopup("Loop jump ativado: " .. value)
 end
 
--- ============================================
--- FUNÇÃO INFJUMP
--- ============================================
-
 local function toggleInfJump(enable)
 	local player = game.Players.LocalPlayer
 	local character = player.Character
@@ -686,10 +651,6 @@ local function toggleInfJump(enable)
 	end
 end
 
--- ============================================
--- FUNÇÕES GOTO, BRING E VIEW
--- ============================================
-
 local function teleportTo(target)
 	local player = game.Players.LocalPlayer
 	local character = player.Character
@@ -721,7 +682,7 @@ local function bringPlayer(target)
 	end
 	
 	targetRoot.CFrame = rootPart.CFrame + Vector3.new(0, 2, 0)
-	showPopup(target.Name .. " trazido até você")
+	showPopup(target.Name .. " trazido ate voce")
 end
 
 local function toggleView(target)
@@ -772,10 +733,6 @@ local function toggleView(target)
 	showPopup("Observando " .. target.Name)
 end
 
--- ============================================
--- CRIAR BOTÕES
--- ============================================
-
 local function createCommandButtons()
 	local yOffset = 5
 	local buttonHeight = 25
@@ -812,10 +769,6 @@ local function createCommandButtons()
 end
 
 createCommandButtons()
-
--- ============================================
--- FUNÇÃO DOS COMANDOS
--- ============================================
 
 local function executeCommand(cmd, args)
 	if cmd == "cmds" then
@@ -938,11 +891,11 @@ local function executeCommand(cmd, args)
 		if #args > 0 then
 			local target = findPlayer(args[1])
 			if type(target) == "table" then
-				showPopup("Vários jogadores encontrados: " .. table.concat(target, ", "))
+				showPopup("Varios jogadores encontrados: " .. table.concat(target, ", "))
 			elseif target then
 				teleportTo(target)
 			else
-				showPopup("Jogador não encontrado")
+				showPopup("Jogador nao encontrado")
 			end
 		else
 			showPopup("Use: goto [nome]")
@@ -953,11 +906,11 @@ local function executeCommand(cmd, args)
 		if #args > 0 then
 			local target = findPlayer(args[1])
 			if type(target) == "table" then
-				showPopup("Vários jogadores encontrados: " .. table.concat(target, ", "))
+				showPopup("Varios jogadores encontrados: " .. table.concat(target, ", "))
 			elseif target then
 				bringPlayer(target)
 			else
-				showPopup("Jogador não encontrado")
+				showPopup("Jogador nao encontrado")
 			end
 		else
 			showPopup("Use: bring [nome]")
@@ -968,11 +921,11 @@ local function executeCommand(cmd, args)
 		if #args > 0 then
 			local target = findPlayer(args[1])
 			if type(target) == "table" then
-				showPopup("Vários jogadores encontrados: " .. table.concat(target, ", "))
+				showPopup("Varios jogadores encontrados: " .. table.concat(target, ", "))
 			elseif target then
 				toggleView(target)
 			else
-				showPopup("Jogador não encontrado")
+				showPopup("Jogador nao encontrado")
 			end
 		else
 			showPopup("Use: view [nome]")
@@ -995,10 +948,6 @@ local function executeCommand(cmd, args)
 	return false
 end
 
--- ============================================
--- PROCESSAR COMANDO VIA CMDBOX
--- ============================================
-
 ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 	if enterPressed and ScreenGui.CMDBOX.Text ~= "" then
 		local fullCommand = ScreenGui.CMDBOX.Text
@@ -1018,13 +967,9 @@ ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 		end
 		
 		executeCommand(cmd, args)
-		ScreenGui.CMDBOX.Text = "" -- APAGA INSTANTANEAMENTE
+		ScreenGui.CMDBOX.Text = ""
 	end
 end)
-
--- ============================================
--- PROCESSAR COMANDO VIA CHAT
--- ============================================
 
 game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 	local parts = {}
@@ -1044,17 +989,9 @@ game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 	end
 end)
 
--- ============================================
--- FECHAR GUI
--- ============================================
-
 ScreenGui.CloseButton.MouseButton1Click:Connect(function()
 	ScreenGui.CmdsLIST.Visible = false
 end)
-
--- ============================================
--- DRAG
--- ============================================
 
 local dragging = false
 local dragInput, dragStart, startPos
@@ -1086,10 +1023,6 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 	end
 end)
 
--- ============================================
--- LIMPAR FLY E NOCLIP QUANDO RESPAWNA
--- ============================================
-
 game.Players.LocalPlayer.CharacterAdded:Connect(function()
 	if flyActive then
 		toggleFly(false)
@@ -1102,5 +1035,8 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 	if viewActive then
 		toggleView(nil)
+	end
+	if tpToolActive then
+		toggleTPTool(false)
 	end
 end)
