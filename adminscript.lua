@@ -21,7 +21,7 @@ local ScreenGui = {
 }
 
 ScreenGui.ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ScreenGui.ResetOnSpawn = false -- NÃO RESETAR AO MORRER
+ScreenGui.ScreenGui.ResetOnSpawn = false
 
 ScreenGui.ComandtxtFrame.Parent = ScreenGui.ScreenGui
 ScreenGui.CMDBOX.Parent = ScreenGui.ComandtxtFrame
@@ -253,6 +253,10 @@ local viewActive = false
 local viewConn = nil
 local viewTarget = nil
 
+-- TP Tool
+local tpToolActive = false
+local tpTool = nil
+
 -- ============================================
 -- LISTA DE COMANDOS
 -- ============================================
@@ -279,7 +283,74 @@ local commands = {
 	{cmd = "bring [nome]", desc = "Puxa o jogador até você"},
 	{cmd = "view [nome]", desc = "Observa o jogador"},
 	{cmd = "unview", desc = "Para de observar"},
+	{cmd = "tptool", desc = "Dá uma tool de teleporte"},
+	{cmd = "untptool", desc = "Remove a tool de teleporte"},
 }
+
+-- ============================================
+-- FUNÇÃO TP TOOL (SEM POPUPS)
+-- ============================================
+
+local function toggleTPTool(enable)
+	local player = game.Players.LocalPlayer
+	local backpack = player:FindFirstChild("Backpack")
+	local character = player.Character
+	
+	if enable and not tpToolActive then
+		-- Remove tool antiga se existir
+		if tpTool then
+			tpTool:Destroy()
+			tpTool = nil
+		end
+		
+		-- Criar a tool
+		local tool = Instance.new("Tool")
+		tool.Name = "TP Tool"
+		tool.RequiresHandle = false
+		tool.CanBeDropped = false
+		tool.ToolTip = "Clique em algum lugar para teleportar"
+		
+		-- Tool invisível (sem handle)
+		tool.Handle = nil
+		
+		-- Não levanta o braço
+		tool.Grip = CFrame.new(0, 0, 0)
+		
+		-- Função de clique (SEM POPUP)
+		function tool.Activated()
+			local mouse = player:GetMouse()
+			local target = mouse.Target
+			local hit = mouse.Hit
+			
+			if target and hit then
+				local position = hit.Position
+				local character = player.Character
+				local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+				
+				if rootPart then
+					rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
+					-- SEM POPUP
+				end
+			end
+		end
+		
+		tpTool = tool
+		tpToolActive = true
+		
+		-- Colocar no inventário
+		tool.Parent = backpack
+		
+		-- SEM POPUP
+		
+	elseif not enable and tpToolActive then
+		if tpTool then
+			tpTool:Destroy()
+			tpTool = nil
+		end
+		tpToolActive = false
+		-- SEM POPUP
+	end
+end
 
 -- ============================================
 -- FUNÇÃO FLY
@@ -484,7 +555,7 @@ local function setJump(value)
 end
 
 -- ============================================
--- FUNÇÕES LOOP (COM REAPLICAÇÃO AO MORRER)
+-- FUNÇÕES LOOP
 -- ============================================
 
 local function toggleSpeedLoop(value)
@@ -519,7 +590,6 @@ local function toggleSpeedLoop(value)
 	
 	speedLoopConn = game:GetService("RunService").RenderStepped:Connect(applySpeedLoop)
 	
-	-- Também aplica quando o personagem mudar (respawn)
 	player.CharacterAdded:Connect(function()
 		if speedLoopActive and speedLoopValue then
 			task.wait(0.1)
@@ -567,7 +637,6 @@ local function toggleJumpLoop(value)
 	
 	jumpLoopConn = game:GetService("RunService").RenderStepped:Connect(applyJumpLoop)
 	
-	-- Também aplica quando o personagem mudar (respawn)
 	player.CharacterAdded:Connect(function()
 		if jumpLoopActive and jumpLoopValue then
 			task.wait(0.1)
@@ -915,6 +984,14 @@ local function executeCommand(cmd, args)
 		
 	elseif cmd == "unview" then
 		toggleView(nil)
+		return true
+		
+	elseif cmd == "tptool" then
+		toggleTPTool(true)
+		return true
+		
+	elseif cmd == "untptool" then
+		toggleTPTool(false)
 		return true
 	end
 	
