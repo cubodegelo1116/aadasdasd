@@ -254,12 +254,13 @@ task.spawn(function()
 end)
 
 -- ============================================
--- CmdsLIST
+-- CmdsLIST (COM ANIMAÇÃO CORRIGIDA)
 -- ============================================
 
 local CMDSLIST_ORIGINAL_POS = UDim2.new(0.311619729, 0, 0.246329531, 0)
 local CMDSLIST_ORIGINAL_SIZE = UDim2.new(0, 382, 0, 299)
 local isAnimating = false
+local savedPosition = CMDSLIST_ORIGINAL_POS
 
 ScreenGui.CmdsLIST.Name = "CmdsLIST"
 ScreenGui.CmdsLIST.ZIndex = 1
@@ -278,34 +279,35 @@ local function animateCmdsList(show)
 	isAnimating = true
 	
 	local list = ScreenGui.CmdsLIST
+	local currentPos = list.Position
 	
 	if show then
 		list.Visible = true
 		list.BackgroundTransparency = 1
 		list.Size = UDim2.new(0, 0, 0, 0)
-		list.Position = UDim2.new(CMDSLIST_ORIGINAL_POS.X.Scale, CMDSLIST_ORIGINAL_POS.X.Offset, CMDSLIST_ORIGINAL_POS.Y.Scale + 0.15, CMDSLIST_ORIGINAL_POS.Y.Offset)
+		list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + 0.15, currentPos.Y.Offset)
 		
 		for i = 1, 20 do
 			list.BackgroundTransparency = 1 - (i / 20)
 			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (i / 20))
-			list.Position = UDim2.new(CMDSLIST_ORIGINAL_POS.X.Scale, CMDSLIST_ORIGINAL_POS.X.Offset, CMDSLIST_ORIGINAL_POS.Y.Scale + (0.15 * (1 - i / 20)), CMDSLIST_ORIGINAL_POS.Y.Offset)
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (1 - i / 20)), currentPos.Y.Offset)
 			task.wait(0.015)
 		end
 		
 		list.BackgroundTransparency = 0
 		list.Size = CMDSLIST_ORIGINAL_SIZE
-		list.Position = CMDSLIST_ORIGINAL_POS
+		list.Position = currentPos
 	else
 		for i = 1, 15 do
 			list.BackgroundTransparency = i / 15
 			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - i / 15), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (1 - i / 15))
-			list.Position = UDim2.new(CMDSLIST_ORIGINAL_POS.X.Scale, CMDSLIST_ORIGINAL_POS.X.Offset, CMDSLIST_ORIGINAL_POS.Y.Scale + (0.15 * (i / 15)), CMDSLIST_ORIGINAL_POS.Y.Offset)
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (i / 15)), currentPos.Y.Offset)
 			task.wait(0.015)
 		end
 		list.Visible = false
 		list.BackgroundTransparency = 0
 		list.Size = CMDSLIST_ORIGINAL_SIZE
-		list.Position = CMDSLIST_ORIGINAL_POS
+		list.Position = currentPos
 	end
 	
 	isAnimating = false
@@ -486,19 +488,16 @@ local espActive = false
 local espConnections = {}
 local espHighlight = {}
 
--- Walkfling (NOVO)
 local walkflingActive = false
 local walkflingLoop = nil
 local walkflingDiedConn = nil
 
--- Float
 local floatActive = false
 local floatName = ""
 local floatPart = nil
 local floatValue = -3.1
 local floatConnections = {}
 
--- Sit
 local sitActive = false
 
 -- ============================================
@@ -627,7 +626,7 @@ local function toggleNoclip(enable, noNotify)
 end
 
 -- ============================================
--- WALKFLING (NOVO)
+-- WALKFLING
 -- ============================================
 
 local function toggleWalkfling(enable)
@@ -636,24 +635,20 @@ local function toggleWalkfling(enable)
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	
 	if enable and not walkflingActive then
-		-- Primeiro desativa walkfling se estiver ativo
 		if walkflingActive then
 			toggleWalkfling(false)
 		end
 		
 		walkflingActive = true
 		
-		-- Ativa noclip sem notificação
 		toggleNoclip(true, true)
 		
-		-- Conexão de morte
 		if humanoid then
 			walkflingDiedConn = humanoid.Died:Connect(function()
 				toggleWalkfling(false)
 			end)
 		end
 		
-		-- Loop principal
 		walkflingLoop = game:GetService("RunService").Heartbeat:Connect(function()
 			local character = plr.Character
 			local root = getRoot(character)
@@ -695,7 +690,6 @@ local function toggleWalkfling(enable)
 			walkflingDiedConn = nil
 		end
 		
-		-- Desativa noclip sem notificação
 		toggleNoclip(false, true)
 		
 		showPopup("Walkfling desativado")
@@ -782,7 +776,8 @@ local function toggleFloat(enable)
 						if key == "e" then
 							floatValue = floatValue + 1.5
 						end
-					end				end)
+					end
+				end)
 				
 				if humanoid then
 					floatConnections.floatDied = humanoid.Died:Connect(function()
@@ -1839,7 +1834,7 @@ ScreenGui.CloseButton.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- DRAG DA CMDLIST
+-- DRAG DA CMDLIST (COM SALVAMENTO DE POSIÇÃO)
 -- ============================================
 
 local dragging = false
@@ -1868,7 +1863,9 @@ end)
 game:GetService("UserInputService").InputChanged:Connect(function(input)
 	if input == dragInput and dragging then
 		local delta = input.Position - dragStart
-		ScreenGui.CmdsLIST.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		ScreenGui.CmdsLIST.Position = newPos
+		savedPosition = newPos
 	end
 end)
 
