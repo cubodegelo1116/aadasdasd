@@ -90,30 +90,137 @@ ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CMDBOX.BorderSizePixel = 3
 
 -- ============================================
--- AUTOCOMPLETE (EM CIMA DA CMDBOX)
+-- AUTOCOMPLETE
 -- ============================================
 
 local autocompleteFrame = Instance.new("Frame")
 autocompleteFrame.Name = "AutocompleteFrame"
 autocompleteFrame.Parent = ScreenGui.ScreenGui
 autocompleteFrame.Size = UDim2.new(0, 218, 0, 0)
-autocompleteFrame.Position = UDim2.new(1, -230, 1, -68) -- EM CIMA da CMDBOX
+autocompleteFrame.Position = UDim2.new(1, -230, 1, -65)
 autocompleteFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
 autocompleteFrame.BackgroundTransparency = 0
 autocompleteFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 autocompleteFrame.BorderSizePixel = 3
 autocompleteFrame.Visible = false
-autocompleteFrame.ZIndex = 2
+autocompleteFrame.ZIndex = 10
 autocompleteFrame.ClipsDescendants = true
 
 local autocompleteList = Instance.new("ScrollingFrame")
 autocompleteList.Name = "AutocompleteList"
 autocompleteList.Parent = autocompleteFrame
 autocompleteList.Size = UDim2.new(1, 0, 1, 0)
-autocompleteList.BackgroundTransparency = 1
+autocompleteList.BackgroundColor3 = Color3.fromRGB(227,227,227)
+autocompleteList.BackgroundTransparency = 0
 autocompleteList.BorderSizePixel = 0
 autocompleteList.ScrollBarThickness = 4
 autocompleteList.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+-- ============================================
+-- EXECUTOR
+-- ============================================
+
+local executorFrame = Instance.new("Frame")
+executorFrame.Name = "ExecutorFrame"
+executorFrame.Parent = ScreenGui.ScreenGui
+executorFrame.Size = UDim2.new(0, 400, 0, 250)
+executorFrame.Position = UDim2.new(0.5, -200, 0.3, 0)
+executorFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
+executorFrame.BackgroundTransparency = 0
+executorFrame.BorderColor3 = Color3.fromRGB(185,185,185)
+executorFrame.BorderSizePixel = 3
+executorFrame.Visible = false
+executorFrame.ZIndex = 10
+executorFrame.ClipsDescendants = false
+
+local executorDragbar = Instance.new("Frame")
+executorDragbar.Name = "ExecutorDragbar"
+executorDragbar.Parent = executorFrame
+executorDragbar.Size = UDim2.new(1, 0, 0, 29)
+executorDragbar.Position = UDim2.new(0, 0, 0, 0)
+executorDragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
+executorDragbar.BackgroundTransparency = 0
+executorDragbar.BorderColor3 = Color3.fromRGB(185,185,185)
+executorDragbar.BorderSizePixel = 3
+executorDragbar.ZIndex = 11
+
+local executorTitle = Instance.new("TextLabel")
+executorTitle.Name = "ExecutorTitle"
+executorTitle.Parent = executorDragbar
+executorTitle.Size = UDim2.new(1, -40, 1, 0)
+executorTitle.Position = UDim2.new(0, 10, 0, 0)
+executorTitle.BackgroundTransparency = 1
+executorTitle.Text = "RXT EXECUTOR"
+executorTitle.TextColor3 = Color3.fromRGB(0,0,0)
+executorTitle.TextSize = 18
+executorTitle.Font = Enum.Font.SourceSansBold
+executorTitle.TextXAlignment = Enum.TextXAlignment.Left
+executorTitle.TextYAlignment = Enum.TextYAlignment.Center
+executorTitle.ZIndex = 11
+
+local executorClose = Instance.new("TextButton")
+executorClose.Name = "ExecutorClose"
+executorClose.Parent = executorDragbar
+executorClose.Size = UDim2.new(0, 30, 0, 30)
+executorClose.Position = UDim2.new(1, -30, 0, 0)
+executorClose.BackgroundColor3 = Color3.fromRGB(177,0,0)
+executorClose.BackgroundTransparency = 0
+executorClose.BorderSizePixel = 0
+executorClose.Text = ""
+executorClose.TextColor3 = Color3.fromRGB(255,255,255)
+executorClose.TextSize = 18
+executorClose.Font = Enum.Font.SourceSansBold
+executorClose.ZIndex = 11
+
+local executorTextBox = Instance.new("TextBox")
+executorTextBox.Name = "ExecutorTextBox"
+executorTextBox.Parent = executorFrame
+executorTextBox.Size = UDim2.new(0.95, 0, 0.65, 0)
+executorTextBox.Position = UDim2.new(0.025, 0, 0.12, 0)
+executorTextBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
+executorTextBox.BackgroundTransparency = 0
+executorTextBox.BorderColor3 = Color3.fromRGB(185,185,185)
+executorTextBox.BorderSizePixel = 3
+executorTextBox.Text = ""
+executorTextBox.TextColor3 = Color3.fromRGB(0,0,0)
+executorTextBox.TextSize = 14
+executorTextBox.Font = Enum.Font.SourceSans
+executorTextBox.TextXAlignment = Enum.TextXAlignment.Left
+executorTextBox.TextYAlignment = Enum.TextYAlignment.Top
+executorTextBox.ClearTextOnFocus = false
+executorTextBox.MultiLine = true
+executorTextBox.PlaceholderText = "Digite o script aqui..."
+executorTextBox.ZIndex = 11
+
+local executorExecute = Instance.new("TextButton")
+executorExecute.Name = "ExecutorExecute"
+executorExecute.Parent = executorFrame
+executorExecute.Size = UDim2.new(0.45, -5, 0, 30)
+executorExecute.Position = UDim2.new(0.025, 0, 0.82, 0)
+executorExecute.BackgroundColor3 = Color3.fromRGB(227,227,227)
+executorExecute.BackgroundTransparency = 0
+executorExecute.BorderColor3 = Color3.fromRGB(185,185,185)
+executorExecute.BorderSizePixel = 3
+executorExecute.Text = "EXECUTAR"
+executorExecute.TextColor3 = Color3.fromRGB(0,0,0)
+executorExecute.TextSize = 14
+executorExecute.Font = Enum.Font.SourceSansBold
+executorExecute.ZIndex = 11
+
+local executorClear = Instance.new("TextButton")
+executorClear.Name = "ExecutorClear"
+executorClear.Parent = executorFrame
+executorClear.Size = UDim2.new(0.45, -5, 0, 30)
+executorClear.Position = UDim2.new(0.525, 0, 0.82, 0)
+executorClear.BackgroundColor3 = Color3.fromRGB(227,227,227)
+executorClear.BackgroundTransparency = 0
+executorClear.BorderColor3 = Color3.fromRGB(185,185,185)
+executorClear.BorderSizePixel = 3
+executorClear.Text = "LIMPAR"
+executorClear.TextColor3 = Color3.fromRGB(0,0,0)
+executorClear.TextSize = 14
+executorClear.Font = Enum.Font.SourceSansBold
+executorClear.ZIndex = 11
 
 -- ============================================
 -- ANIMAÇÃO DA CMDBOX
@@ -189,12 +296,10 @@ local function animateCmdsList(show)
 		list.Size = CMDSLIST_ORIGINAL_SIZE
 		list.Position = CMDSLIST_ORIGINAL_POS
 	else
-		local currentPos = list.Position
-		
 		for i = 1, 15 do
 			list.BackgroundTransparency = i / 15
 			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - i / 15), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (1 - i / 15))
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (i / 15)), currentPos.Y.Offset)
+			list.Position = UDim2.new(CMDSLIST_ORIGINAL_POS.X.Scale, CMDSLIST_ORIGINAL_POS.X.Offset, CMDSLIST_ORIGINAL_POS.Y.Scale + (0.15 * (i / 15)), CMDSLIST_ORIGINAL_POS.Y.Offset)
 			task.wait(0.015)
 		end
 		list.Visible = false
@@ -281,7 +386,7 @@ ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 -- ============================================
--- RESTO DO SCRIPT
+-- FUNÇÕES AUXILIARES
 -- ============================================
 
 local function showPopup(text)
@@ -336,15 +441,30 @@ local function findPlayer(name)
 	if #found == 1 then
 		return found[1]
 	elseif #found > 1 then
-		return found
+		local names = {}
+		for _, p in ipairs(found) do
+			table.insert(names, p.Name)
+		end
+		showPopup("Varios jogadores encontrados: " .. table.concat(names, ", "))
+		return nil
 	end
 	
 	return nil
 end
 
+local function getRoot(character)
+	if not character then return nil end
+	return character:FindFirstChild("HumanoidRootPart")
+end
+
+-- ============================================
+-- VARIÁVEIS GLOBAIS
+-- ============================================
+
 local prefix = Config.Prefix
 local flyActive = false
 local flyData = {}
+local flySpeed = 50
 local noclipActive = false
 local noclipConn = nil
 local speedLoopActive = false
@@ -366,11 +486,24 @@ local espActive = false
 local espConnections = {}
 local espHighlight = {}
 
--- WALKFLING
+-- Walkfling (NOVO)
 local walkflingActive = false
-local walkflingGodConn = nil
-local walkflingLoopConn = nil
-local walkflingCharacterAddedConn = nil
+local walkflingLoop = nil
+local walkflingDiedConn = nil
+
+-- Float
+local floatActive = false
+local floatName = ""
+local floatPart = nil
+local floatValue = -3.1
+local floatConnections = {}
+
+-- Sit
+local sitActive = false
+
+-- ============================================
+-- COMANDOS
+-- ============================================
 
 local commands = {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
@@ -378,7 +511,7 @@ local commands = {
 	{cmd = "vprefix", desc = "Mostra o prefixo atual"},
 	{cmd = "popup true", desc = "Ativa os popups"},
 	{cmd = "popup false", desc = "Desativa os popups"},
-	{cmd = "fly", desc = "Ativa o modo voo"},
+	{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
 	{cmd = "unfly", desc = "Desativa o modo voo"},
 	{cmd = "noclip", desc = "Ativa o noclip"},
 	{cmd = "clip", desc = "Desativa o noclip"},
@@ -400,77 +533,150 @@ local commands = {
 	{cmd = "unesp", desc = "Desativa o ESP"},
 	{cmd = "walkfling", desc = "Ativa walkfling"},
 	{cmd = "unwalkfling", desc = "Desativa walkfling"},
+	{cmd = "executor", desc = "Abre o executor de scripts"},
+	{cmd = "rejoin", desc = "Reentra no servidor"},
+	{cmd = "reset", desc = "Respawna o personagem"},
+	{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
+	{cmd = "unfloat", desc = "Desativa o float"},
+	{cmd = "sit", desc = "Senta o personagem"},
 }
 
 -- ============================================
--- FUNÇÃO WALKFLING (CORRIGIDA)
+-- FUNÇÕES DOS COMANDOS
+-- ============================================
+
+local function toggleExecutor(enable)
+	executorFrame.Visible = enable
+	if enable then
+		task.wait(0.1)
+		executorTextBox:CaptureFocus()
+	end
+end
+
+local function rejoinServer()
+	game:GetService("TeleportService"):Teleport(game.PlaceId, player)
+end
+
+local function resetCharacter()
+	local char = player.Character
+	if char then
+		char:BreakJoints()
+		showPopup("Resetado!")
+	end
+end
+
+local function toggleSit()
+	local char = player.Character
+	local humanoid = char and char:FindFirstChild("Humanoid")
+	if not humanoid then return end
+	
+	sitActive = not sitActive
+	humanoid.Sit = sitActive
+	showPopup(sitActive and "Sentado" or "Levantado")
+end
+
+-- ============================================
+-- NOCLIP (COM NONOTIFY)
+-- ============================================
+
+local function toggleNoclip(enable, noNotify)
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
+	if not character then return end
+	
+	if enable and not noclipActive then
+		noclipActive = true
+		
+		noclipConn = game:GetService("RunService").Stepped:Connect(function()
+			if not noclipActive or not character or not character.Parent then
+				toggleNoclip(false, true)
+				return
+			end
+			
+			for _, part in ipairs(character:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = false
+				end
+			end
+		end)
+		
+		if not noNotify then
+			showPopup("Noclip ativado")
+		end
+		
+	elseif not enable and noclipActive then
+		noclipActive = false
+		
+		if noclipConn then
+			noclipConn:Disconnect()
+			noclipConn = nil
+		end
+		
+		if character then
+			for _, part in ipairs(character:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = true
+				end
+			end
+		end
+		
+		if not noNotify then
+			showPopup("Noclip desativado")
+		end
+	end
+end
+
+-- ============================================
+-- WALKFLING (NOVO)
 -- ============================================
 
 local function toggleWalkfling(enable)
 	local plr = game.Players.LocalPlayer
+	local character = plr.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	
 	if enable and not walkflingActive then
+		-- Primeiro desativa walkfling se estiver ativo
+		if walkflingActive then
+			toggleWalkfling(false)
+		end
+		
 		walkflingActive = true
 		
-		local function startWalkfling(character)
-			if not character then return end
-			
-			local rootPart = character:FindFirstChild("HumanoidRootPart")
-			local humanoid = character:FindFirstChild("Humanoid")
-			if not rootPart or not humanoid then return end
-			
-			-- God mode
-			humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-			humanoid.BreakJointsOnDeath = false
-			
-			if walkflingGodConn then
-				walkflingGodConn:Disconnect()
-				walkflingGodConn = nil
-			end
-			
-			walkflingGodConn = game:GetService("RunService").Stepped:Connect(function()
-				if walkflingActive and humanoid and humanoid.Parent then
-					humanoid.Health = math.huge
-					humanoid.MaxHealth = math.huge
-				end
-			end)
-			
-			rootPart.CanCollide = false
-			
-			if walkflingLoopConn then
-				walkflingLoopConn:Disconnect()
-				walkflingLoopConn = nil
-			end
-			
-			walkflingLoopConn = game:GetService("RunService").Heartbeat:Connect(function()
-				if not walkflingActive or not rootPart or not rootPart.Parent then
-					return
-				end
-				
-				local v = rootPart.Velocity
-				rootPart.Velocity = Vector3.new(v.X * 99999999, v.Y + 50, v.Z * 99999999)
-				task.wait()
-				rootPart.Velocity = v
-				task.wait()
-				rootPart.Velocity = v + Vector3.new(0, 0.1, 0)
+		-- Ativa noclip sem notificação
+		toggleNoclip(true, true)
+		
+		-- Conexão de morte
+		if humanoid then
+			walkflingDiedConn = humanoid.Died:Connect(function()
+				toggleWalkfling(false)
 			end)
 		end
 		
-		-- Aplica no personagem atual
-		if plr.Character then
-			startWalkfling(plr.Character)
-		end
-		
-		-- Aplica quando o personagem spawnar
-		if walkflingCharacterAddedConn then
-			walkflingCharacterAddedConn:Disconnect()
-			walkflingCharacterAddedConn = nil
-		end
-		
-		walkflingCharacterAddedConn = plr.CharacterAdded:Connect(function(character)
-			if walkflingActive then
-				task.wait(0.1)
-				startWalkfling(character)
+		-- Loop principal
+		walkflingLoop = game:GetService("RunService").Heartbeat:Connect(function()
+			local character = plr.Character
+			local root = getRoot(character)
+			local vel, movel = nil, 0.1
+			
+			while not (character and character.Parent and root and root.Parent) do
+				game:GetService("RunService").Heartbeat:Wait()
+				character = plr.Character
+				root = getRoot(character)
+			end
+			
+			vel = root.Velocity
+			root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+			
+			game:GetService("RunService").RenderStepped:Wait()
+			if character and character.Parent and root and root.Parent then
+				root.Velocity = vel
+			end
+			
+			game:GetService("RunService").Stepped:Wait()
+			if character and character.Parent and root and root.Parent then
+				root.Velocity = vel + Vector3.new(0, movel, 0)
+				movel = movel * -1
 			end
 		end)
 		
@@ -479,289 +685,144 @@ local function toggleWalkfling(enable)
 	elseif not enable and walkflingActive then
 		walkflingActive = false
 		
-		if walkflingGodConn then
-			walkflingGodConn:Disconnect()
-			walkflingGodConn = nil
+		if walkflingLoop then
+			walkflingLoop:Disconnect()
+			walkflingLoop = nil
 		end
 		
-		if walkflingLoopConn then
-			walkflingLoopConn:Disconnect()
-			walkflingLoopConn = nil
+		if walkflingDiedConn then
+			walkflingDiedConn:Disconnect()
+			walkflingDiedConn = nil
 		end
 		
-		if walkflingCharacterAddedConn then
-			walkflingCharacterAddedConn:Disconnect()
-			walkflingCharacterAddedConn = nil
-		end
-		
-		local character = plr.Character
-		if character then
-			local humanoid = character:FindFirstChild("Humanoid")
-			local rootPart = character:FindFirstChild("HumanoidRootPart")
-			
-			if humanoid then
-				humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
-				humanoid.BreakJointsOnDeath = true
-				humanoid.Health = 100
-				humanoid.MaxHealth = 100
-			end
-			
-			if rootPart then
-				rootPart.CanCollide = true
-			end
-		end
+		-- Desativa noclip sem notificação
+		toggleNoclip(false, true)
 		
 		showPopup("Walkfling desativado")
 	end
 end
 
 -- ============================================
--- AUTOCOMPLETE
+-- FLOAT
 -- ============================================
 
-local function updateAutocomplete(input)
-	-- Limpa lista
-	for _, child in ipairs(autocompleteList:GetChildren()) do
-		if child:IsA("TextButton") then
-			child:Destroy()
-		end
-	end
+local function toggleFloat(enable)
+	local char = player.Character
+	local humanoid = char and char:FindFirstChild("Humanoid")
 	
-	if #input == 0 then
-		autocompleteFrame.Visible = false
-		return
-	end
-	
-	local matches = {}
-	local lowerInput = string.lower(input)
-	
-	for _, cmd in ipairs(commands) do
-		local cmdName = string.split(cmd.cmd, " ")[1]
-		if string.sub(string.lower(cmdName), 1, #lowerInput) == lowerInput then
-			table.insert(matches, cmdName)
-		end
-	end
-	
-	if #matches == 0 then
-		autocompleteFrame.Visible = false
-		return
-	end
-	
-	autocompleteFrame.Visible = true
-	
-	local yOffset = 2
-	local buttonHeight = 20
-	
-	for _, match in ipairs(matches) do
-		local btn = Instance.new("TextButton")
-		btn.Parent = autocompleteList
-		btn.Size = UDim2.new(1, -4, 0, buttonHeight)
-		btn.Position = UDim2.new(0, 2, 0, yOffset)
-		btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-		btn.BackgroundTransparency = 0.3
-		btn.BorderSizePixel = 0
-		btn.Text = match
-		btn.TextColor3 = Color3.fromRGB(0, 0, 0)
-		btn.TextSize = 12
-		btn.TextXAlignment = Enum.TextXAlignment.Left
-		btn.Font = Enum.Font.SourceSans
+	if enable and not floatActive then
+		floatActive = true
+		floatName = tostring(math.random(100000, 999999))
 		
-		btn.MouseEnter:Connect(function()
-			btn.BackgroundTransparency = 0
-		end)
-		btn.MouseLeave:Connect(function()
-			btn.BackgroundTransparency = 0.3
-		end)
-		
-		btn.MouseButton1Click:Connect(function()
-			ScreenGui.CMDBOX.Text = match
-			autocompleteFrame.Visible = false
-			ScreenGui.CMDBOX:CaptureFocus()
-		end)
-		
-		yOffset = yOffset + buttonHeight + 2
-	end
-	
-	autocompleteList.CanvasSize = UDim2.new(0, 0, 0, yOffset + 4)
-	autocompleteFrame.Size = UDim2.new(0, 218, 0, math.min(yOffset + 4, 100))
-end
-
--- ============================================
--- FUNÇÃO ESP
--- ============================================
-
-local function toggleESP(enable)
-	local plr = game.Players.LocalPlayer
-	
-	if enable and not espActive then
-		espActive = true
-		
-		for _, p in ipairs(game.Players:GetPlayers()) do
-			if p ~= plr then
-				local highlight = Instance.new("Highlight")
-				highlight.Name = "ESP_Highlight"
-				highlight.Parent = p.Character or p
-				highlight.FillColor = Color3.fromRGB(255, 0, 0)
-				highlight.FillTransparency = 0.5
-				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-				highlight.OutlineTransparency = 0
-				highlight.Adornee = p.Character
-				table.insert(espHighlight, highlight)
-			end
-		end
-		
-		local function onPlayerAdded(p)
-			if p ~= plr then
-				local highlight = Instance.new("Highlight")
-				highlight.Name = "ESP_Highlight"
-				highlight.Parent = p.Character or p
-				highlight.FillColor = Color3.fromRGB(255, 0, 0)
-				highlight.FillTransparency = 0.5
-				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-				highlight.OutlineTransparency = 0
-				highlight.Adornee = p.Character
-				table.insert(espHighlight, highlight)
-			end
-		end
-		
-		local function onPlayerRemoving(p)
-			for i, highlight in ipairs(espHighlight) do
-				if highlight and highlight.Parent == p.Character or highlight.Adornee == p.Character then
-					highlight:Destroy()
-					table.remove(espHighlight, i)
-					break
+		if char and not char:FindFirstChild(floatName) then
+			task.spawn(function()
+				local Float = Instance.new("Part")
+				Float.Name = floatName
+				Float.Parent = char
+				Float.Transparency = 1
+				Float.Size = Vector3.new(2, 0.2, 1.5)
+				Float.Anchored = true
+				floatValue = -3.1
+				
+				local rootPart = char:FindFirstChild("HumanoidRootPart")
+				if rootPart then
+					Float.CFrame = rootPart.CFrame * CFrame.new(0, floatValue, 0)
 				end
-			end
-		end
-		
-		local function onCharacterAdded(character)
-			local p = game.Players:GetPlayerFromCharacter(character)
-			if p and p ~= plr then
-				for i, highlight in ipairs(espHighlight) do
-					if highlight.Adornee == character then
-						highlight:Destroy()
-						table.remove(espHighlight, i)
-						break
+				
+				floatPart = Float
+				
+				showPopup("Float ativado (Q desce, E sobe)")
+				
+				local function FloatPadLoop()
+					if char:FindFirstChild(floatName) and char:FindFirstChild("HumanoidRootPart") then
+						local root = char:FindFirstChild("HumanoidRootPart")
+						Float.CFrame = root.CFrame * CFrame.new(0, floatValue, 0)
+					else
+						if floatConnections.FloatingFunc then floatConnections.FloatingFunc:Disconnect() end
+						if floatConnections.qUp then floatConnections.qUp:Disconnect() end
+						if floatConnections.eUp then floatConnections.eUp:Disconnect() end
+						if floatConnections.qDown then floatConnections.qDown:Disconnect() end
+						if floatConnections.eDown then floatConnections.eDown:Disconnect() end
+						if floatConnections.floatDied then floatConnections.floatDied:Disconnect() end
+						Float:Destroy()
+						floatActive = false
 					end
 				end
-				local highlight = Instance.new("Highlight")
-				highlight.Name = "ESP_Highlight"
-				highlight.Parent = character
-				highlight.FillColor = Color3.fromRGB(255, 0, 0)
-				highlight.FillTransparency = 0.5
-				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-				highlight.OutlineTransparency = 0
-				highlight.Adornee = character
-				table.insert(espHighlight, highlight)
-			end
+				
+				floatConnections.qUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.Keyboard then
+						local key = string.lower(input.KeyCode.Name)
+						if key == "q" then
+							floatValue = floatValue + 0.5
+						end
+					end
+				end)
+				
+				floatConnections.eUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.Keyboard then
+						local key = string.lower(input.KeyCode.Name)
+						if key == "e" then
+							floatValue = floatValue - 1.5
+						end
+					end
+				end)
+				
+				floatConnections.qDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.Keyboard then
+						local key = string.lower(input.KeyCode.Name)
+						if key == "q" then
+							floatValue = floatValue - 0.5
+						end
+					end
+				end)
+				
+				floatConnections.eDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
+					if input.UserInputType == Enum.UserInputType.Keyboard then
+						local key = string.lower(input.KeyCode.Name)
+						if key == "e" then
+							floatValue = floatValue + 1.5
+						end
+					end				end)
+				
+				if humanoid then
+					floatConnections.floatDied = humanoid.Died:Connect(function()
+						if floatConnections.FloatingFunc then floatConnections.FloatingFunc:Disconnect() end
+						if floatConnections.qUp then floatConnections.qUp:Disconnect() end
+						if floatConnections.eUp then floatConnections.eUp:Disconnect() end
+						if floatConnections.qDown then floatConnections.qDown:Disconnect() end
+						if floatConnections.eDown then floatConnections.eDown:Disconnect() end
+						if floatConnections.floatDied then floatConnections.floatDied:Disconnect() end
+						Float:Destroy()
+						floatActive = false
+					end)
+				end
+				
+				floatConnections.FloatingFunc = game:GetService("RunService").Heartbeat:Connect(FloatPadLoop)
+			end)
 		end
 		
-		espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(onPlayerAdded)
-		espConnections.PlayerRemoving = game.Players.PlayerRemoving:Connect(onPlayerRemoving)
-		espConnections.CharacterAdded = game.Players.PlayerAdded:Connect(function(p)
-			p.CharacterAdded:Connect(onCharacterAdded)
-		end)
+	elseif not enable and floatActive then
+		floatActive = false
 		
-		showPopup("ESP ativado")
-		
-	elseif not enable and espActive then
-		espActive = false
-		
-		for _, highlight in ipairs(espHighlight) do
-			highlight:Destroy()
+		local char = player.Character
+		if char and char:FindFirstChild(floatName) then
+			char:FindFirstChild(floatName):Destroy()
 		end
-		espHighlight = {}
 		
-		for _, conn in pairs(espConnections) do
-			conn:Disconnect()
-		end
-		espConnections = {}
+		if floatConnections.FloatingFunc then floatConnections.FloatingFunc:Disconnect() end
+		if floatConnections.qUp then floatConnections.qUp:Disconnect() end
+		if floatConnections.eUp then floatConnections.eUp:Disconnect() end
+		if floatConnections.qDown then floatConnections.qDown:Disconnect() end
+		if floatConnections.eDown then floatConnections.eDown:Disconnect() end
+		if floatConnections.floatDied then floatConnections.floatDied:Disconnect() end
+		floatConnections = {}
 		
-		showPopup("ESP desativado")
+		showPopup("Float desativado")
 	end
 end
 
 -- ============================================
--- FUNÇÃO TP TOOL
--- ============================================
-
-local function toggleTPTool(enable)
-	local plr = game.Players.LocalPlayer
-	local backpack = plr:FindFirstChild("Backpack")
-	
-	if enable and not tpToolActive then
-		if tpTool then
-			tpTool:Destroy()
-			tpTool = nil
-		end
-		if tpToolConn then
-			tpToolConn:Disconnect()
-			tpToolConn = nil
-		end
-		
-		local tool = Instance.new("Tool")
-		tool.Name = "TP Tool"
-		tool.RequiresHandle = false
-		tool.CanBeDropped = false
-		tool.ToolTip = "Clique em algum lugar para teleportar"
-		tool.Parent = backpack
-		tool.Grip = CFrame.new(0, 0, 0)
-		
-		local mouse = plr:GetMouse()
-		local currentConn = nil
-		
-		local function onMouseClick()
-			local character = plr.Character
-			local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-			if not rootPart then return end
-			
-			local target = mouse.Target
-			local hit = mouse.Hit
-			
-			if target and hit then
-				local position = hit.Position
-				rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
-			end
-		end
-		
-		tool.Equipped:Connect(function()
-			if currentConn then
-				currentConn:Disconnect()
-				currentConn = nil
-			end
-			currentConn = mouse.Button1Down:Connect(onMouseClick)
-		end)
-		
-		tool.Unequipped:Connect(function()
-			if currentConn then
-				currentConn:Disconnect()
-				currentConn = nil
-			end
-		end)
-		
-		if plr.Character and plr.Character:FindFirstChild(tool.Name) then
-			currentConn = mouse.Button1Down:Connect(onMouseClick)
-		end
-		
-		tpToolConn = currentConn
-		tpTool = tool
-		tpToolActive = true
-		
-	elseif not enable and tpToolActive then
-		if tpTool then
-			tpTool:Destroy()
-			tpTool = nil
-		end
-		if tpToolConn then
-			tpToolConn:Disconnect()
-			tpToolConn = nil
-		end
-		tpToolActive = false
-	end
-end
-
--- ============================================
--- FUNÇÃO FLY
+-- FLY
 -- ============================================
 
 local function toggleFly(enable)
@@ -784,44 +845,14 @@ local function toggleFly(enable)
 		bg.CFrame = torso.CFrame
 		
 		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-		bv.Velocity = Vector3.new(0, 0.1, 0)
+		bv.Velocity = Vector3.new(0, 0, 0)
 		
 		humanoid.PlatformStand = true
 		
 		local ctrl = {f = 0, b = 0, l = 0, r = 0}
-		local spd = 50
+		local spd = flySpeed
 		
-		local function onKeyDown(key)
-			if key == "w" then ctrl.f = 1 end
-			if key == "s" then ctrl.b = -1 end
-			if key == "a" then ctrl.l = -1 end
-			if key == "d" then ctrl.r = 1 end
-		end
-		
-		local function onKeyUp(key)
-			if key == "w" then ctrl.f = 0 end
-			if key == "s" then ctrl.b = 0 end
-			if key == "a" then ctrl.l = 0 end
-			if key == "d" then ctrl.r = 0 end
-		end
-		
-		local connections = {}
-		connections.KeyDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.Keyboard then
-				local key = string.lower(input.KeyCode.Name)
-				onKeyDown(key)
-			end
-		end)
-		
-		connections.KeyUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.Keyboard then
-				local key = string.lower(input.KeyCode.Name)
-				onKeyUp(key)
-			end
-		end)
-		
-		local renderConn
-		renderConn = game:GetService("RunService").RenderStepped:Connect(function()
+		local renderConn = game:GetService("RunService").RenderStepped:Connect(function()
 			if not flyActive or not character or not character.Parent then
 				toggleFly(false)
 				return
@@ -835,42 +866,60 @@ local function toggleFly(enable)
 			local bv = torso:FindFirstChild("BodyVelocity")
 			
 			if bg and bv then
-				local speed = (ctrl.f + ctrl.b)
-				local strafe = (ctrl.r + ctrl.l)
-				local forward = cam.CFrame.LookVector * (speed * spd)
-				local right = cam.CFrame.RightVector * (strafe * spd)
+				local forward = cam.CFrame.LookVector * (ctrl.f + ctrl.b)
+				local right = cam.CFrame.RightVector * (ctrl.r + ctrl.l)
 				local up = Vector3.new(0, 0.1, 0)
+				local move = forward + right
 				
 				if ctrl.f == 0 and ctrl.b == 0 and ctrl.l == 0 and ctrl.r == 0 then
-					bv.Velocity = Vector3.new(0, 0.1, 0)
+					bv.Velocity = Vector3.new(0, 0, 0)
 				else
-					bv.Velocity = forward + right + up
+					bv.Velocity = (move * spd) + up
 				end
 				bg.CFrame = cam.CFrame
+			end
+		end)
+		
+		local keyDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.Keyboard then
+				local key = string.lower(input.KeyCode.Name)
+				if key == "w" then ctrl.f = 1 end
+				if key == "s" then ctrl.b = -1 end
+				if key == "a" then ctrl.l = -1 end
+				if key == "d" then ctrl.r = 1 end
+			end
+		end)
+		
+		local keyUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.Keyboard then
+				local key = string.lower(input.KeyCode.Name)
+				if key == "w" then ctrl.f = 0 end
+				if key == "s" then ctrl.b = 0 end
+				if key == "a" then ctrl.l = 0 end
+				if key == "d" then ctrl.r = 0 end
 			end
 		end)
 		
 		flyData = {
 			bodyGyro = bg,
 			bodyVelocity = bv,
-			connections = connections,
 			renderConn = renderConn,
+			keyDown = keyDown,
+			keyUp = keyUp,
 			ctrl = ctrl,
 			spd = spd
 		}
 		
-		showPopup("Fly ativado")
+		showPopup("Fly ativado (velocidade: " .. spd .. ")")
 		
 	elseif not enable and flyActive then
 		flyActive = false
 		
 		if flyData.bodyGyro then flyData.bodyGyro:Destroy() end
 		if flyData.bodyVelocity then flyData.bodyVelocity:Destroy() end
-		if flyData.connections then
-			if flyData.connections.KeyDown then flyData.connections.KeyDown:Disconnect() end
-			if flyData.connections.KeyUp then flyData.connections.KeyUp:Disconnect() end
-		end
 		if flyData.renderConn then flyData.renderConn:Disconnect() end
+		if flyData.keyDown then flyData.keyDown:Disconnect() end
+		if flyData.keyUp then flyData.keyUp:Disconnect() end
 		
 		if character and character:FindFirstChild("Humanoid") then
 			character.Humanoid.PlatformStand = false
@@ -882,54 +931,7 @@ local function toggleFly(enable)
 end
 
 -- ============================================
--- FUNÇÃO NOCLIP
--- ============================================
-
-local function toggleNoclip(enable)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	if not character then return end
-	
-	if enable and not noclipActive then
-		noclipActive = true
-		
-		noclipConn = game:GetService("RunService").Stepped:Connect(function()
-			if not noclipActive or not character or not character.Parent then
-				toggleNoclip(false)
-				return
-			end
-			
-			for _, part in ipairs(character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = false
-				end
-			end
-		end)
-		
-		showPopup("Noclip ativado")
-		
-	elseif not enable and noclipActive then
-		noclipActive = false
-		
-		if noclipConn then
-			noclipConn:Disconnect()
-			noclipConn = nil
-		end
-		
-		if character then
-			for _, part in ipairs(character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = true
-				end
-			end
-		end
-		
-		showPopup("Noclip desativado")
-	end
-end
-
--- ============================================
--- FUNÇÕES SPEED E JUMP
+-- SPEED E JUMP
 -- ============================================
 
 local function setSpeed(value)
@@ -963,7 +965,7 @@ local function setJump(value)
 end
 
 -- ============================================
--- FUNÇÕES LOOP
+-- LOOP
 -- ============================================
 
 local function toggleSpeedLoop(value)
@@ -1061,7 +1063,7 @@ local function toggleJumpLoop(value)
 end
 
 -- ============================================
--- FUNÇÃO INFJUMP
+-- INFJUMP
 -- ============================================
 
 local function toggleInfJump(enable)
@@ -1098,7 +1100,7 @@ local function toggleInfJump(enable)
 end
 
 -- ============================================
--- FUNÇÕES GOTO, BRING E VIEW
+-- GOTO, BRING, VIEW
 -- ============================================
 
 local function teleportTo(target)
@@ -1184,48 +1186,181 @@ local function toggleView(target)
 end
 
 -- ============================================
--- CRIAR BOTÕES
+-- ESP
 -- ============================================
 
-local function createCommandButtons()
-	local yOffset = 5
-	local buttonHeight = 25
-	local spacing = 3
+local function toggleESP(enable)
+	local plr = game.Players.LocalPlayer
 	
-	for i, cmdData in ipairs(commands) do
-		local cmdButton = Instance.new("TextButton")
-		cmdButton.Parent = ScreenGui.ScrollingFrame
-		cmdButton.Size = UDim2.new(0.95, 0, 0, buttonHeight)
-		cmdButton.Position = UDim2.new(0.025, 0, 0, yOffset)
-		cmdButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-		cmdButton.BackgroundTransparency = 0.5
-		cmdButton.BorderSizePixel = 0
-		cmdButton.Text = cmdData.cmd .. " - " .. cmdData.desc
-		cmdButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-		cmdButton.TextSize = 13
-		cmdButton.TextXAlignment = Enum.TextXAlignment.Left
-		cmdButton.TextYAlignment = Enum.TextYAlignment.Center
-		cmdButton.Font = Enum.Font.SourceSans
-		cmdButton.BorderColor3 = Color3.fromRGB(185,185,185)
-		cmdButton.BorderSizePixel = 3
+	if enable and not espActive then
+		espActive = true
 		
-		cmdButton.MouseButton1Click:Connect(function()
-			ScreenGui.CMDBOX.Text = cmdData.cmd
-			ScreenGui.CmdsLIST.Visible = false
-			task.wait(0.1)
-			ScreenGui.CMDBOX:CaptureFocus()
+		for _, p in ipairs(game.Players:GetPlayers()) do
+			if p ~= plr then
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "ESP_Highlight"
+				highlight.Parent = p.Character or p
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = 0
+				highlight.Adornee = p.Character
+				table.insert(espHighlight, highlight)
+			end
+		end
+		
+		local function onPlayerAdded(p)
+			if p ~= plr then
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "ESP_Highlight"
+				highlight.Parent = p.Character or p
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = 0
+				highlight.Adornee = p.Character
+				table.insert(espHighlight, highlight)
+			end
+		end
+		
+		local function onPlayerRemoving(p)
+			for i, highlight in ipairs(espHighlight) do
+				if highlight and (highlight.Parent == p.Character or highlight.Adornee == p.Character) then
+					highlight:Destroy()
+					table.remove(espHighlight, i)
+					break
+				end
+			end
+		end
+		
+		local function onCharacterAdded(character)
+			local p = game.Players:GetPlayerFromCharacter(character)
+			if p and p ~= plr then
+				for i, highlight in ipairs(espHighlight) do
+					if highlight.Adornee == character then
+						highlight:Destroy()
+						table.remove(espHighlight, i)
+						break
+					end
+				end
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "ESP_Highlight"
+				highlight.Parent = character
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = 0
+				highlight.Adornee = character
+				table.insert(espHighlight, highlight)
+			end
+		end
+		
+		espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(onPlayerAdded)
+		espConnections.PlayerRemoving = game.Players.PlayerRemoving:Connect(onPlayerRemoving)
+		espConnections.CharacterAdded = game.Players.PlayerAdded:Connect(function(p)
+			p.CharacterAdded:Connect(onCharacterAdded)
 		end)
 		
-		yOffset = yOffset + buttonHeight + spacing
+		showPopup("ESP ativado")
+		
+	elseif not enable and espActive then
+		espActive = false
+		
+		for _, highlight in ipairs(espHighlight) do
+			highlight:Destroy()
+		end
+		espHighlight = {}
+		
+		for _, conn in pairs(espConnections) do
+			conn:Disconnect()
+		end
+		espConnections = {}
+		
+		showPopup("ESP desativado")
 	end
-	
-	ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset + 10)
 end
 
-createCommandButtons()
+-- ============================================
+-- TP TOOL
+-- ============================================
+
+local function toggleTPTool(enable)
+	local plr = game.Players.LocalPlayer
+	local backpack = plr:FindFirstChild("Backpack")
+	
+	if enable and not tpToolActive then
+		if tpTool then
+			tpTool:Destroy()
+			tpTool = nil
+		end
+		if tpToolConn then
+			tpToolConn:Disconnect()
+			tpToolConn = nil
+		end
+		
+		local tool = Instance.new("Tool")
+		tool.Name = "TP Tool"
+		tool.RequiresHandle = false
+		tool.CanBeDropped = false
+		tool.ToolTip = "Clique em algum lugar para teleportar"
+		tool.Parent = backpack
+		tool.Grip = CFrame.new(0, 0, 0)
+		
+		local mouse = plr:GetMouse()
+		local currentConn = nil
+		
+		local function onMouseClick()
+			local character = plr.Character
+			local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+			if not rootPart then return end
+			
+			local target = mouse.Target
+			local hit = mouse.Hit
+			
+			if target and hit then
+				local position = hit.Position
+				rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
+			end
+		end
+		
+		tool.Equipped:Connect(function()
+			if currentConn then
+				currentConn:Disconnect()
+				currentConn = nil
+			end
+			currentConn = mouse.Button1Down:Connect(onMouseClick)
+		end)
+		
+		tool.Unequipped:Connect(function()
+			if currentConn then
+				currentConn:Disconnect()
+				currentConn = nil
+			end
+		end)
+		
+		if plr.Character and plr.Character:FindFirstChild(tool.Name) then
+			currentConn = mouse.Button1Down:Connect(onMouseClick)
+		end
+		
+		tpToolConn = currentConn
+		tpTool = tool
+		tpToolActive = true
+		
+	elseif not enable and tpToolActive then
+		if tpTool then
+			tpTool:Destroy()
+			tpTool = nil
+		end
+		if tpToolConn then
+			tpToolConn:Disconnect()
+			tpToolConn = nil
+		end
+		tpToolActive = false
+	end
+end
 
 -- ============================================
--- FUNÇÃO DOS COMANDOS
+-- EXECUTAR COMANDO
 -- ============================================
 
 local function executeCommand(cmd, args)
@@ -1262,6 +1397,12 @@ local function executeCommand(cmd, args)
 		return true
 		
 	elseif cmd == "fly" then
+		if #args > 0 then
+			local speed = tonumber(args[1])
+			if speed and speed > 0 then
+				flySpeed = speed
+			end
+		end
 		toggleFly(true)
 		return true
 		
@@ -1270,11 +1411,11 @@ local function executeCommand(cmd, args)
 		return true
 		
 	elseif cmd == "noclip" then
-		toggleNoclip(true)
+		toggleNoclip(true, false)
 		return true
 		
 	elseif cmd == "clip" then
-		toggleNoclip(false)
+		toggleNoclip(false, false)
 		return true
 		
 	elseif cmd == "speed" then
@@ -1348,12 +1489,8 @@ local function executeCommand(cmd, args)
 	elseif cmd == "goto" then
 		if #args > 0 then
 			local target = findPlayer(args[1])
-			if type(target) == "table" then
-				showPopup("Varios jogadores encontrados: " .. table.concat(target, ", "))
-			elseif target then
+			if target then
 				teleportTo(target)
-			else
-				showPopup("Jogador nao encontrado")
 			end
 		else
 			showPopup("Use: goto [nome]")
@@ -1363,12 +1500,8 @@ local function executeCommand(cmd, args)
 	elseif cmd == "bring" then
 		if #args > 0 then
 			local target = findPlayer(args[1])
-			if type(target) == "table" then
-				showPopup("Varios jogadores encontrados: " .. table.concat(target, ", "))
-			elseif target then
+			if target then
 				bringPlayer(target)
-			else
-				showPopup("Jogador nao encontrado")
 			end
 		else
 			showPopup("Use: bring [nome]")
@@ -1378,12 +1511,8 @@ local function executeCommand(cmd, args)
 	elseif cmd == "view" then
 		if #args > 0 then
 			local target = findPlayer(args[1])
-			if type(target) == "table" then
-				showPopup("Varios jogadores encontrados: " .. table.concat(target, ", "))
-			elseif target then
+			if target then
 				toggleView(target)
-			else
-				showPopup("Jogador nao encontrado")
 			end
 		else
 			showPopup("Use: view [nome]")
@@ -1417,13 +1546,166 @@ local function executeCommand(cmd, args)
 	elseif cmd == "unwalkfling" then
 		toggleWalkfling(false)
 		return true
+		
+	elseif cmd == "executor" then
+		toggleExecutor(not executorFrame.Visible)
+		return true
+		
+	elseif cmd == "rejoin" then
+		rejoinServer()
+		return true
+		
+	elseif cmd == "reset" then
+		resetCharacter()
+		return true
+		
+	elseif cmd == "float" then
+		toggleFloat(true)
+		return true
+		
+	elseif cmd == "unfloat" then
+		toggleFloat(false)
+		return true
+		
+	elseif cmd == "sit" then
+		toggleSit()
+		return true
 	end
 	
 	return false
 end
 
 -- ============================================
--- AUTOCOMPLETE
+-- AUTOCOMPLETE FUNCTION
+-- ============================================
+
+local function updateAutocomplete(input)
+	for _, child in ipairs(autocompleteList:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+	
+	if #input == 0 then
+		autocompleteFrame.Visible = false
+		return
+	end
+	
+	local matches = {}
+	local lowerInput = string.lower(input)
+	
+	for _, cmd in ipairs(commands) do
+		local cmdName = string.split(cmd.cmd, " ")[1]
+		if string.sub(string.lower(cmdName), 1, #lowerInput) == lowerInput then
+			table.insert(matches, cmd)
+		end
+	end
+	
+	if #matches == 0 then
+		autocompleteFrame.Visible = false
+		return
+	end
+	
+	autocompleteFrame.Visible = true
+	
+	local yOffset = 2
+	local buttonHeight = 20
+	
+	for _, match in ipairs(matches) do
+		local btn = Instance.new("TextButton")
+		btn.Parent = autocompleteList
+		btn.Size = UDim2.new(1, -4, 0, buttonHeight)
+		btn.Position = UDim2.new(0, 2, 0, yOffset)
+		btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+		btn.BackgroundTransparency = 0.3
+		btn.BorderSizePixel = 0
+		btn.Text = match.cmd .. " - " .. match.desc
+		btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+		btn.TextSize = 12
+		btn.TextXAlignment = Enum.TextXAlignment.Left
+		btn.Font = Enum.Font.SourceSans
+		btn.ZIndex = 11
+		
+		btn.MouseEnter:Connect(function()
+			btn.BackgroundTransparency = 0
+		end)
+		btn.MouseLeave:Connect(function()
+			btn.BackgroundTransparency = 0.3
+		end)
+		
+		btn.MouseButton1Click:Connect(function()
+			local cmdName = string.split(match.cmd, " ")[1]
+			local args = {}
+			local parts = {}
+			for part in string.gmatch(match.cmd, "%S+") do
+				table.insert(parts, part)
+			end
+			for i = 2, #parts do
+				table.insert(args, parts[i])
+			end
+			executeCommand(cmdName, args)
+			autocompleteFrame.Visible = false
+			ScreenGui.CMDBOX.Text = ""
+		end)
+		
+		yOffset = yOffset + buttonHeight + 2
+	end
+	
+	autocompleteList.CanvasSize = UDim2.new(0, 0, 0, yOffset + 4)
+	local newHeight = math.min(yOffset + 4, 100)
+	autocompleteFrame.Size = UDim2.new(0, 218, 0, newHeight)
+	autocompleteFrame.Position = UDim2.new(1, -230, 1, -40 - newHeight - 5)
+end
+
+-- ============================================
+-- CRIAR BOTÕES DA CMDLIST
+-- ============================================
+
+local function createCommandButtons()
+	local yOffset = 5
+	local buttonHeight = 25
+	local spacing = 3
+	
+	for i, cmdData in ipairs(commands) do
+		local cmdButton = Instance.new("TextButton")
+		cmdButton.Parent = ScreenGui.ScrollingFrame
+		cmdButton.Size = UDim2.new(0.95, 0, 0, buttonHeight)
+		cmdButton.Position = UDim2.new(0.025, 0, 0, yOffset)
+		cmdButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+		cmdButton.BackgroundTransparency = 0.5
+		cmdButton.BorderSizePixel = 0
+		cmdButton.Text = cmdData.cmd .. " - " .. cmdData.desc
+		cmdButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+		cmdButton.TextSize = 13
+		cmdButton.TextXAlignment = Enum.TextXAlignment.Left
+		cmdButton.TextYAlignment = Enum.TextYAlignment.Center
+		cmdButton.Font = Enum.Font.SourceSans
+		cmdButton.BorderColor3 = Color3.fromRGB(185,185,185)
+		cmdButton.BorderSizePixel = 3
+		
+		cmdButton.MouseButton1Click:Connect(function()
+			local cmdName = string.split(cmdData.cmd, " ")[1]
+			local args = {}
+			local parts = {}
+			for part in string.gmatch(cmdData.cmd, "%S+") do
+				table.insert(parts, part)
+			end
+			for i = 2, #parts do
+				table.insert(args, parts[i])
+			end
+			executeCommand(cmdName, args)
+		end)
+		
+		yOffset = yOffset + buttonHeight + spacing
+	end
+	
+	ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset + 10)
+end
+
+createCommandButtons()
+
+-- ============================================
+-- AUTOCOMPLETE - DETECTA DIGITAÇÃO
 -- ============================================
 
 ScreenGui.CMDBOX:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1489,6 +1771,66 @@ game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 end)
 
 -- ============================================
+-- EXECUTOR - BOTÕES
+-- ============================================
+
+executorExecute.MouseButton1Click:Connect(function()
+	local scriptText = executorTextBox.Text
+	if scriptText and scriptText ~= "" then
+		local success, err = pcall(function()
+			loadstring(scriptText)()
+		end)
+		if not success then
+			showPopup("Erro no script: " .. err)
+		else
+			showPopup("Script executado!")
+		end
+	end
+end)
+
+executorClear.MouseButton1Click:Connect(function()
+	executorTextBox.Text = ""
+end)
+
+executorClose.MouseButton1Click:Connect(function()
+	toggleExecutor(false)
+end)
+
+-- ============================================
+-- EXECUTOR - DRAG
+-- ============================================
+
+local execDragging = false
+local execDragInput, execDragStart, execStartPos
+
+executorDragbar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		execDragging = true
+		execDragStart = input.Position
+		execStartPos = executorFrame.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				execDragging = false
+			end
+		end)
+	end
+end)
+
+executorDragbar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		execDragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == execDragInput and execDragging then
+		local delta = input.Position - execDragStart
+		executorFrame.Position = UDim2.new(execStartPos.X.Scale, execStartPos.X.Offset + delta.X, execStartPos.Y.Scale, execStartPos.Y.Offset + delta.Y)
+	end
+end)
+
+-- ============================================
 -- FECHAR GUI
 -- ============================================
 
@@ -1497,7 +1839,7 @@ ScreenGui.CloseButton.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================
--- DRAG
+-- DRAG DA CMDLIST
 -- ============================================
 
 local dragging = false
@@ -1539,7 +1881,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function()
 		toggleFly(false)
 	end
 	if noclipActive then
-		toggleNoclip(false)
+		toggleNoclip(false, true)
 	end
 	if infJumpActive then
 		toggleInfJump(false)
@@ -1555,5 +1897,8 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 	if walkflingActive then
 		toggleWalkfling(false)
+	end
+	if floatActive then
+		toggleFloat(false)
 	end
 end)
