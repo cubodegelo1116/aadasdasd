@@ -90,14 +90,14 @@ ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CMDBOX.BorderSizePixel = 3
 
 -- ============================================
--- AUTOCOMPLETE FRAME
+-- AUTOCOMPLETE (EM CIMA DA CMDBOX)
 -- ============================================
 
 local autocompleteFrame = Instance.new("Frame")
 autocompleteFrame.Name = "AutocompleteFrame"
 autocompleteFrame.Parent = ScreenGui.ScreenGui
 autocompleteFrame.Size = UDim2.new(0, 218, 0, 0)
-autocompleteFrame.Position = UDim2.new(1, -230, 1, -70)
+autocompleteFrame.Position = UDim2.new(1, -230, 1, -68) -- EM CIMA da CMDBOX
 autocompleteFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
 autocompleteFrame.BackgroundTransparency = 0
 autocompleteFrame.BorderColor3 = Color3.fromRGB(185,185,185)
@@ -366,11 +366,11 @@ local espActive = false
 local espConnections = {}
 local espHighlight = {}
 
--- WALKFLING (NOVO)
+-- WALKFLING
 local walkflingActive = false
-local walkflingConn = nil
 local walkflingGodConn = nil
 local walkflingLoopConn = nil
+local walkflingCharacterAddedConn = nil
 
 local commands = {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
@@ -403,7 +403,7 @@ local commands = {
 }
 
 -- ============================================
--- FUNÇÃO WALKFLING (NOVA)
+-- FUNÇÃO WALKFLING (CORRIGIDA)
 -- ============================================
 
 local function toggleWalkfling(enable)
@@ -429,7 +429,7 @@ local function toggleWalkfling(enable)
 			end
 			
 			walkflingGodConn = game:GetService("RunService").Stepped:Connect(function()
-				if walkflingActive then
+				if walkflingActive and humanoid and humanoid.Parent then
 					humanoid.Health = math.huge
 					humanoid.MaxHealth = math.huge
 				end
@@ -449,20 +449,25 @@ local function toggleWalkfling(enable)
 				
 				local v = rootPart.Velocity
 				rootPart.Velocity = Vector3.new(v.X * 99999999, v.Y + 50, v.Z * 99999999)
-				
 				task.wait()
 				rootPart.Velocity = v
-				
 				task.wait()
 				rootPart.Velocity = v + Vector3.new(0, 0.1, 0)
 			end)
 		end
 		
+		-- Aplica no personagem atual
 		if plr.Character then
 			startWalkfling(plr.Character)
 		end
 		
-		plr.CharacterAdded:Connect(function(character)
+		-- Aplica quando o personagem spawnar
+		if walkflingCharacterAddedConn then
+			walkflingCharacterAddedConn:Disconnect()
+			walkflingCharacterAddedConn = nil
+		end
+		
+		walkflingCharacterAddedConn = plr.CharacterAdded:Connect(function(character)
 			if walkflingActive then
 				task.wait(0.1)
 				startWalkfling(character)
@@ -482,6 +487,11 @@ local function toggleWalkfling(enable)
 		if walkflingLoopConn then
 			walkflingLoopConn:Disconnect()
 			walkflingLoopConn = nil
+		end
+		
+		if walkflingCharacterAddedConn then
+			walkflingCharacterAddedConn:Disconnect()
+			walkflingCharacterAddedConn = nil
 		end
 		
 		local character = plr.Character
@@ -506,21 +516,29 @@ local function toggleWalkfling(enable)
 end
 
 -- ============================================
--- FUNÇÃO AUTCOMPLETE
+-- AUTOCOMPLETE
 -- ============================================
 
 local function updateAutocomplete(input)
-	local cmdNames = {}
-	for _, cmd in ipairs(commands) do
-		table.insert(cmdNames, cmd.cmd)
+	-- Limpa lista
+	for _, child in ipairs(autocompleteList:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+	
+	if #input == 0 then
+		autocompleteFrame.Visible = false
+		return
 	end
 	
 	local matches = {}
 	local lowerInput = string.lower(input)
 	
-	for _, cmd in ipairs(cmdNames) do
-		if string.sub(string.lower(cmd), 1, #lowerInput) == lowerInput and #lowerInput > 0 then
-			table.insert(matches, cmd)
+	for _, cmd in ipairs(commands) do
+		local cmdName = string.split(cmd.cmd, " ")[1]
+		if string.sub(string.lower(cmdName), 1, #lowerInput) == lowerInput then
+			table.insert(matches, cmdName)
 		end
 	end
 	
@@ -530,13 +548,6 @@ local function updateAutocomplete(input)
 	end
 	
 	autocompleteFrame.Visible = true
-	
-	-- Limpa lista antiga
-	for _, child in ipairs(autocompleteList:GetChildren()) do
-		if child:IsA("TextButton") then
-			child:Destroy()
-		end
-	end
 	
 	local yOffset = 2
 	local buttonHeight = 20
@@ -1412,19 +1423,14 @@ local function executeCommand(cmd, args)
 end
 
 -- ============================================
--- AUTOCOMPLETE - DETECTA DIGITAÇÃO
+-- AUTOCOMPLETE
 -- ============================================
 
 ScreenGui.CMDBOX:GetPropertyChangedSignal("Text"):Connect(function()
 	local text = ScreenGui.CMDBOX.Text
-	if #text > 0 then
-		updateAutocomplete(text)
-	else
-		autocompleteFrame.Visible = false
-	end
+	updateAutocomplete(text)
 end)
 
--- Fecha autocomplete quando perde o foco
 ScreenGui.CMDBOX.FocusLost:Connect(function()
 	task.wait(0.2)
 	if not ScreenGui.CMDBOX:IsFocused() then
