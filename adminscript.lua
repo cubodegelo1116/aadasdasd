@@ -194,8 +194,10 @@ local function showPopup(text)
 	label.TextYAlignment = Enum.TextYAlignment.Center
 	label.ZIndex = 11
 	
-	task.wait(2)
-	popup:Destroy()
+	task.spawn(function()
+		task.wait(2)
+		popup:Destroy()
+	end)
 end
 
 -- ============================================
@@ -294,7 +296,6 @@ local commands = {
 local function toggleTPTool(enable)
 	local player = game.Players.LocalPlayer
 	local backpack = player:FindFirstChild("Backpack")
-	local character = player.Character
 	
 	if enable and not tpToolActive then
 		-- Remove tool antiga se existir
@@ -309,6 +310,7 @@ local function toggleTPTool(enable)
 		tool.RequiresHandle = false
 		tool.CanBeDropped = false
 		tool.ToolTip = "Clique em algum lugar para teleportar"
+		tool.Parent = backpack
 		
 		-- Tool invisível (sem handle)
 		tool.Handle = nil
@@ -317,7 +319,7 @@ local function toggleTPTool(enable)
 		tool.Grip = CFrame.new(0, 0, 0)
 		
 		-- Função de clique (SEM POPUP)
-		function tool.Activated()
+		local function onActivated()
 			local mouse = player:GetMouse()
 			local target = mouse.Target
 			local hit = mouse.Hit
@@ -329,18 +331,14 @@ local function toggleTPTool(enable)
 				
 				if rootPart then
 					rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
-					-- SEM POPUP
 				end
 			end
 		end
 		
+		tool.Activated:Connect(onActivated)
+		
 		tpTool = tool
 		tpToolActive = true
-		
-		-- Colocar no inventário
-		tool.Parent = backpack
-		
-		-- SEM POPUP
 		
 	elseif not enable and tpToolActive then
 		if tpTool then
@@ -348,7 +346,6 @@ local function toggleTPTool(enable)
 			tpTool = nil
 		end
 		tpToolActive = false
-		-- SEM POPUP
 	end
 end
 
@@ -1021,7 +1018,7 @@ ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 		end
 		
 		executeCommand(cmd, args)
-		ScreenGui.CMDBOX.Text = ""
+		ScreenGui.CMDBOX.Text = "" -- APAGA INSTANTANEAMENTE
 	end
 end)
 
