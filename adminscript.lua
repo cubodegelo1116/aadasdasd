@@ -1,5 +1,22 @@
 -- FRVGMXNT GUI2LUA CONVERTER 1.2. Like pls!
 
+-- ============================================
+-- ANTI DUPLICATE - DESTROI GUI ANTIGA
+-- ============================================
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+for _, gui in ipairs(playerGui:GetChildren()) do
+	if gui.Name == "RXT_Admin_GUI" then
+		gui:Destroy()
+	end
+end
+
+-- ============================================
+-- CONFIGURAÇÕES
+-- ============================================
+
 local Config = {
 	Prefix = "/",
 	Popups = true,
@@ -16,7 +33,8 @@ local ScreenGui = {
 	ScrollingFrame = Instance.new("ScrollingFrame"),
 }
 
-ScreenGui.ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ScreenGui.Parent = playerGui
+ScreenGui.ScreenGui.Name = "RXT_Admin_GUI"
 ScreenGui.ScreenGui.ResetOnSpawn = false
 
 ScreenGui.ComandtxtFrame.Parent = ScreenGui.ScreenGui
@@ -27,9 +45,12 @@ ScreenGui.CloseButton.Parent = ScreenGui.Dragbar
 ScreenGui.TextLabel.Parent = ScreenGui.Dragbar
 ScreenGui.ScrollingFrame.Parent = ScreenGui.CmdsLIST
 
-ScreenGui.ScreenGui.Name = "ScreenGui"
 ScreenGui.ScreenGui.IgnoreGuiInset = false
 ScreenGui.ScreenGui.DisplayOrder = 0
+
+-- ============================================
+-- CMDBOX - CANTO INFERIOR DIREITO (COM ANIMAÇÃO)
+-- ============================================
 
 ScreenGui.ComandtxtFrame.Name = "ComandtxtFrame"
 ScreenGui.ComandtxtFrame.ZIndex = 1
@@ -68,6 +89,46 @@ ScreenGui.CMDBOX.PlaceholderText = "digite 'cmds' para ver os comandos"
 ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CMDBOX.BorderSizePixel = 3
 
+-- ============================================
+-- ANIMAÇÃO DA CMDBOX (TIPO TGLD)
+-- ============================================
+
+task.spawn(function()
+	local cmbbox = ScreenGui.CMDBOX
+	cmbbox.BackgroundTransparency = 1
+	cmbbox.TextTransparency = 1
+	cmbbox.Size = UDim2.new(0, 0, 0, 25)
+	cmbbox.Position = UDim2.new(0, 0, 0, 0)
+	
+	-- Efeito de digitação oldschool
+	local text = "> RXT ADMIN v1.0"
+	for i = 1, #text do
+		cmbbox.PlaceholderText = string.sub(text, 1, i)
+		task.wait(0.03)
+	end
+	task.wait(0.3)
+	
+	-- Limpa e coloca o placeholder final
+	cmbbox.PlaceholderText = "digite 'cmds' para ver os comandos"
+	
+	-- Animação de fade in e slide
+	for i = 1, 15 do
+		cmbbox.BackgroundTransparency = 1 - (i / 15)
+		cmbbox.TextTransparency = 1 - (i / 15)
+		cmbbox.Size = UDim2.new(0, 218 * (i / 15), 0, 25)
+		cmbbox.Position = UDim2.new(0, 0, 0, 0)
+		task.wait(0.02)
+	end
+	
+	cmbbox.BackgroundTransparency = 0
+	cmbbox.TextTransparency = 0
+	cmbbox.Size = UDim2.new(0, 218, 0, 25)
+end)
+
+-- ============================================
+-- CmdsLIST (COM ANIMAÇÃO)
+-- ============================================
+
 ScreenGui.CmdsLIST.Name = "CmdsLIST"
 ScreenGui.CmdsLIST.ZIndex = 1
 ScreenGui.CmdsLIST.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
@@ -79,6 +140,43 @@ ScreenGui.CmdsLIST.AnchorPoint = Vector2.new(0, 0)
 ScreenGui.CmdsLIST.ClipsDescendants = false
 ScreenGui.CmdsLIST.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CmdsLIST.BorderSizePixel = 3
+
+-- OVERRIDE do Visible pra animar quando abrir
+local originalVisible = ScreenGui.CmdsLIST.Visible
+
+local function animateCmdsList(show)
+	local list = ScreenGui.CmdsLIST
+	if show then
+		list.Visible = true
+		list.BackgroundTransparency = 1
+		list.Size = UDim2.new(0, 0, 0, 0)
+		list.Position = UDim2.new(0.311619729, 0, 0.5, 0)
+		
+		for i = 1, 20 do
+			list.BackgroundTransparency = 1 - (i / 20)
+			list.Size = UDim2.new(0, 382 * (i / 20), 0, 299 * (i / 20))
+			list.Position = UDim2.new(0.311619729, 0, 0.246329531 + (0.15 * (1 - i / 20)), 0)
+			task.wait(0.015)
+		end
+		
+		list.BackgroundTransparency = 0
+		list.Size = UDim2.new(0, 382, 0, 299)
+		list.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
+	else
+		for i = 1, 15 do
+			list.BackgroundTransparency = i / 15
+			list.Size = UDim2.new(0, 382 * (1 - i / 15), 0, 299 * (1 - i / 15))
+			list.Position = UDim2.new(0.311619729, 0, 0.246329531 + (0.15 * (i / 15)), 0)
+			task.wait(0.015)
+		end
+		list.Visible = false
+		list.BackgroundTransparency = 0
+		list.Size = UDim2.new(0, 382, 0, 299)
+		list.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
+	end
+end
+
+ScreenGui.CmdsLIST.Visible = false
 
 ScreenGui.Dragbar.Name = "Dragbar"
 ScreenGui.Dragbar.ZIndex = 1
@@ -152,6 +250,10 @@ ScreenGui.ScrollingFrame.ScrollingEnabled = true
 ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
+-- ============================================
+-- RESTO DO SCRIPT
+-- ============================================
+
 local function showPopup(text)
 	if not Config.Popups then return end
 	
@@ -188,16 +290,16 @@ local function findPlayer(name)
 	local found = {}
 	local lowerName = string.lower(name)
 	
-	for _, player in ipairs(game.Players:GetPlayers()) do
-		local lowerPlayerName = string.lower(player.Name)
-		local lowerDisplayName = string.lower(player.DisplayName)
+	for _, plr in ipairs(game.Players:GetPlayers()) do
+		local lowerPlayerName = string.lower(plr.Name)
+		local lowerDisplayName = string.lower(plr.DisplayName)
 		
 		if lowerPlayerName == lowerName or lowerDisplayName == lowerName then
-			return player
+			return plr
 		end
 		
 		if string.find(lowerPlayerName, lowerName, 1, true) or string.find(lowerDisplayName, lowerName, 1, true) then
-			table.insert(found, player)
+			table.insert(found, plr)
 		end
 	end
 	
@@ -230,6 +332,14 @@ local tpToolActive = false
 local tpTool = nil
 local tpToolConn = nil
 
+local espActive = false
+local espConnections = {}
+local espHighlight = {}
+
+local walkflingActive = false
+local walkflingConn = nil
+local walkflingForce = 5000
+
 local commands = {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
 	{cmd = "prefix [novo]", desc = "Muda o prefixo"},
@@ -254,11 +364,147 @@ local commands = {
 	{cmd = "unview", desc = "Para de observar"},
 	{cmd = "tptool", desc = "Da uma tool de teleporte"},
 	{cmd = "untptool", desc = "Remove a tool de teleporte"},
+	{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
+	{cmd = "unesp", desc = "Desativa o ESP"},
+	{cmd = "walkfling", desc = "Ativa walkfling"},
+	{cmd = "unwalkfling", desc = "Desativa walkfling"},
 }
 
+local function toggleESP(enable)
+	local plr = game.Players.LocalPlayer
+	
+	if enable and not espActive then
+		espActive = true
+		
+		for _, p in ipairs(game.Players:GetPlayers()) do
+			if p ~= plr then
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "ESP_Highlight"
+				highlight.Parent = p.Character or p
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = 0
+				highlight.Adornee = p.Character
+				table.insert(espHighlight, highlight)
+			end
+		end
+		
+		local function onPlayerAdded(p)
+			if p ~= plr then
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "ESP_Highlight"
+				highlight.Parent = p.Character or p
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = 0
+				highlight.Adornee = p.Character
+				table.insert(espHighlight, highlight)
+			end
+		end
+		
+		local function onPlayerRemoving(p)
+			for i, highlight in ipairs(espHighlight) do
+				if highlight and highlight.Parent == p.Character or highlight.Adornee == p.Character then
+					highlight:Destroy()
+					table.remove(espHighlight, i)
+					break
+				end
+			end
+		end
+		
+		local function onCharacterAdded(character)
+			local p = game.Players:GetPlayerFromCharacter(character)
+			if p and p ~= plr then
+				for i, highlight in ipairs(espHighlight) do
+					if highlight.Adornee == character then
+						highlight:Destroy()
+						table.remove(espHighlight, i)
+						break
+					end
+				end
+				local highlight = Instance.new("Highlight")
+				highlight.Name = "ESP_Highlight"
+				highlight.Parent = character
+				highlight.FillColor = Color3.fromRGB(255, 0, 0)
+				highlight.FillTransparency = 0.5
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+				highlight.OutlineTransparency = 0
+				highlight.Adornee = character
+				table.insert(espHighlight, highlight)
+			end
+		end
+		
+		espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(onPlayerAdded)
+		espConnections.PlayerRemoving = game.Players.PlayerRemoving:Connect(onPlayerRemoving)
+		espConnections.CharacterAdded = game.Players.PlayerAdded:Connect(function(p)
+			p.CharacterAdded:Connect(onCharacterAdded)
+		end)
+		
+		showPopup("ESP ativado")
+		
+	elseif not enable and espActive then
+		espActive = false
+		
+		for _, highlight in ipairs(espHighlight) do
+			highlight:Destroy()
+		end
+		espHighlight = {}
+		
+		for _, conn in pairs(espConnections) do
+			conn:Disconnect()
+		end
+		espConnections = {}
+		
+		showPopup("ESP desativado")
+	end
+end
+
+local function toggleWalkfling(enable)
+	local plr = game.Players.LocalPlayer
+	
+	if enable and not walkflingActive then
+		walkflingActive = true
+		
+		walkflingConn = game:GetService("RunService").RenderStepped:Connect(function()
+			local character = plr.Character
+			local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+			if not rootPart then return end
+			
+			for _, p in ipairs(game.Players:GetPlayers()) do
+				if p ~= plr then
+					local pChar = p.Character
+					local pRoot = pChar and pChar:FindFirstChild("HumanoidRootPart")
+					if pRoot then
+						local distance = (rootPart.Position - pRoot.Position).Magnitude
+						if distance < 10 then
+							local direction = (pRoot.Position - rootPart.Position).Unit
+							local force = direction * walkflingForce
+							pRoot.Velocity = force
+						end
+					end
+				end
+			end
+		end)
+		
+		showPopup("Walkfling ativado")
+		
+	elseif not enable and walkflingActive then
+		walkflingActive = false
+		
+		if walkflingConn then
+			walkflingConn:Disconnect()
+			walkflingConn = nil
+		end
+		
+		showPopup("Walkfling desativado")
+	end
+end
+
 local function toggleTPTool(enable)
-	local player = game.Players.LocalPlayer
-	local backpack = player:FindFirstChild("Backpack")
+	local plr = game.Players.LocalPlayer
+	local backpack = plr:FindFirstChild("Backpack")
 	
 	if enable and not tpToolActive then
 		if tpTool then
@@ -278,11 +524,11 @@ local function toggleTPTool(enable)
 		tool.Parent = backpack
 		tool.Grip = CFrame.new(0, 0, 0)
 		
-		local mouse = player:GetMouse()
+		local mouse = plr:GetMouse()
 		local currentConn = nil
 		
 		local function onMouseClick()
-			local character = player.Character
+			local character = plr.Character
 			local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 			if not rootPart then return end
 			
@@ -295,7 +541,6 @@ local function toggleTPTool(enable)
 			end
 		end
 		
-		-- Quando equipar, ativa o clique
 		tool.Equipped:Connect(function()
 			if currentConn then
 				currentConn:Disconnect()
@@ -304,7 +549,6 @@ local function toggleTPTool(enable)
 			currentConn = mouse.Button1Down:Connect(onMouseClick)
 		end)
 		
-		-- Quando desequipar, remove a conexão
 		tool.Unequipped:Connect(function()
 			if currentConn then
 				currentConn:Disconnect()
@@ -312,8 +556,7 @@ local function toggleTPTool(enable)
 			end
 		end)
 		
-		-- Se já estiver equipado, ativa
-		if player.Character and player.Character:FindFirstChild(tool.Name) then
+		if plr.Character and plr.Character:FindFirstChild(tool.Name) then
 			currentConn = mouse.Button1Down:Connect(onMouseClick)
 		end
 		
@@ -335,8 +578,8 @@ local function toggleTPTool(enable)
 end
 
 local function toggleFly(enable)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	if not character then return end
 	
 	local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
@@ -452,8 +695,8 @@ local function toggleFly(enable)
 end
 
 local function toggleNoclip(enable)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	if not character then return end
 	
 	if enable and not noclipActive then
@@ -495,8 +738,8 @@ local function toggleNoclip(enable)
 end
 
 local function setSpeed(value)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid then return end
 	
@@ -510,8 +753,8 @@ local function setSpeed(value)
 end
 
 local function setJump(value)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid then return end
 	
@@ -525,7 +768,7 @@ local function setJump(value)
 end
 
 local function toggleSpeedLoop(value)
-	local player = game.Players.LocalPlayer
+	local plr = game.Players.LocalPlayer
 	
 	if speedLoopActive then
 		if speedLoopConn then
@@ -547,7 +790,7 @@ local function toggleSpeedLoop(value)
 	speedLoopValue = value
 	
 	local function applySpeedLoop()
-		local character = player.Character
+		local character = plr.Character
 		local humanoid = character and character:FindFirstChild("Humanoid")
 		if humanoid and speedLoopActive then
 			humanoid.WalkSpeed = speedLoopValue
@@ -556,10 +799,10 @@ local function toggleSpeedLoop(value)
 	
 	speedLoopConn = game:GetService("RunService").RenderStepped:Connect(applySpeedLoop)
 	
-	player.CharacterAdded:Connect(function()
+	plr.CharacterAdded:Connect(function()
 		if speedLoopActive and speedLoopValue then
 			task.wait(0.1)
-			local character = player.Character
+			local character = plr.Character
 			local humanoid = character and character:FindFirstChild("Humanoid")
 			if humanoid then
 				humanoid.WalkSpeed = speedLoopValue
@@ -572,7 +815,7 @@ local function toggleSpeedLoop(value)
 end
 
 local function toggleJumpLoop(value)
-	local player = game.Players.LocalPlayer
+	local plr = game.Players.LocalPlayer
 	
 	if jumpLoopActive then
 		if jumpLoopConn then
@@ -594,7 +837,7 @@ local function toggleJumpLoop(value)
 	jumpLoopValue = value
 	
 	local function applyJumpLoop()
-		local character = player.Character
+		local character = plr.Character
 		local humanoid = character and character:FindFirstChild("Humanoid")
 		if humanoid and jumpLoopActive then
 			humanoid.JumpPower = jumpLoopValue
@@ -603,10 +846,10 @@ local function toggleJumpLoop(value)
 	
 	jumpLoopConn = game:GetService("RunService").RenderStepped:Connect(applyJumpLoop)
 	
-	player.CharacterAdded:Connect(function()
+	plr.CharacterAdded:Connect(function()
 		if jumpLoopActive and jumpLoopValue then
 			task.wait(0.1)
-			local character = player.Character
+			local character = plr.Character
 			local humanoid = character and character:FindFirstChild("Humanoid")
 			if humanoid then
 				humanoid.JumpPower = jumpLoopValue
@@ -619,8 +862,8 @@ local function toggleJumpLoop(value)
 end
 
 local function toggleInfJump(enable)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	local humanoid = character and character:FindFirstChild("Humanoid")
 	if not humanoid then return end
 	
@@ -630,7 +873,7 @@ local function toggleInfJump(enable)
 		local conn
 		conn = game:GetService("UserInputService").JumpRequest:Connect(function()
 			if infJumpActive then
-				local char = player.Character
+				local char = plr.Character
 				local hum = char and char:FindFirstChild("Humanoid")
 				if hum then
 					hum:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -652,8 +895,8 @@ local function toggleInfJump(enable)
 end
 
 local function teleportTo(target)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 	if not rootPart then return end
 	
@@ -669,8 +912,8 @@ local function teleportTo(target)
 end
 
 local function bringPlayer(target)
-	local player = game.Players.LocalPlayer
-	local character = player.Character
+	local plr = game.Players.LocalPlayer
+	local character = plr.Character
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart")
 	if not rootPart then return end
 	
@@ -686,7 +929,7 @@ local function bringPlayer(target)
 end
 
 local function toggleView(target)
-	local player = game.Players.LocalPlayer
+	local plr = game.Players.LocalPlayer
 	local camera = workspace.CurrentCamera
 	
 	if viewActive then
@@ -696,7 +939,7 @@ local function toggleView(target)
 		end
 		viewActive = false
 		viewTarget = nil
-		camera.CameraSubject = player.Character
+		camera.CameraSubject = plr.Character
 		showPopup("View desativado")
 		return
 	end
@@ -732,6 +975,10 @@ local function toggleView(target)
 	
 	showPopup("Observando " .. target.Name)
 end
+
+-- ============================================
+-- CRIAR BOTÕES
+-- ============================================
 
 local function createCommandButtons()
 	local yOffset = 5
@@ -770,9 +1017,13 @@ end
 
 createCommandButtons()
 
+-- ============================================
+-- FUNÇÃO DOS COMANDOS
+-- ============================================
+
 local function executeCommand(cmd, args)
 	if cmd == "cmds" then
-		ScreenGui.CmdsLIST.Visible = not ScreenGui.CmdsLIST.Visible
+		animateCmdsList(not ScreenGui.CmdsLIST.Visible)
 		return true
 		
 	elseif cmd == "prefix" then
@@ -943,10 +1194,30 @@ local function executeCommand(cmd, args)
 	elseif cmd == "untptool" then
 		toggleTPTool(false)
 		return true
+		
+	elseif cmd == "esp" then
+		toggleESP(true)
+		return true
+		
+	elseif cmd == "unesp" then
+		toggleESP(false)
+		return true
+		
+	elseif cmd == "walkfling" then
+		toggleWalkfling(true)
+		return true
+		
+	elseif cmd == "unwalkfling" then
+		toggleWalkfling(false)
+		return true
 	end
 	
 	return false
 end
+
+-- ============================================
+-- PROCESSAR COMANDO VIA CMDBOX
+-- ============================================
 
 ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 	if enterPressed and ScreenGui.CMDBOX.Text ~= "" then
@@ -971,6 +1242,10 @@ ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 	end
 end)
 
+-- ============================================
+-- PROCESSAR COMANDO VIA CHAT
+-- ============================================
+
 game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 	local parts = {}
 	for part in string.gmatch(message, "%S+") do
@@ -989,9 +1264,17 @@ game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 	end
 end)
 
+-- ============================================
+-- FECHAR GUI
+-- ============================================
+
 ScreenGui.CloseButton.MouseButton1Click:Connect(function()
-	ScreenGui.CmdsLIST.Visible = false
+	animateCmdsList(false)
 end)
+
+-- ============================================
+-- DRAG
+-- ============================================
 
 local dragging = false
 local dragInput, dragStart, startPos
@@ -1023,6 +1306,10 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 	end
 end)
 
+-- ============================================
+-- LIMPAR TUDO QUANDO RESPAWNA
+-- ============================================
+
 game.Players.LocalPlayer.CharacterAdded:Connect(function()
 	if flyActive then
 		toggleFly(false)
@@ -1038,5 +1325,11 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function()
 	end
 	if tpToolActive then
 		toggleTPTool(false)
+	end
+	if espActive then
+		toggleESP(false)
+	end
+	if walkflingActive then
+		toggleWalkfling(false)
 	end
 end)
