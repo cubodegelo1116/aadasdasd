@@ -1,7 +1,7 @@
 -- FRVGMXNT GUI2LUA CONVERTER 1.2. Like pls!
 
 -- ============================================
--- ANTI DUPLICATE - DESTROI GUI ANTIGA
+-- ANTI DUPLICATE
 -- ============================================
 
 local player = game.Players.LocalPlayer
@@ -49,7 +49,7 @@ ScreenGui.ScreenGui.IgnoreGuiInset = false
 ScreenGui.ScreenGui.DisplayOrder = 0
 
 -- ============================================
--- CMDBOX - CANTO INFERIOR DIREITO (COM ANIMAÇÃO)
+-- CMDBOX
 -- ============================================
 
 ScreenGui.ComandtxtFrame.Name = "ComandtxtFrame"
@@ -90,7 +90,33 @@ ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CMDBOX.BorderSizePixel = 3
 
 -- ============================================
--- ANIMAÇÃO DA CMDBOX (TIPO TGLD)
+-- AUTOCOMPLETE FRAME
+-- ============================================
+
+local autocompleteFrame = Instance.new("Frame")
+autocompleteFrame.Name = "AutocompleteFrame"
+autocompleteFrame.Parent = ScreenGui.ScreenGui
+autocompleteFrame.Size = UDim2.new(0, 218, 0, 0)
+autocompleteFrame.Position = UDim2.new(1, -230, 1, -70)
+autocompleteFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
+autocompleteFrame.BackgroundTransparency = 0
+autocompleteFrame.BorderColor3 = Color3.fromRGB(185,185,185)
+autocompleteFrame.BorderSizePixel = 3
+autocompleteFrame.Visible = false
+autocompleteFrame.ZIndex = 2
+autocompleteFrame.ClipsDescendants = true
+
+local autocompleteList = Instance.new("ScrollingFrame")
+autocompleteList.Name = "AutocompleteList"
+autocompleteList.Parent = autocompleteFrame
+autocompleteList.Size = UDim2.new(1, 0, 1, 0)
+autocompleteList.BackgroundTransparency = 1
+autocompleteList.BorderSizePixel = 0
+autocompleteList.ScrollBarThickness = 4
+autocompleteList.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+-- ============================================
+-- ANIMAÇÃO DA CMDBOX
 -- ============================================
 
 task.spawn(function()
@@ -98,9 +124,7 @@ task.spawn(function()
 	cmbbox.BackgroundTransparency = 1
 	cmbbox.TextTransparency = 1
 	cmbbox.Size = UDim2.new(0, 0, 0, 25)
-	cmbbox.Position = UDim2.new(0, 0, 0, 0)
 	
-	-- Efeito de digitação oldschool
 	local text = "> RXT ADMIN v1.0"
 	for i = 1, #text do
 		cmbbox.PlaceholderText = string.sub(text, 1, i)
@@ -108,15 +132,12 @@ task.spawn(function()
 	end
 	task.wait(0.3)
 	
-	-- Limpa e coloca o placeholder final
 	cmbbox.PlaceholderText = "digite 'cmds' para ver os comandos"
 	
-	-- Animação de fade in e slide
 	for i = 1, 15 do
 		cmbbox.BackgroundTransparency = 1 - (i / 15)
 		cmbbox.TextTransparency = 1 - (i / 15)
 		cmbbox.Size = UDim2.new(0, 218 * (i / 15), 0, 25)
-		cmbbox.Position = UDim2.new(0, 0, 0, 0)
 		task.wait(0.02)
 	end
 	
@@ -126,13 +147,17 @@ task.spawn(function()
 end)
 
 -- ============================================
--- CmdsLIST (COM ANIMAÇÃO)
+-- CmdsLIST
 -- ============================================
+
+local CMDSLIST_ORIGINAL_POS = UDim2.new(0.311619729, 0, 0.246329531, 0)
+local CMDSLIST_ORIGINAL_SIZE = UDim2.new(0, 382, 0, 299)
+local isAnimating = false
 
 ScreenGui.CmdsLIST.Name = "CmdsLIST"
 ScreenGui.CmdsLIST.ZIndex = 1
-ScreenGui.CmdsLIST.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
-ScreenGui.CmdsLIST.Size = UDim2.new(0, 382, 0, 299)
+ScreenGui.CmdsLIST.Position = CMDSLIST_ORIGINAL_POS
+ScreenGui.CmdsLIST.Size = CMDSLIST_ORIGINAL_SIZE
 ScreenGui.CmdsLIST.BackgroundColor3 = Color3.fromRGB(227,227,227)
 ScreenGui.CmdsLIST.BackgroundTransparency = 0
 ScreenGui.CmdsLIST.Visible = false
@@ -141,39 +166,44 @@ ScreenGui.CmdsLIST.ClipsDescendants = false
 ScreenGui.CmdsLIST.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.CmdsLIST.BorderSizePixel = 3
 
--- OVERRIDE do Visible pra animar quando abrir
-local originalVisible = ScreenGui.CmdsLIST.Visible
-
 local function animateCmdsList(show)
+	if isAnimating then return end
+	isAnimating = true
+	
 	local list = ScreenGui.CmdsLIST
+	
 	if show then
 		list.Visible = true
 		list.BackgroundTransparency = 1
 		list.Size = UDim2.new(0, 0, 0, 0)
-		list.Position = UDim2.new(0.311619729, 0, 0.5, 0)
+		list.Position = UDim2.new(CMDSLIST_ORIGINAL_POS.X.Scale, CMDSLIST_ORIGINAL_POS.X.Offset, CMDSLIST_ORIGINAL_POS.Y.Scale + 0.15, CMDSLIST_ORIGINAL_POS.Y.Offset)
 		
 		for i = 1, 20 do
 			list.BackgroundTransparency = 1 - (i / 20)
-			list.Size = UDim2.new(0, 382 * (i / 20), 0, 299 * (i / 20))
-			list.Position = UDim2.new(0.311619729, 0, 0.246329531 + (0.15 * (1 - i / 20)), 0)
+			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (i / 20))
+			list.Position = UDim2.new(CMDSLIST_ORIGINAL_POS.X.Scale, CMDSLIST_ORIGINAL_POS.X.Offset, CMDSLIST_ORIGINAL_POS.Y.Scale + (0.15 * (1 - i / 20)), CMDSLIST_ORIGINAL_POS.Y.Offset)
 			task.wait(0.015)
 		end
 		
 		list.BackgroundTransparency = 0
-		list.Size = UDim2.new(0, 382, 0, 299)
-		list.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
+		list.Size = CMDSLIST_ORIGINAL_SIZE
+		list.Position = CMDSLIST_ORIGINAL_POS
 	else
+		local currentPos = list.Position
+		
 		for i = 1, 15 do
 			list.BackgroundTransparency = i / 15
-			list.Size = UDim2.new(0, 382 * (1 - i / 15), 0, 299 * (1 - i / 15))
-			list.Position = UDim2.new(0.311619729, 0, 0.246329531 + (0.15 * (i / 15)), 0)
+			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - i / 15), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (1 - i / 15))
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (i / 15)), currentPos.Y.Offset)
 			task.wait(0.015)
 		end
 		list.Visible = false
 		list.BackgroundTransparency = 0
-		list.Size = UDim2.new(0, 382, 0, 299)
-		list.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
+		list.Size = CMDSLIST_ORIGINAL_SIZE
+		list.Position = CMDSLIST_ORIGINAL_POS
 	end
+	
+	isAnimating = false
 end
 
 ScreenGui.CmdsLIST.Visible = false
@@ -336,9 +366,11 @@ local espActive = false
 local espConnections = {}
 local espHighlight = {}
 
+-- WALKFLING (NOVO)
 local walkflingActive = false
 local walkflingConn = nil
-local walkflingForce = 5000
+local walkflingGodConn = nil
+local walkflingLoopConn = nil
 
 local commands = {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
@@ -369,6 +401,183 @@ local commands = {
 	{cmd = "walkfling", desc = "Ativa walkfling"},
 	{cmd = "unwalkfling", desc = "Desativa walkfling"},
 }
+
+-- ============================================
+-- FUNÇÃO WALKFLING (NOVA)
+-- ============================================
+
+local function toggleWalkfling(enable)
+	local plr = game.Players.LocalPlayer
+	
+	if enable and not walkflingActive then
+		walkflingActive = true
+		
+		local function startWalkfling(character)
+			if not character then return end
+			
+			local rootPart = character:FindFirstChild("HumanoidRootPart")
+			local humanoid = character:FindFirstChild("Humanoid")
+			if not rootPart or not humanoid then return end
+			
+			-- God mode
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+			humanoid.BreakJointsOnDeath = false
+			
+			if walkflingGodConn then
+				walkflingGodConn:Disconnect()
+				walkflingGodConn = nil
+			end
+			
+			walkflingGodConn = game:GetService("RunService").Stepped:Connect(function()
+				if walkflingActive then
+					humanoid.Health = math.huge
+					humanoid.MaxHealth = math.huge
+				end
+			end)
+			
+			rootPart.CanCollide = false
+			
+			if walkflingLoopConn then
+				walkflingLoopConn:Disconnect()
+				walkflingLoopConn = nil
+			end
+			
+			walkflingLoopConn = game:GetService("RunService").Heartbeat:Connect(function()
+				if not walkflingActive or not rootPart or not rootPart.Parent then
+					return
+				end
+				
+				local v = rootPart.Velocity
+				rootPart.Velocity = Vector3.new(v.X * 99999999, v.Y + 50, v.Z * 99999999)
+				
+				task.wait()
+				rootPart.Velocity = v
+				
+				task.wait()
+				rootPart.Velocity = v + Vector3.new(0, 0.1, 0)
+			end)
+		end
+		
+		if plr.Character then
+			startWalkfling(plr.Character)
+		end
+		
+		plr.CharacterAdded:Connect(function(character)
+			if walkflingActive then
+				task.wait(0.1)
+				startWalkfling(character)
+			end
+		end)
+		
+		showPopup("Walkfling ativado")
+		
+	elseif not enable and walkflingActive then
+		walkflingActive = false
+		
+		if walkflingGodConn then
+			walkflingGodConn:Disconnect()
+			walkflingGodConn = nil
+		end
+		
+		if walkflingLoopConn then
+			walkflingLoopConn:Disconnect()
+			walkflingLoopConn = nil
+		end
+		
+		local character = plr.Character
+		if character then
+			local humanoid = character:FindFirstChild("Humanoid")
+			local rootPart = character:FindFirstChild("HumanoidRootPart")
+			
+			if humanoid then
+				humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
+				humanoid.BreakJointsOnDeath = true
+				humanoid.Health = 100
+				humanoid.MaxHealth = 100
+			end
+			
+			if rootPart then
+				rootPart.CanCollide = true
+			end
+		end
+		
+		showPopup("Walkfling desativado")
+	end
+end
+
+-- ============================================
+-- FUNÇÃO AUTCOMPLETE
+-- ============================================
+
+local function updateAutocomplete(input)
+	local cmdNames = {}
+	for _, cmd in ipairs(commands) do
+		table.insert(cmdNames, cmd.cmd)
+	end
+	
+	local matches = {}
+	local lowerInput = string.lower(input)
+	
+	for _, cmd in ipairs(cmdNames) do
+		if string.sub(string.lower(cmd), 1, #lowerInput) == lowerInput and #lowerInput > 0 then
+			table.insert(matches, cmd)
+		end
+	end
+	
+	if #matches == 0 then
+		autocompleteFrame.Visible = false
+		return
+	end
+	
+	autocompleteFrame.Visible = true
+	
+	-- Limpa lista antiga
+	for _, child in ipairs(autocompleteList:GetChildren()) do
+		if child:IsA("TextButton") then
+			child:Destroy()
+		end
+	end
+	
+	local yOffset = 2
+	local buttonHeight = 20
+	
+	for _, match in ipairs(matches) do
+		local btn = Instance.new("TextButton")
+		btn.Parent = autocompleteList
+		btn.Size = UDim2.new(1, -4, 0, buttonHeight)
+		btn.Position = UDim2.new(0, 2, 0, yOffset)
+		btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+		btn.BackgroundTransparency = 0.3
+		btn.BorderSizePixel = 0
+		btn.Text = match
+		btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+		btn.TextSize = 12
+		btn.TextXAlignment = Enum.TextXAlignment.Left
+		btn.Font = Enum.Font.SourceSans
+		
+		btn.MouseEnter:Connect(function()
+			btn.BackgroundTransparency = 0
+		end)
+		btn.MouseLeave:Connect(function()
+			btn.BackgroundTransparency = 0.3
+		end)
+		
+		btn.MouseButton1Click:Connect(function()
+			ScreenGui.CMDBOX.Text = match
+			autocompleteFrame.Visible = false
+			ScreenGui.CMDBOX:CaptureFocus()
+		end)
+		
+		yOffset = yOffset + buttonHeight + 2
+	end
+	
+	autocompleteList.CanvasSize = UDim2.new(0, 0, 0, yOffset + 4)
+	autocompleteFrame.Size = UDim2.new(0, 218, 0, math.min(yOffset + 4, 100))
+end
+
+-- ============================================
+-- FUNÇÃO ESP
+-- ============================================
 
 local function toggleESP(enable)
 	local plr = game.Players.LocalPlayer
@@ -461,46 +670,9 @@ local function toggleESP(enable)
 	end
 end
 
-local function toggleWalkfling(enable)
-	local plr = game.Players.LocalPlayer
-	
-	if enable and not walkflingActive then
-		walkflingActive = true
-		
-		walkflingConn = game:GetService("RunService").RenderStepped:Connect(function()
-			local character = plr.Character
-			local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-			if not rootPart then return end
-			
-			for _, p in ipairs(game.Players:GetPlayers()) do
-				if p ~= plr then
-					local pChar = p.Character
-					local pRoot = pChar and pChar:FindFirstChild("HumanoidRootPart")
-					if pRoot then
-						local distance = (rootPart.Position - pRoot.Position).Magnitude
-						if distance < 10 then
-							local direction = (pRoot.Position - rootPart.Position).Unit
-							local force = direction * walkflingForce
-							pRoot.Velocity = force
-						end
-					end
-				end
-			end
-		end)
-		
-		showPopup("Walkfling ativado")
-		
-	elseif not enable and walkflingActive then
-		walkflingActive = false
-		
-		if walkflingConn then
-			walkflingConn:Disconnect()
-			walkflingConn = nil
-		end
-		
-		showPopup("Walkfling desativado")
-	end
-end
+-- ============================================
+-- FUNÇÃO TP TOOL
+-- ============================================
 
 local function toggleTPTool(enable)
 	local plr = game.Players.LocalPlayer
@@ -576,6 +748,10 @@ local function toggleTPTool(enable)
 		tpToolActive = false
 	end
 end
+
+-- ============================================
+-- FUNÇÃO FLY
+-- ============================================
 
 local function toggleFly(enable)
 	local plr = game.Players.LocalPlayer
@@ -694,6 +870,10 @@ local function toggleFly(enable)
 	end
 end
 
+-- ============================================
+-- FUNÇÃO NOCLIP
+-- ============================================
+
 local function toggleNoclip(enable)
 	local plr = game.Players.LocalPlayer
 	local character = plr.Character
@@ -737,6 +917,10 @@ local function toggleNoclip(enable)
 	end
 end
 
+-- ============================================
+-- FUNÇÕES SPEED E JUMP
+-- ============================================
+
 local function setSpeed(value)
 	local plr = game.Players.LocalPlayer
 	local character = plr.Character
@@ -766,6 +950,10 @@ local function setJump(value)
 		showPopup("Pulo normal")
 	end
 end
+
+-- ============================================
+-- FUNÇÕES LOOP
+-- ============================================
 
 local function toggleSpeedLoop(value)
 	local plr = game.Players.LocalPlayer
@@ -861,6 +1049,10 @@ local function toggleJumpLoop(value)
 	showPopup("Loop jump ativado: " .. value)
 end
 
+-- ============================================
+-- FUNÇÃO INFJUMP
+-- ============================================
+
 local function toggleInfJump(enable)
 	local plr = game.Players.LocalPlayer
 	local character = plr.Character
@@ -893,6 +1085,10 @@ local function toggleInfJump(enable)
 		showPopup("Pulo infinito desativado")
 	end
 end
+
+-- ============================================
+-- FUNÇÕES GOTO, BRING E VIEW
+-- ============================================
 
 local function teleportTo(target)
 	local plr = game.Players.LocalPlayer
@@ -1216,6 +1412,27 @@ local function executeCommand(cmd, args)
 end
 
 -- ============================================
+-- AUTOCOMPLETE - DETECTA DIGITAÇÃO
+-- ============================================
+
+ScreenGui.CMDBOX:GetPropertyChangedSignal("Text"):Connect(function()
+	local text = ScreenGui.CMDBOX.Text
+	if #text > 0 then
+		updateAutocomplete(text)
+	else
+		autocompleteFrame.Visible = false
+	end
+end)
+
+-- Fecha autocomplete quando perde o foco
+ScreenGui.CMDBOX.FocusLost:Connect(function()
+	task.wait(0.2)
+	if not ScreenGui.CMDBOX:IsFocused() then
+		autocompleteFrame.Visible = false
+	end
+end)
+
+-- ============================================
 -- PROCESSAR COMANDO VIA CMDBOX
 -- ============================================
 
@@ -1239,6 +1456,7 @@ ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
 		
 		executeCommand(cmd, args)
 		ScreenGui.CMDBOX.Text = ""
+		autocompleteFrame.Visible = false
 	end
 end)
 
