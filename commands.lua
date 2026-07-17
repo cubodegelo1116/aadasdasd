@@ -2,10 +2,6 @@
 -- RXT ADMIN - COMANDOS
 -- ============================================
 
--- ============================================
--- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
--- ============================================
-
 _G.RXT_ExecuteCommand = function(cmd, args)
 	local player = _G.RXT_Player
 	local gui = _G.RXT_GUI
@@ -91,7 +87,6 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 	-- COMANDOS QUE PRECISAM DE ESTADO GLOBAL
 	-- ============================================
 	
-	-- Inicializa estado se não existir
 	if not _G.RXT_State then
 		_G.RXT_State = {
 			flyActive = false,
@@ -978,7 +973,8 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		toggleJumpLoop(nil)
 		return true
 		
-	elseif cmd == "infjump" then		toggleInfJump(true)
+	elseif cmd == "infjump" then
+		toggleInfJump(true)
 		return true
 		
 	elseif cmd == "uninfjump" then
