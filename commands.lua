@@ -6,16 +6,8 @@
 
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
-local ScreenGui = playerGui:WaitForChild("RXT_Admin_GUI")
-
--- ============================================
--- CONFIGURAÇÕES
--- ============================================
-
-local Config = {
-	Prefix = "/",
-	Popups = true,
-}
+local ScreenGui = _G.RXT_ScreenGui
+local Config = _G.RXT_Config
 
 -- ============================================
 -- FUNÇÕES AUXILIARES
@@ -25,7 +17,7 @@ local function showPopup(text)
 	if not Config.Popups then return end
 	
 	local popup = Instance.new("Frame")
-	popup.Parent = ScreenGui
+	popup.Parent = ScreenGui.ScreenGui
 	popup.Size = UDim2.new(0, 300, 0, 40)
 	popup.Position = UDim2.new(0.5, -150, 0.15, 0)
 	popup.BackgroundColor3 = Color3.fromRGB(227,227,227)
@@ -174,7 +166,7 @@ local commands = {
 -- ============================================
 
 local function toggleExecutor(enable)
-	local executorFrame = ScreenGui:FindFirstChild("ExecutorFrame")
+	local executorFrame = ScreenGui.ScreenGui:FindFirstChild("ExecutorFrame")
 	if executorFrame then
 		executorFrame.Visible = enable
 		if enable then
@@ -785,7 +777,7 @@ local function executeCommand(input)
 	
 	if command == "cmds" then
 		-- Mostrar comandos na interface
-		local scrolling = ScreenGui:FindFirstChild("ScrollingFrame")
+		local scrolling = ScreenGui.ScrollingFrame
 		if scrolling then
 			for _, child in ipairs(scrolling:GetChildren()) do
 				child:Destroy()
@@ -924,7 +916,7 @@ end
 -- LISTENER DE COMANDOS
 -- ============================================
 
-local cmdBox = ScreenGui:FindFirstChild("CMDBOX")
+local cmdBox = ScreenGui.CMDBOX
 if cmdBox then
 	cmdBox.FocusLost:Connect(function(enterPressed)
 		if enterPressed then
@@ -939,7 +931,7 @@ end
 -- EXECUTOR DE SCRIPTS
 -- ============================================
 
-local executorFrame = ScreenGui:FindFirstChild("ExecutorFrame")
+local executorFrame = ScreenGui.ScreenGui:FindFirstChild("ExecutorFrame")
 if executorFrame then
 	local executeBtn = executorFrame:FindFirstChild("ExecutorExecute")
 	local clearBtn = executorFrame:FindFirstChild("ExecutorClear")
