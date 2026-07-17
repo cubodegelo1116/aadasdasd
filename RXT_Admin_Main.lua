@@ -196,14 +196,14 @@ _G.RXT_AutocompleteList = autocompleteList
 _G.RXT_AutocompleteFrame = autocompleteFrame
 
 -- ============================================
--- EXECUTOR
+-- EXECUTOR (UI DO USUÁRIO)
 -- ============================================
 
 local executorFrame = Instance.new("Frame")
 executorFrame.Name = "ExecutorFrame"
 executorFrame.Parent = ScreenGui.ScreenGui
-executorFrame.Size = UDim2.new(0, 400, 0, 250)
-executorFrame.Position = UDim2.new(0.5, -200, 0.3, 0)
+executorFrame.Size = UDim2.new(0, 382, 0, 299)
+executorFrame.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
 executorFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
 executorFrame.BackgroundTransparency = 0
 executorFrame.BorderColor3 = Color3.fromRGB(185,185,185)
@@ -213,9 +213,9 @@ executorFrame.ZIndex = 10
 executorFrame.ClipsDescendants = false
 
 local executorDragbar = Instance.new("Frame")
-executorDragbar.Name = "ExecutorDragbar"
+executorDragbar.Name = "DRAGBAR"
 executorDragbar.Parent = executorFrame
-executorDragbar.Size = UDim2.new(1, 0, 0, 29)
+executorDragbar.Size = UDim2.new(0, 382, 0, 29)
 executorDragbar.Position = UDim2.new(0, 0, 0, 0)
 executorDragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
 executorDragbar.BackgroundTransparency = 0
@@ -223,39 +223,39 @@ executorDragbar.BorderColor3 = Color3.fromRGB(185,185,185)
 executorDragbar.BorderSizePixel = 3
 executorDragbar.ZIndex = 11
 
-local executorTitle = Instance.new("TextLabel")
-executorTitle.Name = "ExecutorTitle"
-executorTitle.Parent = executorDragbar
-executorTitle.Size = UDim2.new(1, -40, 1, 0)
-executorTitle.Position = UDim2.new(0, 10, 0, 0)
-executorTitle.BackgroundTransparency = 1
-executorTitle.Text = "RXT EXECUTOR"
-executorTitle.TextColor3 = Color3.fromRGB(0,0,0)
-executorTitle.TextSize = 18
-executorTitle.Font = Enum.Font.SourceSansBold
-executorTitle.TextXAlignment = Enum.TextXAlignment.Left
-executorTitle.TextYAlignment = Enum.TextYAlignment.Center
-executorTitle.ZIndex = 11
-
 local executorClose = Instance.new("TextButton")
-executorClose.Name = "ExecutorClose"
+executorClose.Name = "CloseButton"
 executorClose.Parent = executorDragbar
-executorClose.Size = UDim2.new(0, 30, 0, 30)
-executorClose.Position = UDim2.new(1, -30, 0, 0)
+executorClose.Size = UDim2.new(0, 22, 0, 22)
+executorClose.Position = UDim2.new(0.931999981, 0, 0.0799999982, 0)
 executorClose.BackgroundColor3 = Color3.fromRGB(177,0,0)
 executorClose.BackgroundTransparency = 0
 executorClose.BorderSizePixel = 0
 executorClose.Text = ""
-executorClose.TextColor3 = Color3.fromRGB(255,255,255)
-executorClose.TextSize = 18
-executorClose.Font = Enum.Font.SourceSansBold
+executorClose.TextColor3 = Color3.fromRGB(0,0,0)
+executorClose.TextSize = 14
+executorClose.Font = Enum.Font.SourceSans
 executorClose.ZIndex = 11
 
+local executorTitle = Instance.new("TextLabel")
+executorTitle.Name = "TextLabel"
+executorTitle.Parent = executorDragbar
+executorTitle.Size = UDim2.new(0, 115, 0, 29)
+executorTitle.Position = UDim2.new(0.0185540486, 0, -0.068965517, 0)
+executorTitle.BackgroundTransparency = 1
+executorTitle.Text = "Executor"
+executorTitle.TextColor3 = Color3.fromRGB(0,0,0)
+executorTitle.TextSize = 30
+executorTitle.Font = Enum.Font.SourceSans
+executorTitle.TextXAlignment = Enum.TextXAlignment.Left
+executorTitle.TextYAlignment = Enum.TextYAlignment.Center
+executorTitle.ZIndex = 11
+
 local executorTextBox = Instance.new("TextBox")
-executorTextBox.Name = "ExecutorTextBox"
+executorTextBox.Name = "TextBox"
 executorTextBox.Parent = executorFrame
-executorTextBox.Size = UDim2.new(0.95, 0, 0.65, 0)
-executorTextBox.Position = UDim2.new(0.025, 0, 0.12, 0)
+executorTextBox.Size = UDim2.new(0, 365, 0, 195)
+executorTextBox.Position = UDim2.new(0.018324608, 0, 0.133779258, 0)
 executorTextBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
 executorTextBox.BackgroundTransparency = 0
 executorTextBox.BorderColor3 = Color3.fromRGB(185,185,185)
@@ -266,43 +266,150 @@ executorTextBox.TextSize = 14
 executorTextBox.Font = Enum.Font.SourceSans
 executorTextBox.TextXAlignment = Enum.TextXAlignment.Left
 executorTextBox.TextYAlignment = Enum.TextYAlignment.Top
-executorTextBox.ClearTextOnFocus = false
+executorTextBox.ClearTextOnFocus = true
 executorTextBox.MultiLine = true
 executorTextBox.PlaceholderText = "Digite o script aqui..."
 executorTextBox.ZIndex = 11
 
 local executorExecute = Instance.new("TextButton")
-executorExecute.Name = "ExecutorExecute"
+executorExecute.Name = "ExecuteButton"
 executorExecute.Parent = executorFrame
-executorExecute.Size = UDim2.new(0.45, -5, 0, 30)
-executorExecute.Position = UDim2.new(0.025, 0, 0.82, 0)
+executorExecute.Size = UDim2.new(0, 159, 0, 47)
+executorExecute.Position = UDim2.new(0.0183873996, 0, 0.819130361, 0)
 executorExecute.BackgroundColor3 = Color3.fromRGB(227,227,227)
 executorExecute.BackgroundTransparency = 0
 executorExecute.BorderColor3 = Color3.fromRGB(185,185,185)
 executorExecute.BorderSizePixel = 3
-executorExecute.Text = "EXECUTAR"
+executorExecute.Text = "Execute"
 executorExecute.TextColor3 = Color3.fromRGB(0,0,0)
-executorExecute.TextSize = 14
-executorExecute.Font = Enum.Font.SourceSansBold
+executorExecute.TextSize = 46
+executorExecute.Font = Enum.Font.SourceSans
 executorExecute.ZIndex = 11
 
 local executorClear = Instance.new("TextButton")
-executorClear.Name = "ExecutorClear"
+executorClear.Name = "Clearbutton"
 executorClear.Parent = executorFrame
-executorClear.Size = UDim2.new(0.45, -5, 0, 30)
-executorClear.Position = UDim2.new(0.525, 0, 0.82, 0)
+executorClear.Size = UDim2.new(0, 159, 0, 47)
+executorClear.Position = UDim2.new(0.555036604, 0, 0.819130361, 0)
 executorClear.BackgroundColor3 = Color3.fromRGB(227,227,227)
 executorClear.BackgroundTransparency = 0
 executorClear.BorderColor3 = Color3.fromRGB(185,185,185)
 executorClear.BorderSizePixel = 3
-executorClear.Text = "LIMPAR"
+executorClear.Text = "Clear"
 executorClear.TextColor3 = Color3.fromRGB(0,0,0)
-executorClear.TextSize = 14
-executorClear.Font = Enum.Font.SourceSansBold
+executorClear.TextSize = 46
+executorClear.Font = Enum.Font.SourceSans
 executorClear.ZIndex = 11
 
 _G.RXT_ExecutorFrame = executorFrame
 _G.RXT_ExecutorTextBox = executorTextBox
+
+-- ============================================
+-- REMOTE SPY (UI DO USUÁRIO)
+-- ============================================
+
+local rspyFrame = Instance.new("Frame")
+rspyFrame.Name = "REMOTESPYFRAME"
+rspyFrame.Parent = ScreenGui.ScreenGui
+rspyFrame.Size = UDim2.new(0, 382, 0, 299)
+rspyFrame.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
+rspyFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
+rspyFrame.BackgroundTransparency = 0
+rspyFrame.BorderColor3 = Color3.fromRGB(185,185,185)
+rspyFrame.BorderSizePixel = 3
+rspyFrame.Visible = false
+rspyFrame.ZIndex = 10
+rspyFrame.ClipsDescendants = false
+
+local rspyDragbar = Instance.new("Frame")
+rspyDragbar.Name = "RSPY_DRAGBAR"
+rspyDragbar.Parent = rspyFrame
+rspyDragbar.Size = UDim2.new(0, 382, 0, 29)
+rspyDragbar.Position = UDim2.new(0, 0, 0, 0)
+rspyDragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
+rspyDragbar.BackgroundTransparency = 0
+rspyDragbar.BorderColor3 = Color3.fromRGB(185,185,185)
+rspyDragbar.BorderSizePixel = 3
+rspyDragbar.ZIndex = 11
+
+local rspyClose = Instance.new("TextButton")
+rspyClose.Name = "CloseButton"
+rspyClose.Parent = rspyDragbar
+rspyClose.Size = UDim2.new(0, 22, 0, 22)
+rspyClose.Position = UDim2.new(0.931999981, 0, 0.0799999982, 0)
+rspyClose.BackgroundColor3 = Color3.fromRGB(177,0,0)
+rspyClose.BackgroundTransparency = 0
+rspyClose.BorderSizePixel = 0
+rspyClose.Text = ""
+rspyClose.TextColor3 = Color3.fromRGB(0,0,0)
+rspyClose.TextSize = 14
+rspyClose.Font = Enum.Font.SourceSans
+rspyClose.ZIndex = 11
+
+local rspyTitle = Instance.new("TextLabel")
+rspyTitle.Name = "TextLabel"
+rspyTitle.Parent = rspyDragbar
+rspyTitle.Size = UDim2.new(0, 115, 0, 29)
+rspyTitle.Position = UDim2.new(0.0185540486, 0, -0.068965517, 0)
+rspyTitle.BackgroundTransparency = 1
+rspyTitle.Text = "Remote spy"
+rspyTitle.TextColor3 = Color3.fromRGB(0,0,0)
+rspyTitle.TextSize = 30
+rspyTitle.Font = Enum.Font.SourceSans
+rspyTitle.TextXAlignment = Enum.TextXAlignment.Left
+rspyTitle.TextYAlignment = Enum.TextYAlignment.Center
+rspyTitle.ZIndex = 11
+
+local rspyList = Instance.new("ScrollingFrame")
+rspyList.Name = "REMOTELIST"
+rspyList.Parent = rspyFrame
+rspyList.Size = UDim2.new(0, 104, 0, 267)
+rspyList.Position = UDim2.new(0, 0, 0.10702341, 0)
+rspyList.BackgroundColor3 = Color3.fromRGB(227,227,227)
+rspyList.BackgroundTransparency = 0
+rspyList.BorderColor3 = Color3.fromRGB(185,185,185)
+rspyList.BorderSizePixel = 3
+rspyList.ScrollBarThickness = 8
+rspyList.CanvasSize = UDim2.new(0, 0, 0, 0)
+rspyList.ZIndex = 11
+
+local rspyArgs = Instance.new("ScrollingFrame")
+rspyArgs.Name = "ARGREMOTE"
+rspyArgs.Parent = rspyFrame
+rspyArgs.Size = UDim2.new(0, 272, 0, 105)
+rspyArgs.Position = UDim2.new(0.287617803, 0, 0.106999934, 0)
+rspyArgs.BackgroundColor3 = Color3.fromRGB(227,227,227)
+rspyArgs.BackgroundTransparency = 0
+rspyArgs.BorderColor3 = Color3.fromRGB(185,185,185)
+rspyArgs.BorderSizePixel = 3
+rspyArgs.ScrollBarThickness = 8
+rspyArgs.CanvasSize = UDim2.new(0, 0, 0, 0)
+rspyArgs.ZIndex = 11
+
+local rspyTextBox = Instance.new("TextBox")
+rspyTextBox.Name = "TextBox"
+rspyTextBox.Parent = rspyArgs
+rspyTextBox.Size = UDim2.new(0, 256, 0, 104)
+rspyTextBox.Position = UDim2.new(0, 0, 0, 0)
+rspyTextBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
+rspyTextBox.BackgroundTransparency = 0
+rspyTextBox.BorderColor3 = Color3.fromRGB(185,185,185)
+rspyTextBox.BorderSizePixel = 3
+rspyTextBox.Text = ""
+rspyTextBox.TextColor3 = Color3.fromRGB(0,0,0)
+rspyTextBox.TextSize = 14
+rspyTextBox.Font = Enum.Font.SourceSans
+rspyTextBox.TextXAlignment = Enum.TextXAlignment.Left
+rspyTextBox.TextYAlignment = Enum.TextYAlignment.Top
+rspyTextBox.ClearTextOnFocus = true
+rspyTextBox.MultiLine = true
+rspyTextBox.PlaceholderText = "Args aparecerão aqui..."
+rspyTextBox.ZIndex = 11
+
+_G.RXT_RSpyFrame = rspyFrame
+_G.RXT_RSpyList = rspyList
+_G.RXT_RSpyArgs = rspyArgs
+_G.RXT_RSpyTextBox = rspyTextBox
 
 -- ============================================
 -- ANIMAÇÃO DA CMDBOX
@@ -807,6 +914,181 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 		local delta = input.Position - execDragStart
 		executorFrame.Position = UDim2.new(execStartPos.X.Scale, execStartPos.X.Offset + delta.X, execStartPos.Y.Scale, execStartPos.Y.Offset + delta.Y)
 	end
+end)
+
+-- ============================================
+-- REMOTE SPY - HOOKS
+-- ============================================
+
+local rspyActive = false
+local rspyConnections = {}
+local rspyLogs = {}
+local rspySelected = nil
+
+local function rspyAddLog(name, remote, args)
+	local color = remote:IsA("RemoteEvent") and Color3.fromRGB(255,200,50) or Color3.fromRGB(100,200,255)
+	
+	local btn = Instance.new("TextButton")
+	btn.Name = "RSpyLog"
+	btn.Parent = rspyList
+	btn.Size = UDim2.new(1, -4, 0, 20)
+	btn.Position = UDim2.new(0, 2, 0, #rspyLogs * 22 + 2)
+	btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+	btn.BackgroundTransparency = 0.3
+	btn.BorderColor3 = Color3.fromRGB(185,185,185)
+	btn.BorderSizePixel = 3
+	btn.Text = name
+	btn.TextColor3 = Color3.fromRGB(0,0,0)
+	btn.TextSize = 11
+	btn.Font = Enum.Font.SourceSans
+	btn.ZIndex = 11
+	btn.AutoButtonColor = false
+	
+	btn.MouseEnter:Connect(function()
+		btn.BackgroundTransparency = 0
+	end)
+	btn.MouseLeave:Connect(function()
+		btn.BackgroundTransparency = 0.3
+	end)
+	
+	local logData = {remote = remote, args = args, button = btn}
+	table.insert(rspyLogs, logData)
+	
+	btn.MouseButton1Click:Connect(function()
+		rspySelected = logData
+		local argsStr = ""
+		for i, v in ipairs(args) do
+			if i > 1 then argsStr = argsStr .. ", " end
+			if type(v) == "string" then
+				argsStr = argsStr .. '"' .. tostring(v) .. '"'
+			else
+				argsStr = argsStr .. tostring(v)
+			end
+		end
+		rspyTextBox.Text = "Remote: " .. name .. "\nArgs: " .. argsStr
+	end)
+	
+	rspyList.CanvasSize = UDim2.new(0, 0, 0, #rspyLogs * 22 + 4)
+end
+
+local function rspyHookRemote(remote)
+	if rspyConnections[remote] then return end
+	
+	local name = remote:GetFullName()
+	local conns = {}
+	
+	if remote:IsA("RemoteEvent") then
+		local conn = remote.OnServerEvent:Connect(function(plr, ...)
+			if not rspyActive then return end
+			local args = {...}
+			rspyAddLog(name .. " (Event)", remote, args)
+		end)
+		table.insert(conns, conn)
+	elseif remote:IsA("RemoteFunction") then
+		local conn = remote.OnServerInvoke = function(plr, ...)
+			if not rspyActive then return end
+			local args = {...}
+			rspyAddLog(name .. " (Function)", remote, args)
+		end
+		table.insert(conns, conn)
+	end
+	
+	if #conns > 0 then
+		rspyConnections[remote] = conns
+	end
+end
+
+local function rspyScanRemotes(parent)
+	for _, child in ipairs(parent:GetChildren()) do
+		if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") or child:IsA("UnreliableRemoteEvent") then
+			rspyHookRemote(child)
+		end
+		if #child:GetChildren() > 0 then
+			rspyScanRemotes(child)
+		end
+	end
+end
+
+function _G.RXT_ToggleRSpy(enable)
+	if enable and not rspyActive then
+		rspyActive = true
+		rspyFrame.Visible = true
+		
+		for _, child in ipairs(rspyList:GetChildren()) do
+			if child:IsA("TextButton") then
+				child:Destroy()
+			end
+		end
+		rspyLogs = {}
+		rspyTextBox.Text = ""
+		rspySelected = nil
+		
+		rspyScanRemotes(game)
+		
+		local descConn = game.DescendantAdded:Connect(function(desc)
+			if rspyActive and (desc:IsA("RemoteEvent") or desc:IsA("RemoteFunction") or desc:IsA("UnreliableRemoteEvent")) then
+				rspyHookRemote(desc)
+			end
+		end)
+		table.insert(rspyConnections, descConn)
+		
+		_G.RXT_ShowPopup("Remote Spy ativado!")
+		
+	elseif not enable and rspyActive then
+		rspyActive = false
+		rspyFrame.Visible = false
+		
+		for _, conns in pairs(rspyConnections) do
+			if type(conns) == "table" then
+				for _, conn in ipairs(conns) do
+					pcall(function() conn:Disconnect() end)
+				end
+			else
+				pcall(function() conns:Disconnect() end)
+			end
+		end
+		rspyConnections = {}
+		
+		_G.RXT_ShowPopup("Remote Spy desativado!")
+	end
+end
+
+-- ============================================
+-- REMOTE SPY - DRAG
+-- ============================================
+
+local rspyDragging = false
+local rspyDragInput, rspyDragStart, rspyStartPos
+
+rspyDragbar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		rspyDragging = true
+		rspyDragStart = input.Position
+		rspyStartPos = rspyFrame.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				rspyDragging = false
+			end
+		end)
+	end
+end)
+
+rspyDragbar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		rspyDragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == rspyDragInput and rspyDragging then
+		local delta = input.Position - rspyDragStart
+		rspyFrame.Position = UDim2.new(rspyStartPos.X.Scale, rspyStartPos.X.Offset + delta.X, rspyStartPos.Y.Scale, rspyStartPos.Y.Offset + delta.Y)
+	end
+end)
+
+rspyClose.MouseButton1Click:Connect(function()
+	_G.RXT_ToggleRSpy(false)
 end)
 
 -- ============================================
