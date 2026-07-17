@@ -1,6 +1,6 @@
-# RXT ADMIN v1.0
+# RXT ADMIN 
 
-Script de administração para Roblox com diversos comandos utilitários.
+Script de admin para Roblox com diversos comandos utilitários.
 
 ## 📋 Comandos Disponíveis
 
@@ -39,34 +39,15 @@ Script de administração para Roblox com diversos comandos utilitários.
 | `float` | Ativa o float (Q desce, E sobe) |
 | `unfloat` | Desativa o float |
 | `sit` | Senta o personagem |
+| `rspy` | Abre o RemoteSpy |
 
 ## 🎮 Configurações
 
 - **Prefixo padrão**: `/`
 - **Popups**: Ativados por padrão
 
-## 🚀 Uso
-
-1. Execute o script `adminscript.lua` no seu executor Roblox
-2. Digite os comandos usando o prefixo configurado
-3. Exemplo: `/fly 50` para ativar o voo com velocidade 50
-
-## ⚙️ Funcionalidades
-
-- ✈️ Modo voo com controle de velocidade
-- 🚫 Noclip (atravessar paredes)
-- ⚡ Modificação de velocidade e pulo
-- 📍 Teleportação entre jogadores
-- 👁️ ESP (visualizar jogadores através de paredes)
-- 🎯 Walkfling e Float
-- 💻 Executor de scripts integrado
-
 ## ⚠️ Aviso
 
-Este script é apenas para fins educacionais. Seu uso em servidores não autorizados pode resultar em banimento.
+NÃO me responsabilizo por qualquer tipo de ban.
 
----
 
-**Versão**: 1.0  
-**Linguagem**: Lua  
-**Plataforma**: Roblox
