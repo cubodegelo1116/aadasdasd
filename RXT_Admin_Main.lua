@@ -32,12 +32,19 @@ local function loadCommands()
 				_G.RXT_Commands = cmdTable
 				print("✅ Comandos carregados: " .. #cmdTable)
 				return true
+			else
+				warn("commands.lua retornou: " .. type(cmdTable))
 			end
+		else
+			warn("Erro ao compilar commands.lua: " .. tostring(err))
 		end
+	else
+		warn("Falha ao baixar commands.lua")
 	end
 	return false
 end
 
+-- Tenta carregar, se falhar usa fallback
 if not loadCommands() then
 	_G.RXT_Commands = {
 		{cmd = "cmds", desc = "Abre esta lista de comandos"},
@@ -68,6 +75,8 @@ if not loadCommands() then
 		{cmd = "walkfling", desc = "Ativa walkfling"},
 		{cmd = "unwalkfling", desc = "Desativa walkfling"},
 		{cmd = "executor", desc = "Abre o executor de scripts"},
+		{cmd = "rspy", desc = "Abre o Remote Spy"},
+		{cmd = "unrspy", desc = "Fecha o Remote Spy"},
 		{cmd = "rejoin", desc = "Reentra no servidor"},
 		{cmd = "reset", desc = "Respawna o personagem"},
 		{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
@@ -196,7 +205,7 @@ _G.RXT_AutocompleteList = autocompleteList
 _G.RXT_AutocompleteFrame = autocompleteFrame
 
 -- ============================================
--- EXECUTOR (UI DO USUÁRIO)
+-- EXECUTOR
 -- ============================================
 
 local executorFrame = Instance.new("Frame")
@@ -305,7 +314,7 @@ _G.RXT_ExecutorFrame = executorFrame
 _G.RXT_ExecutorTextBox = executorTextBox
 
 -- ============================================
--- REMOTE SPY (UI DO USUÁRIO)
+-- REMOTE SPY
 -- ============================================
 
 local rspyFrame = Instance.new("Frame")
@@ -443,7 +452,7 @@ task.spawn(function()
 end)
 
 -- ============================================
--- CmdsLIST (COM ANIMAÇÃO DE SAÍDA - Y ATÉ 0)
+-- CmdsLIST
 -- ============================================
 
 local CMDSLIST_ORIGINAL_POS = UDim2.new(0.311619729, 0, 0.246329531, 0)
@@ -917,97 +926,13 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 -- ============================================
--- REMOTE SPY - HOOKS
+-- REMOTE SPY - FUNÇÕES
 -- ============================================
 
 local rspyActive = false
 local rspyConnections = {}
 local rspyLogs = {}
 local rspySelected = nil
-
-local function rspyAddLog(name, remote, args)
-	local color = remote:IsA("RemoteEvent") and Color3.fromRGB(255,200,50) or Color3.fromRGB(100,200,255)
-	
-	local btn = Instance.new("TextButton")
-	btn.Name = "RSpyLog"
-	btn.Parent = rspyList
-	btn.Size = UDim2.new(1, -4, 0, 20)
-	btn.Position = UDim2.new(0, 2, 0, #rspyLogs * 22 + 2)
-	btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
-	btn.BackgroundTransparency = 0.3
-	btn.BorderColor3 = Color3.fromRGB(185,185,185)
-	btn.BorderSizePixel = 3
-	btn.Text = name
-	btn.TextColor3 = Color3.fromRGB(0,0,0)
-	btn.TextSize = 11
-	btn.Font = Enum.Font.SourceSans
-	btn.ZIndex = 11
-	btn.AutoButtonColor = false
-	
-	btn.MouseEnter:Connect(function()
-		btn.BackgroundTransparency = 0
-	end)
-	btn.MouseLeave:Connect(function()
-		btn.BackgroundTransparency = 0.3
-	end)
-	
-	local logData = {remote = remote, args = args, button = btn}
-	table.insert(rspyLogs, logData)
-	
-	btn.MouseButton1Click:Connect(function()
-		rspySelected = logData
-		local argsStr = ""
-		for i, v in ipairs(args) do
-			if i > 1 then argsStr = argsStr .. ", " end
-			if type(v) == "string" then
-				argsStr = argsStr .. '"' .. tostring(v) .. '"'
-			else
-				argsStr = argsStr .. tostring(v)
-			end
-		end
-		rspyTextBox.Text = "Remote: " .. name .. "\nArgs: " .. argsStr
-	end)
-	
-	rspyList.CanvasSize = UDim2.new(0, 0, 0, #rspyLogs * 22 + 4)
-end
-
-local function rspyHookRemote(remote)
-	if rspyConnections[remote] then return end
-	
-	local name = remote:GetFullName()
-	local conns = {}
-	
-	if remote:IsA("RemoteEvent") then
-		local conn = remote.OnServerEvent:Connect(function(plr, ...)
-			if not rspyActive then return end
-			local args = {...}
-			rspyAddLog(name .. " (Event)", remote, args)
-		end)
-		table.insert(conns, conn)
-	elseif remote:IsA("RemoteFunction") then
-		local conn = remote.OnServerInvoke = function(plr, ...)
-			if not rspyActive then return end
-			local args = {...}
-			rspyAddLog(name .. " (Function)", remote, args)
-		end
-		table.insert(conns, conn)
-	end
-	
-	if #conns > 0 then
-		rspyConnections[remote] = conns
-	end
-end
-
-local function rspyScanRemotes(parent)
-	for _, child in ipairs(parent:GetChildren()) do
-		if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") or child:IsA("UnreliableRemoteEvent") then
-			rspyHookRemote(child)
-		end
-		if #child:GetChildren() > 0 then
-			rspyScanRemotes(child)
-		end
-	end
-end
 
 function _G.RXT_ToggleRSpy(enable)
 	if enable and not rspyActive then
@@ -1022,15 +947,6 @@ function _G.RXT_ToggleRSpy(enable)
 		rspyLogs = {}
 		rspyTextBox.Text = ""
 		rspySelected = nil
-		
-		rspyScanRemotes(game)
-		
-		local descConn = game.DescendantAdded:Connect(function(desc)
-			if rspyActive and (desc:IsA("RemoteEvent") or desc:IsA("RemoteFunction") or desc:IsA("UnreliableRemoteEvent")) then
-				rspyHookRemote(desc)
-			end
-		end)
-		table.insert(rspyConnections, descConn)
 		
 		_G.RXT_ShowPopup("Remote Spy ativado!")
 		
@@ -1184,6 +1100,20 @@ player.CharacterAdded:Connect(function()
 		end
 	end
 end)
+
+-- ============================================
+-- CARREGAR EXECUTE COMMAND
+-- ============================================
+
+-- A função _G.RXT_ExecuteCommand é definida no commands.lua
+-- Se não foi carregada, usa um fallback simples
+if not _G.RXT_ExecuteCommand then
+	_G.RXT_ExecuteCommand = function(cmd, args)
+		_G.RXT_ShowPopup("Comando não disponível: " .. cmd)
+		return false
+	end
+	print("⚠️ _G.RXT_ExecuteCommand não encontrado, usando fallback")
+end
 
 print("✅ RXT ADMIN carregado!")
 print("💡 Comandos carregados: " .. (#(_G.RXT_Commands or {}) or 0))
