@@ -1,4 +1,6 @@
--- FRVGMXNT GUI2LUA CONVERTER 1.2. Like pls!
+-- ============================================
+-- RXT ADMIN - MAIN
+-- ============================================
 
 -- ============================================
 -- ANTI DUPLICATE
@@ -334,7 +336,7 @@ task.spawn(function()
 end)
 
 -- ============================================
--- CmdsLIST (COM ANIMAÇÃO DE BAIXO PRA CIMA)
+-- CmdsLIST (COM ANIMAÇÃO DE SAÍDA - Y ATÉ 0)
 -- ============================================
 
 local CMDSLIST_ORIGINAL_POS = UDim2.new(0.311619729, 0, 0.246329531, 0)
@@ -360,18 +362,17 @@ function _G.RXT_AnimateCmdsList(show)
 	
 	local list = ScreenGui.CmdsLIST
 	local currentPos = list.Position
-	local dragbarHeight = 29
 	
 	if show then
 		list.Visible = true
 		list.BackgroundTransparency = 1
-		list.Size = UDim2.new(0, 0, 0, dragbarHeight)
-		list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
+		list.Size = UDim2.new(0, 0, 0, 0)
+		list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + 0.15, currentPos.Y.Offset)
 		
 		for i = 1, 20 do
 			list.BackgroundTransparency = 1 - (i / 20)
-			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, dragbarHeight + (CMDSLIST_ORIGINAL_SIZE.Y.Offset - dragbarHeight) * (i / 20))
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
+			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (i / 20))
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (1 - i / 20)), currentPos.Y.Offset)
 			task.wait(0.015)
 		end
 		
@@ -382,9 +383,9 @@ function _G.RXT_AnimateCmdsList(show)
 		for i = 1, 15 do
 			local progress = i / 15
 			list.BackgroundTransparency = progress
-			local newHeight = CMDSLIST_ORIGINAL_SIZE.Y.Offset - (CMDSLIST_ORIGINAL_SIZE.Y.Offset - dragbarHeight) * progress
+			local newHeight = CMDSLIST_ORIGINAL_SIZE.Y.Offset * (1 - progress)
 			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - progress * 0.3), 0, newHeight)
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (CMDSLIST_ORIGINAL_SIZE.Y.Offset * (progress * 0.5)), currentPos.Y.Offset)
 			task.wait(0.015)
 		end
 		
@@ -853,7 +854,7 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 -- ============================================
--- LIMPAR TUDO QUANDO RESPAWNA (SÓ NO MAIN)
+-- LIMPAR TUDO QUANDO RESPAWNA
 -- ============================================
 
 player.CharacterAdded:Connect(function()
