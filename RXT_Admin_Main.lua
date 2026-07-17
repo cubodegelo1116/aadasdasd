@@ -724,4 +724,224 @@ function _G.RXT_UpdateAutocomplete(input)
 	for _, match in ipairs(matches) do
 		local btn = Instance.new("TextButton")
 		btn.Parent = autocompleteList
-		btn.Size = UDim2.new(1, -4, 0, buttonHeight
+		btn.Size = UDim2.new(1, -4, 0, buttonHeight)
+		btn.Position = UDim2.new(0, 2, 0, yOffset)
+		btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+		btn.BackgroundTransparency = 0.3
+		btn.BorderSizePixel = 0
+		btn.Text = match.cmd .. " - " .. match.desc
+		btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+		btn.TextSize = 12
+		btn.TextXAlignment = Enum.TextXAlignment.Left
+		btn.Font = Enum.Font.SourceSans
+		btn.ZIndex = 11
+		
+		btn.MouseEnter:Connect(function()
+			btn.BackgroundTransparency = 0
+		end)
+		btn.MouseLeave:Connect(function()
+			btn.BackgroundTransparency = 0.3
+		end)
+		
+		btn.MouseButton1Click:Connect(function()
+			local cmdName = string.split(match.cmd, " ")[1]
+			local args = {}
+			local parts = {}
+			for part in string.gmatch(match.cmd, "%S+") do
+				table.insert(parts, part)
+			end
+			for i = 2, #parts do
+				table.insert(args, parts[i])
+			end
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand(cmdName, args)
+			end
+			autocompleteFrame.Visible = false
+			ScreenGui.CMDBOX.Text = ""
+		end)
+		
+		yOffset = yOffset + buttonHeight + 2
+	end
+	
+	autocompleteList.CanvasSize = UDim2.new(0, 0, 0, yOffset + 4)
+	local newHeight = math.min(yOffset + 4, 100)
+	autocompleteFrame.Size = UDim2.new(0, 218, 0, newHeight)
+	autocompleteFrame.Position = UDim2.new(1, -230, 1, -40 - newHeight - 5)
+end
+
+-- ============================================
+-- AUTOCOMPLETE - DETECTA DIGITAÇÃO
+-- ============================================
+
+ScreenGui.CMDBOX:GetPropertyChangedSignal("Text"):Connect(function()
+	local text = ScreenGui.CMDBOX.Text
+	_G.RXT_UpdateAutocomplete(text)
+end)
+
+ScreenGui.CMDBOX.FocusLost:Connect(function()
+	task.wait(0.2)
+	if not ScreenGui.CMDBOX:IsFocused() then
+		autocompleteFrame.Visible = false
+	end
+end)
+
+-- ============================================
+-- PROCESSAR COMANDO VIA CMDBOX
+-- ============================================
+
+ScreenGui.CMDBOX.FocusLost:Connect(function(enterPressed)
+	if enterPressed and ScreenGui.CMDBOX.Text ~= "" then
+		local fullCommand = ScreenGui.CMDBOX.Text
+		local parts = {}
+		for part in string.gmatch(fullCommand, "%S+") do
+			table.insert(parts, part)
+		end
+		
+		local cmd = parts[1] or ""
+		local args = {}
+		for i = 2, #parts do
+			table.insert(args, parts[i])
+		end
+		
+		if string.sub(cmd, 1, 1) == _G.RXT_Config.Prefix then
+			cmd = string.sub(cmd, 2)
+		end
+		
+		if _G.RXT_ExecuteCommand then
+			_G.RXT_ExecuteCommand(cmd, args)
+		end
+		ScreenGui.CMDBOX.Text = ""
+		autocompleteFrame.Visible = false
+	end
+end)
+
+-- ============================================
+-- PROCESSAR COMANDO VIA CHAT
+-- ============================================
+
+game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
+	local parts = {}
+	for part in string.gmatch(message, "%S+") do
+		table.insert(parts, part)
+	end
+	
+	local cmd = parts[1] or ""
+	local args = {}
+	for i = 2, #parts do
+		table.insert(args, parts[i])
+	end
+	
+	if string.sub(cmd, 1, 1) == _G.RXT_Config.Prefix then
+		cmd = string.sub(cmd, 2)
+		if _G.RXT_ExecuteCommand then
+			_G.RXT_ExecuteCommand(cmd, args)
+		end
+	end
+end)
+
+-- ============================================
+-- EXECUTOR - BOTÕES
+-- ============================================
+
+executorExecute.MouseButton1Click:Connect(function()
+	local scriptText = executorTextBox.Text
+	if scriptText and scriptText ~= "" then
+		local success, err = pcall(function()
+			loadstring(scriptText)()
+		end)
+		if not success then
+			_G.RXT_ShowPopup("Erro no script: " .. err)
+		else
+			_G.RXT_ShowPopup("Script executado!")
+		end
+	end
+end)
+
+executorClear.MouseButton1Click:Connect(function()
+	executorTextBox.Text = ""
+end)
+
+executorClose.MouseButton1Click:Connect(function()
+	executorFrame.Visible = false
+end)
+
+-- ============================================
+-- EXECUTOR - DRAG
+-- ============================================
+
+local execDragging = false
+local execDragInput, execDragStart, execStartPos
+
+executorDragbar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		execDragging = true
+		execDragStart = input.Position
+		execStartPos = executorFrame.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				execDragging = false
+			end
+		end)
+	end
+end)
+
+executorDragbar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		execDragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == execDragInput and execDragging then
+		local delta = input.Position - execDragStart
+		executorFrame.Position = UDim2.new(execStartPos.X.Scale, execStartPos.X.Offset + delta.X, execStartPos.Y.Scale, execStartPos.Y.Offset + delta.Y)
+	end
+end)
+
+-- ============================================
+-- FECHAR GUI
+-- ============================================
+
+ScreenGui.CloseButton.MouseButton1Click:Connect(function()
+	_G.RXT_AnimateCmdsList(false)
+end)
+
+-- ============================================
+-- DRAG DA CMDLIST
+-- ============================================
+
+local dragging = false
+local dragInput, dragStart, startPos
+
+ScreenGui.Dragbar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = ScreenGui.CmdsLIST.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+ScreenGui.Dragbar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		ScreenGui.CmdsLIST.Position = newPos
+		savedPosition = newPos
+	end
+end)
+
+print("✅ RXT ADMIN carregado!")
+print("💡 Comandos carregados: " .. (#(_G.RXT_Commands or {}) or 0))
