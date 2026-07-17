@@ -10,6 +10,11 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 	local player = _G.RXT_Player
 	local gui = _G.RXT_GUI
 	
+	if not player or not gui then
+		warn("RXT: Player ou GUI não inicializados")
+		return false
+	end
+	
 	-- ============================================
 	-- COMANDOS DA MAIN
 	-- ============================================
@@ -48,10 +53,14 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		
 	elseif cmd == "executor" then
 		local executorFrame = _G.RXT_ExecutorFrame
-		executorFrame.Visible = not executorFrame.Visible
-		if executorFrame.Visible then
-			task.wait(0.1)
-			_G.RXT_ExecutorTextBox:CaptureFocus()
+		if executorFrame then
+			executorFrame.Visible = not executorFrame.Visible
+			if executorFrame.Visible then
+				task.wait(0.1)
+				if _G.RXT_ExecutorTextBox then
+					_G.RXT_ExecutorTextBox:CaptureFocus()
+				end
+			end
 		end
 		return true
 		
@@ -969,8 +978,7 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		toggleJumpLoop(nil)
 		return true
 		
-	elseif cmd == "infjump" then
-		toggleInfJump(true)
+	elseif cmd == "infjump" then		toggleInfJump(true)
 		return true
 		
 	elseif cmd == "uninfjump" then
@@ -1051,41 +1059,7 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 end
 
 -- ============================================
--- LIMPAR TUDO QUANDO RESPAWNA
--- ============================================
-
-player.CharacterAdded:Connect(function()
-	local state = _G.RXT_State
-	if state then
-		if state.flyActive then
-			toggleFly(false)
-		end
-		if state.noclipActive then
-			toggleNoclip(false, true)
-		end
-		if state.infJumpActive then
-			toggleInfJump(false)
-		end
-		if state.viewActive then
-			toggleView(nil)
-		end
-		if state.tpToolActive then
-			toggleTPTool(false)
-		end
-		if state.espActive then
-			toggleESP(false)
-		end
-		if state.walkflingActive then
-			toggleWalkfling(false)
-		end
-		if state.floatActive then
-			toggleFloat(false)
-		end
-	end
-end)
-
--- ============================================
--- RETORNAR TABELA DE COMANDOS (DEVE SER A ÚLTIMA COISA)
+-- RETORNAR TABELA DE COMANDOS
 -- ============================================
 
 return {
