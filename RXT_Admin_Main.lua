@@ -14,15 +14,15 @@ for _, gui in ipairs(playerGui:GetChildren()) do
 end
 
 -- ============================================
--- CONFIGURAÇÕES
+-- CONFIGURAÇÕES GLOBAIS
 -- ============================================
 
-local Config = {
+_G.RXT_Config = {
 	Prefix = "/",
 	Popups = true,
 }
 
-local ScreenGui = {
+_G.RXT_ScreenGui = {
 	ScreenGui = Instance.new("ScreenGui"),
 	ComandtxtFrame = Instance.new("Frame"),
 	CMDBOX = Instance.new("TextBox"),
@@ -33,61 +33,61 @@ local ScreenGui = {
 	ScrollingFrame = Instance.new("ScrollingFrame"),
 }
 
-ScreenGui.ScreenGui.Parent = playerGui
-ScreenGui.ScreenGui.Name = "RXT_Admin_GUI"
-ScreenGui.ScreenGui.ResetOnSpawn = false
+_G.RXT_ScreenGui.ScreenGui.Parent = playerGui
+_G.RXT_ScreenGui.ScreenGui.Name = "RXT_Admin_GUI"
+_G.RXT_ScreenGui.ScreenGui.ResetOnSpawn = false
 
-ScreenGui.ComandtxtFrame.Parent = ScreenGui.ScreenGui
-ScreenGui.CMDBOX.Parent = ScreenGui.ComandtxtFrame
-ScreenGui.CmdsLIST.Parent = ScreenGui.ScreenGui
-ScreenGui.Dragbar.Parent = ScreenGui.CmdsLIST
-ScreenGui.CloseButton.Parent = ScreenGui.Dragbar
-ScreenGui.TextLabel.Parent = ScreenGui.Dragbar
-ScreenGui.ScrollingFrame.Parent = ScreenGui.CmdsLIST
+_G.RXT_ScreenGui.ComandtxtFrame.Parent = _G.RXT_ScreenGui.ScreenGui
+_G.RXT_ScreenGui.CMDBOX.Parent = _G.RXT_ScreenGui.ComandtxtFrame
+_G.RXT_ScreenGui.CmdsLIST.Parent = _G.RXT_ScreenGui.ScreenGui
+_G.RXT_ScreenGui.Dragbar.Parent = _G.RXT_ScreenGui.CmdsLIST
+_G.RXT_ScreenGui.CloseButton.Parent = _G.RXT_ScreenGui.Dragbar
+_G.RXT_ScreenGui.TextLabel.Parent = _G.RXT_ScreenGui.Dragbar
+_G.RXT_ScreenGui.ScrollingFrame.Parent = _G.RXT_ScreenGui.CmdsLIST
 
-ScreenGui.ScreenGui.IgnoreGuiInset = false
-ScreenGui.ScreenGui.DisplayOrder = 0
+_G.RXT_ScreenGui.ScreenGui.IgnoreGuiInset = false
+_G.RXT_ScreenGui.ScreenGui.DisplayOrder = 0
 
 -- ============================================
 -- CMDBOX
 -- ============================================
 
-ScreenGui.ComandtxtFrame.Name = "ComandtxtFrame"
-ScreenGui.ComandtxtFrame.ZIndex = 1
-ScreenGui.ComandtxtFrame.Position = UDim2.new(1, -230, 1, -40)
-ScreenGui.ComandtxtFrame.Size = UDim2.new(0, 218, 0, 25)
-ScreenGui.ComandtxtFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
-ScreenGui.ComandtxtFrame.BackgroundTransparency = 1
-ScreenGui.ComandtxtFrame.Visible = true
-ScreenGui.ComandtxtFrame.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.ComandtxtFrame.ClipsDescendants = false
-ScreenGui.ComandtxtFrame.BorderSizePixel = 0
+_G.RXT_ScreenGui.ComandtxtFrame.Name = "ComandtxtFrame"
+_G.RXT_ScreenGui.ComandtxtFrame.ZIndex = 1
+_G.RXT_ScreenGui.ComandtxtFrame.Position = UDim2.new(1, -230, 1, -40)
+_G.RXT_ScreenGui.ComandtxtFrame.Size = UDim2.new(0, 218, 0, 25)
+_G.RXT_ScreenGui.ComandtxtFrame.BackgroundColor3 = Color3.fromRGB(255,255,255)
+_G.RXT_ScreenGui.ComandtxtFrame.BackgroundTransparency = 1
+_G.RXT_ScreenGui.ComandtxtFrame.Visible = true
+_G.RXT_ScreenGui.ComandtxtFrame.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.ComandtxtFrame.ClipsDescendants = false
+_G.RXT_ScreenGui.ComandtxtFrame.BorderSizePixel = 0
 
-ScreenGui.CMDBOX.Name = "CMDBOX"
-ScreenGui.CMDBOX.ZIndex = 1
-ScreenGui.CMDBOX.Position = UDim2.new(0, 0, 0, 0)
-ScreenGui.CMDBOX.Size = UDim2.new(0, 218, 0, 25)
-ScreenGui.CMDBOX.BackgroundColor3 = Color3.fromRGB(227,227,227)
-ScreenGui.CMDBOX.BackgroundTransparency = 0
-ScreenGui.CMDBOX.Text = ""
-ScreenGui.CMDBOX.TextScaled = false
-ScreenGui.CMDBOX.TextSize = 14
-ScreenGui.CMDBOX.Font = Enum.Font.SourceSans
-ScreenGui.CMDBOX.TextColor3 = Color3.fromRGB(0,0,0)
-ScreenGui.CMDBOX.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-ScreenGui.CMDBOX.TextStrokeTransparency = 1
-ScreenGui.CMDBOX.TextWrapped = false
-ScreenGui.CMDBOX.TextXAlignment = Enum.TextXAlignment.Center
-ScreenGui.CMDBOX.TextYAlignment = Enum.TextYAlignment.Center
-ScreenGui.CMDBOX.TextTransparency = 0
-ScreenGui.CMDBOX.ClearTextOnFocus = true
-ScreenGui.CMDBOX.MultiLine = false
-ScreenGui.CMDBOX.Visible = true
-ScreenGui.CMDBOX.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.CMDBOX.ClipsDescendants = false
-ScreenGui.CMDBOX.PlaceholderText = "digite 'cmds' para ver os comandos"
-ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
-ScreenGui.CMDBOX.BorderSizePixel = 3
+_G.RXT_ScreenGui.CMDBOX.Name = "CMDBOX"
+_G.RXT_ScreenGui.CMDBOX.ZIndex = 1
+_G.RXT_ScreenGui.CMDBOX.Position = UDim2.new(0, 0, 0, 0)
+_G.RXT_ScreenGui.CMDBOX.Size = UDim2.new(0, 218, 0, 25)
+_G.RXT_ScreenGui.CMDBOX.BackgroundColor3 = Color3.fromRGB(227,227,227)
+_G.RXT_ScreenGui.CMDBOX.BackgroundTransparency = 0
+_G.RXT_ScreenGui.CMDBOX.Text = ""
+_G.RXT_ScreenGui.CMDBOX.TextScaled = false
+_G.RXT_ScreenGui.CMDBOX.TextSize = 14
+_G.RXT_ScreenGui.CMDBOX.Font = Enum.Font.SourceSans
+_G.RXT_ScreenGui.CMDBOX.TextColor3 = Color3.fromRGB(0,0,0)
+_G.RXT_ScreenGui.CMDBOX.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+_G.RXT_ScreenGui.CMDBOX.TextStrokeTransparency = 1
+_G.RXT_ScreenGui.CMDBOX.TextWrapped = false
+_G.RXT_ScreenGui.CMDBOX.TextXAlignment = Enum.TextXAlignment.Center
+_G.RXT_ScreenGui.CMDBOX.TextYAlignment = Enum.TextYAlignment.Center
+_G.RXT_ScreenGui.CMDBOX.TextTransparency = 0
+_G.RXT_ScreenGui.CMDBOX.ClearTextOnFocus = true
+_G.RXT_ScreenGui.CMDBOX.MultiLine = false
+_G.RXT_ScreenGui.CMDBOX.Visible = true
+_G.RXT_ScreenGui.CMDBOX.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.CMDBOX.ClipsDescendants = false
+_G.RXT_ScreenGui.CMDBOX.PlaceholderText = "digite 'cmds' para ver os comandos"
+_G.RXT_ScreenGui.CMDBOX.BorderColor3 = Color3.fromRGB(185,185,185)
+_G.RXT_ScreenGui.CMDBOX.BorderSizePixel = 3
 
 -- ============================================
 -- AUTOCOMPLETE
@@ -95,7 +95,7 @@ ScreenGui.CMDBOX.BorderSizePixel = 3
 
 local autocompleteFrame = Instance.new("Frame")
 autocompleteFrame.Name = "AutocompleteFrame"
-autocompleteFrame.Parent = ScreenGui.ScreenGui
+autocompleteFrame.Parent = _G.RXT_ScreenGui.ScreenGui
 autocompleteFrame.Size = UDim2.new(0, 218, 0, 0)
 autocompleteFrame.Position = UDim2.new(1, -230, 1, -65)
 autocompleteFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
@@ -122,7 +122,7 @@ autocompleteList.CanvasSize = UDim2.new(0, 0, 0, 0)
 
 local executorFrame = Instance.new("Frame")
 executorFrame.Name = "ExecutorFrame"
-executorFrame.Parent = ScreenGui.ScreenGui
+executorFrame.Parent = _G.RXT_ScreenGui.ScreenGui
 executorFrame.Size = UDim2.new(0, 400, 0, 250)
 executorFrame.Position = UDim2.new(0.5, -200, 0.3, 0)
 executorFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
@@ -227,7 +227,7 @@ executorClear.ZIndex = 11
 -- ============================================
 
 task.spawn(function()
-	local cmbbox = ScreenGui.CMDBOX
+	local cmbbox = _G.RXT_ScreenGui.CMDBOX
 	cmbbox.BackgroundTransparency = 1
 	cmbbox.TextTransparency = 1
 	cmbbox.Size = UDim2.new(0, 0, 0, 25)
@@ -259,133 +259,90 @@ end)
 
 local CMDSLIST_ORIGINAL_POS = UDim2.new(0.311619729, 0, 0.246329531, 0)
 local CMDSLIST_ORIGINAL_SIZE = UDim2.new(0, 382, 0, 299)
-local isAnimating = false
-local savedPosition = CMDSLIST_ORIGINAL_POS
 
-ScreenGui.CmdsLIST.Name = "CmdsLIST"
-ScreenGui.CmdsLIST.ZIndex = 1
-ScreenGui.CmdsLIST.Position = CMDSLIST_ORIGINAL_POS
-ScreenGui.CmdsLIST.Size = CMDSLIST_ORIGINAL_SIZE
-ScreenGui.CmdsLIST.BackgroundColor3 = Color3.fromRGB(227,227,227)
-ScreenGui.CmdsLIST.BackgroundTransparency = 0
-ScreenGui.CmdsLIST.Visible = false
-ScreenGui.CmdsLIST.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.CmdsLIST.ClipsDescendants = false
-ScreenGui.CmdsLIST.BorderColor3 = Color3.fromRGB(185,185,185)
-ScreenGui.CmdsLIST.BorderSizePixel = 3
+_G.RXT_ScreenGui.CmdsLIST.Name = "CmdsLIST"
+_G.RXT_ScreenGui.CmdsLIST.ZIndex = 1
+_G.RXT_ScreenGui.CmdsLIST.Position = CMDSLIST_ORIGINAL_POS
+_G.RXT_ScreenGui.CmdsLIST.Size = CMDSLIST_ORIGINAL_SIZE
+_G.RXT_ScreenGui.CmdsLIST.BackgroundColor3 = Color3.fromRGB(227,227,227)
+_G.RXT_ScreenGui.CmdsLIST.BackgroundTransparency = 0
+_G.RXT_ScreenGui.CmdsLIST.Visible = false
+_G.RXT_ScreenGui.CmdsLIST.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.CmdsLIST.ClipsDescendants = false
+_G.RXT_ScreenGui.CmdsLIST.BorderColor3 = Color3.fromRGB(185,185,185)
+_G.RXT_ScreenGui.CmdsLIST.BorderSizePixel = 3
 
-local function animateCmdsList(show)
-	if isAnimating then return end
-	isAnimating = true
-	
-	local list = ScreenGui.CmdsLIST
-	local currentPos = list.Position
-	
-	if show then
-		list.Visible = true
-		list.BackgroundTransparency = 1
-		list.Size = UDim2.new(0, 0, 0, 0)
-		list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + 0.15, currentPos.Y.Offset)
-		
-		for i = 1, 20 do
-			list.BackgroundTransparency = 1 - (i / 20)
-			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (i / 20))
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (1 - i / 20)), currentPos.Y.Offset)
-			task.wait(0.015)
-		end
-		
-		list.BackgroundTransparency = 0
-		list.Size = CMDSLIST_ORIGINAL_SIZE
-		list.Position = currentPos
-	else
-		for i = 1, 15 do
-			list.BackgroundTransparency = i / 15
-			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - i / 15), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (1 - i / 15))
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (i / 15)), currentPos.Y.Offset)
-			task.wait(0.015)
-		end
-		list.Visible = false
-		list.BackgroundTransparency = 0
-		list.Size = CMDSLIST_ORIGINAL_SIZE
-		list.Position = currentPos
-	end
-	
-	isAnimating = false
-end
+_G.RXT_ScreenGui.Dragbar.Name = "Dragbar"
+_G.RXT_ScreenGui.Dragbar.ZIndex = 1
+_G.RXT_ScreenGui.Dragbar.Position = UDim2.new(-0, 0, -0, 0)
+_G.RXT_ScreenGui.Dragbar.Size = UDim2.new(0, 382, 0, 29)
+_G.RXT_ScreenGui.Dragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
+_G.RXT_ScreenGui.Dragbar.BackgroundTransparency = 0
+_G.RXT_ScreenGui.Dragbar.Visible = true
+_G.RXT_ScreenGui.Dragbar.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.Dragbar.ClipsDescendants = false
+_G.RXT_ScreenGui.Dragbar.BorderColor3 = Color3.fromRGB(185,185,185)
+_G.RXT_ScreenGui.Dragbar.BorderSizePixel = 3
 
-ScreenGui.CmdsLIST.Visible = false
+_G.RXT_ScreenGui.CloseButton.Name = "CloseButton"
+_G.RXT_ScreenGui.CloseButton.ZIndex = 1
+_G.RXT_ScreenGui.CloseButton.Position = UDim2.new(0.931999981, 0, 0.0799999982, 0)
+_G.RXT_ScreenGui.CloseButton.Size = UDim2.new(0, 22, 0, 22)
+_G.RXT_ScreenGui.CloseButton.BackgroundColor3 = Color3.fromRGB(177,0,0)
+_G.RXT_ScreenGui.CloseButton.BackgroundTransparency = 0
+_G.RXT_ScreenGui.CloseButton.Text = ""
+_G.RXT_ScreenGui.CloseButton.TextScaled = false
+_G.RXT_ScreenGui.CloseButton.TextSize = 14
+_G.RXT_ScreenGui.CloseButton.Font = Enum.Font.SourceSans
+_G.RXT_ScreenGui.CloseButton.TextColor3 = Color3.fromRGB(0,0,0)
+_G.RXT_ScreenGui.CloseButton.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+_G.RXT_ScreenGui.CloseButton.TextStrokeTransparency = 1
+_G.RXT_ScreenGui.CloseButton.TextWrapped = false
+_G.RXT_ScreenGui.CloseButton.TextXAlignment = Enum.TextXAlignment.Center
+_G.RXT_ScreenGui.CloseButton.TextYAlignment = Enum.TextYAlignment.Center
+_G.RXT_ScreenGui.CloseButton.TextTransparency = 0
+_G.RXT_ScreenGui.CloseButton.Visible = true
+_G.RXT_ScreenGui.CloseButton.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.CloseButton.ClipsDescendants = false
+_G.RXT_ScreenGui.CloseButton.BorderSizePixel = 0
 
-ScreenGui.Dragbar.Name = "Dragbar"
-ScreenGui.Dragbar.ZIndex = 1
-ScreenGui.Dragbar.Position = UDim2.new(-0, 0, -0, 0)
-ScreenGui.Dragbar.Size = UDim2.new(0, 382, 0, 29)
-ScreenGui.Dragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
-ScreenGui.Dragbar.BackgroundTransparency = 0
-ScreenGui.Dragbar.Visible = true
-ScreenGui.Dragbar.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.Dragbar.ClipsDescendants = false
-ScreenGui.Dragbar.BorderColor3 = Color3.fromRGB(185,185,185)
-ScreenGui.Dragbar.BorderSizePixel = 3
+_G.RXT_ScreenGui.TextLabel.Name = "TextLabel"
+_G.RXT_ScreenGui.TextLabel.ZIndex = 1
+_G.RXT_ScreenGui.TextLabel.Position = UDim2.new(0.0185540486, 0, -0.068965517, 0)
+_G.RXT_ScreenGui.TextLabel.Size = UDim2.new(0, 115, 0, 29)
+_G.RXT_ScreenGui.TextLabel.BackgroundColor3 = Color3.fromRGB(255,255,255)
+_G.RXT_ScreenGui.TextLabel.BackgroundTransparency = 1
+_G.RXT_ScreenGui.TextLabel.Text = "RXT ADMIN"
+_G.RXT_ScreenGui.TextLabel.TextScaled = false
+_G.RXT_ScreenGui.TextLabel.TextSize = 30
+_G.RXT_ScreenGui.TextLabel.Font = Enum.Font.SourceSans
+_G.RXT_ScreenGui.TextLabel.TextColor3 = Color3.fromRGB(0,0,0)
+_G.RXT_ScreenGui.TextLabel.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+_G.RXT_ScreenGui.TextLabel.TextStrokeTransparency = 1
+_G.RXT_ScreenGui.TextLabel.TextWrapped = false
+_G.RXT_ScreenGui.TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+_G.RXT_ScreenGui.TextLabel.TextYAlignment = Enum.TextYAlignment.Center
+_G.RXT_ScreenGui.TextLabel.TextTransparency = 0
+_G.RXT_ScreenGui.TextLabel.Visible = true
+_G.RXT_ScreenGui.TextLabel.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.TextLabel.ClipsDescendants = false
+_G.RXT_ScreenGui.TextLabel.BorderColor3 = Color3.fromRGB(185,185,185)
+_G.RXT_ScreenGui.TextLabel.BorderSizePixel = 3
 
-ScreenGui.CloseButton.Name = "CloseButton"
-ScreenGui.CloseButton.ZIndex = 1
-ScreenGui.CloseButton.Position = UDim2.new(0.931999981, 0, 0.0799999982, 0)
-ScreenGui.CloseButton.Size = UDim2.new(0, 22, 0, 22)
-ScreenGui.CloseButton.BackgroundColor3 = Color3.fromRGB(177,0,0)
-ScreenGui.CloseButton.BackgroundTransparency = 0
-ScreenGui.CloseButton.Text = ""
-ScreenGui.CloseButton.TextScaled = false
-ScreenGui.CloseButton.TextSize = 14
-ScreenGui.CloseButton.Font = Enum.Font.SourceSans
-ScreenGui.CloseButton.TextColor3 = Color3.fromRGB(0,0,0)
-ScreenGui.CloseButton.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-ScreenGui.CloseButton.TextStrokeTransparency = 1
-ScreenGui.CloseButton.TextWrapped = false
-ScreenGui.CloseButton.TextXAlignment = Enum.TextXAlignment.Center
-ScreenGui.CloseButton.TextYAlignment = Enum.TextYAlignment.Center
-ScreenGui.CloseButton.TextTransparency = 0
-ScreenGui.CloseButton.Visible = true
-ScreenGui.CloseButton.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.CloseButton.ClipsDescendants = false
-ScreenGui.CloseButton.BorderSizePixel = 0
-
-ScreenGui.TextLabel.Name = "TextLabel"
-ScreenGui.TextLabel.ZIndex = 1
-ScreenGui.TextLabel.Position = UDim2.new(0.0185540486, 0, -0.068965517, 0)
-ScreenGui.TextLabel.Size = UDim2.new(0, 115, 0, 29)
-ScreenGui.TextLabel.BackgroundColor3 = Color3.fromRGB(255,255,255)
-ScreenGui.TextLabel.BackgroundTransparency = 1
-ScreenGui.TextLabel.Text = "RXT ADMIN"
-ScreenGui.TextLabel.TextScaled = false
-ScreenGui.TextLabel.TextSize = 30
-ScreenGui.TextLabel.Font = Enum.Font.SourceSans
-ScreenGui.TextLabel.TextColor3 = Color3.fromRGB(0,0,0)
-ScreenGui.TextLabel.TextStrokeColor3 = Color3.fromRGB(0,0,0)
-ScreenGui.TextLabel.TextStrokeTransparency = 1
-ScreenGui.TextLabel.TextWrapped = false
-ScreenGui.TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-ScreenGui.TextLabel.TextYAlignment = Enum.TextYAlignment.Center
-ScreenGui.TextLabel.TextTransparency = 0
-ScreenGui.TextLabel.Visible = true
-ScreenGui.TextLabel.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.TextLabel.ClipsDescendants = false
-ScreenGui.TextLabel.BorderColor3 = Color3.fromRGB(185,185,185)
-ScreenGui.TextLabel.BorderSizePixel = 3
-
-ScreenGui.ScrollingFrame.Name = "ScrollingFrame"
-ScreenGui.ScrollingFrame.ZIndex = 1
-ScreenGui.ScrollingFrame.Position = UDim2.new(0, 0, 0.0969899669, 0)
-ScreenGui.ScrollingFrame.Size = UDim2.new(0, 381, 0, 270)
-ScreenGui.ScrollingFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
-ScreenGui.ScrollingFrame.BackgroundTransparency = 0
-ScreenGui.ScrollingFrame.Visible = true
-ScreenGui.ScrollingFrame.AnchorPoint = Vector2.new(0, 0)
-ScreenGui.ScrollingFrame.ClipsDescendants = true
-ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
-ScreenGui.ScrollingFrame.ScrollBarThickness = 12
-ScreenGui.ScrollingFrame.ScrollingEnabled = true
-ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
-ScreenGui.ScrollingFrame.BorderSizePixel = 3
+_G.RXT_ScreenGui.ScrollingFrame.Name = "ScrollingFrame"
+_G.RXT_ScreenGui.ScrollingFrame.ZIndex = 1
+_G.RXT_ScreenGui.ScrollingFrame.Position = UDim2.new(0, 0, 0.0969899669, 0)
+_G.RXT_ScreenGui.ScrollingFrame.Size = UDim2.new(0, 381, 0, 270)
+_G.RXT_ScreenGui.ScrollingFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
+_G.RXT_ScreenGui.ScrollingFrame.BackgroundTransparency = 0
+_G.RXT_ScreenGui.ScrollingFrame.Visible = true
+_G.RXT_ScreenGui.ScrollingFrame.AnchorPoint = Vector2.new(0, 0)
+_G.RXT_ScreenGui.ScrollingFrame.ClipsDescendants = true
+_G.RXT_ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+_G.RXT_ScreenGui.ScrollingFrame.ScrollBarThickness = 12
+_G.RXT_ScreenGui.ScrollingFrame.ScrollingEnabled = true
+_G.RXT_ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
+_G.RXT_ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 -- ============================================
 -- CARREGA O ARQUIVO DE COMANDOS VIA HttpGet
