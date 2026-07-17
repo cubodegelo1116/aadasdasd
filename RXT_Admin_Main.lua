@@ -1,6 +1,4 @@
--- ============================================
--- RXT ADMIN - MAIN
--- ============================================
+-- FRVGMXNT GUI2LUA CONVERTER 1.2. Like pls!
 
 -- ============================================
 -- ANTI DUPLICATE
@@ -19,7 +17,6 @@ end
 -- CARREGAR COMANDOS
 -- ============================================
 
-local commandScript = nil
 local function loadCommands()
 	local success, result = pcall(function()
 		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
@@ -33,79 +30,49 @@ local function loadCommands()
 				_G.RXT_Commands = cmdTable
 				print("✅ Comandos carregados: " .. #cmdTable)
 				return true
-			else
-				warn("commands.lua não retornou uma tabela")
-			end
-		else
-			warn("Erro ao compilar commands.lua: " .. tostring(err))
-		end
-	else
-		warn("Falha ao baixar commands.lua: " .. tostring(success))
-	end
-	return false
-end
-
-local function loadCommandsFromURL(url)
-	local success, result = pcall(function()
-		return game:HttpGet(url)
-	end)
-	
-	if success and result then
-		local fn, err = loadstring(result)
-		if fn then
-			local cmdTable = fn()
-			if type(cmdTable) == "table" then
-				_G.RXT_Commands = cmdTable
-				print("✅ Comandos carregados: " .. #cmdTable)
-				return true
 			end
 		end
 	end
 	return false
 end
 
--- Tenta carregar com o caminho direto
 if not loadCommands() then
-	-- Tenta com o caminho sem /refs/heads/
-	if not loadCommandsFromURL("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/main/commands.lua") then
-		-- Fallback: comandos embutidos
-		_G.RXT_Commands = {
-			{cmd = "cmds", desc = "Abre esta lista de comandos"},
-			{cmd = "prefix [novo]", desc = "Muda o prefixo"},
-			{cmd = "vprefix", desc = "Mostra o prefixo atual"},
-			{cmd = "popup true", desc = "Ativa os popups"},
-			{cmd = "popup false", desc = "Desativa os popups"},
-			{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
-			{cmd = "unfly", desc = "Desativa o modo voo"},
-			{cmd = "noclip", desc = "Ativa o noclip"},
-			{cmd = "clip", desc = "Desativa o noclip"},
-			{cmd = "speed [numero]", desc = "Altera a velocidade"},
-			{cmd = "jump [numero]", desc = "Altera o pulo"},
-			{cmd = "loopspeed [numero]", desc = "Loop da velocidade"},
-			{cmd = "unloopspeed", desc = "Desativa loop da velocidade"},
-			{cmd = "loopjump [numero]", desc = "Loop do pulo"},
-			{cmd = "unloopjump", desc = "Desativa loop do pulo"},
-			{cmd = "infjump", desc = "Ativa pulo infinito"},
-			{cmd = "uninfjump", desc = "Desativa pulo infinito"},
-			{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
-			{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
-			{cmd = "view [nome]", desc = "Observa o jogador"},
-			{cmd = "unview", desc = "Para de observar"},
-			{cmd = "tptool", desc = "Da uma tool de teleporte"},
-			{cmd = "untptool", desc = "Remove a tool de teleporte"},
-			{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
-			{cmd = "unesp", desc = "Desativa o ESP"},
-			{cmd = "walkfling", desc = "Ativa walkfling"},
-			{cmd = "unwalkfling", desc = "Desativa walkfling"},
-			{cmd = "executor", desc = "Abre o executor de scripts"},
-			{cmd = "rejoin", desc = "Reentra no servidor"},
-			{cmd = "reset", desc = "Respawna o personagem"},
-			{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
-			{cmd = "unfloat", desc = "Desativa o float"},
-			{cmd = "sit", desc = "Senta o personagem"},
-		}
-		print("⚠️ Usando comandos embutidos (fallback)")
-	end
+	_G.RXT_Commands = {
+		{cmd = "cmds", desc = "Abre esta lista de comandos"},
+		{cmd = "prefix [novo]", desc = "Muda o prefixo"},
+		{cmd = "vprefix", desc = "Mostra o prefixo atual"},
+		{cmd = "popup true", desc = "Ativa os popups"},
+		{cmd = "popup false", desc = "Desativa os popups"},
+		{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
+		{cmd = "unfly", desc = "Desativa o modo voo"},
+		{cmd = "noclip", desc = "Ativa o noclip"},
+		{cmd = "clip", desc = "Desativa o noclip"},
+		{cmd = "speed [numero]", desc = "Altera a velocidade"},
+		{cmd = "jump [numero]", desc = "Altera o pulo"},
+		{cmd = "loopspeed [numero]", desc = "Loop da velocidade"},
+		{cmd = "unloopspeed", desc = "Desativa loop da velocidade"},
+		{cmd = "loopjump [numero]", desc = "Loop do pulo"},
+		{cmd = "unloopjump", desc = "Desativa loop do pulo"},
+		{cmd = "infjump", desc = "Ativa pulo infinito"},
+		{cmd = "uninfjump", desc = "Desativa pulo infinito"},
+		{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
+		{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
+		{cmd = "view [nome]", desc = "Observa o jogador"},
+		{cmd = "unview", desc = "Para de observar"},
+		{cmd = "tptool", desc = "Da uma tool de teleporte"},
+		{cmd = "untptool", desc = "Remove a tool de teleporte"},
+		{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
+		{cmd = "unesp", desc = "Desativa o ESP"},
+		{cmd = "walkfling", desc = "Ativa walkfling"},
+		{cmd = "unwalkfling", desc = "Desativa walkfling"},
+		{cmd = "executor", desc = "Abre o executor de scripts"},
+		{cmd = "rejoin", desc = "Reentra no servidor"},
+		{cmd = "reset", desc = "Respawna o personagem"},
+		{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
+		{cmd = "unfloat", desc = "Desativa o float"},
+		{cmd = "sit", desc = "Senta o personagem"},
+	}
+	print("⚠️ Usando comandos embutidos (fallback)")
 end
 
 -- ============================================
@@ -367,7 +334,7 @@ task.spawn(function()
 end)
 
 -- ============================================
--- CmdsLIST
+-- CmdsLIST (COM ANIMAÇÃO DE BAIXO PRA CIMA)
 -- ============================================
 
 local CMDSLIST_ORIGINAL_POS = UDim2.new(0.311619729, 0, 0.246329531, 0)
@@ -393,17 +360,18 @@ function _G.RXT_AnimateCmdsList(show)
 	
 	local list = ScreenGui.CmdsLIST
 	local currentPos = list.Position
+	local dragbarHeight = 29
 	
 	if show then
 		list.Visible = true
 		list.BackgroundTransparency = 1
-		list.Size = UDim2.new(0, 0, 0, 0)
-		list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + 0.15, currentPos.Y.Offset)
+		list.Size = UDim2.new(0, 0, 0, dragbarHeight)
+		list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
 		
 		for i = 1, 20 do
 			list.BackgroundTransparency = 1 - (i / 20)
-			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (i / 20))
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (1 - i / 20)), currentPos.Y.Offset)
+			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (i / 20), 0, dragbarHeight + (CMDSLIST_ORIGINAL_SIZE.Y.Offset - dragbarHeight) * (i / 20))
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
 			task.wait(0.015)
 		end
 		
@@ -412,11 +380,14 @@ function _G.RXT_AnimateCmdsList(show)
 		list.Position = currentPos
 	else
 		for i = 1, 15 do
-			list.BackgroundTransparency = i / 15
-			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - i / 15), 0, CMDSLIST_ORIGINAL_SIZE.Y.Offset * (1 - i / 15))
-			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale + (0.15 * (i / 15)), currentPos.Y.Offset)
+			local progress = i / 15
+			list.BackgroundTransparency = progress
+			local newHeight = CMDSLIST_ORIGINAL_SIZE.Y.Offset - (CMDSLIST_ORIGINAL_SIZE.Y.Offset - dragbarHeight) * progress
+			list.Size = UDim2.new(0, CMDSLIST_ORIGINAL_SIZE.X.Offset * (1 - progress * 0.3), 0, newHeight)
+			list.Position = UDim2.new(currentPos.X.Scale, currentPos.X.Offset, currentPos.Y.Scale, currentPos.Y.Offset)
 			task.wait(0.015)
 		end
+		
 		list.Visible = false
 		list.BackgroundTransparency = 0
 		list.Size = CMDSLIST_ORIGINAL_SIZE
@@ -570,68 +541,6 @@ end
 function _G.RXT_GetRoot(character)
 	if not character then return nil end
 	return character:FindFirstChild("HumanoidRootPart")
-end
-
--- ============================================
--- INICIALIZAR EXECUTE COMMAND (DEPOIS DE CARREGAR OS COMANDOS)
--- ============================================
-
-local function loadExecuteCommand()
-	local success, result = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
-	end)
-	
-	if success and result then
-		local fn, err = loadstring(result)
-		if fn then
-			local cmdTable = fn()
-			if type(cmdTable) == "table" then
-				_G.RXT_Commands = cmdTable
-				return true
-			end
-		end
-	end
-	return false
-end
-
--- Tenta carregar, se falhar usa fallback
-if not loadExecuteCommand() then
-	_G.RXT_Commands = {
-		{cmd = "cmds", desc = "Abre esta lista de comandos"},
-		{cmd = "prefix [novo]", desc = "Muda o prefixo"},
-		{cmd = "vprefix", desc = "Mostra o prefixo atual"},
-		{cmd = "popup true", desc = "Ativa os popups"},
-		{cmd = "popup false", desc = "Desativa os popups"},
-		{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
-		{cmd = "unfly", desc = "Desativa o modo voo"},
-		{cmd = "noclip", desc = "Ativa o noclip"},
-		{cmd = "clip", desc = "Desativa o noclip"},
-		{cmd = "speed [numero]", desc = "Altera a velocidade"},
-		{cmd = "jump [numero]", desc = "Altera o pulo"},
-		{cmd = "loopspeed [numero]", desc = "Loop da velocidade"},
-		{cmd = "unloopspeed", desc = "Desativa loop da velocidade"},
-		{cmd = "loopjump [numero]", desc = "Loop do pulo"},
-		{cmd = "unloopjump", desc = "Desativa loop do pulo"},
-		{cmd = "infjump", desc = "Ativa pulo infinito"},
-		{cmd = "uninfjump", desc = "Desativa pulo infinito"},
-		{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
-		{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
-		{cmd = "view [nome]", desc = "Observa o jogador"},
-		{cmd = "unview", desc = "Para de observar"},
-		{cmd = "tptool", desc = "Da uma tool de teleporte"},
-		{cmd = "untptool", desc = "Remove a tool de teleporte"},
-		{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
-		{cmd = "unesp", desc = "Desativa o ESP"},
-		{cmd = "walkfling", desc = "Ativa walkfling"},
-		{cmd = "unwalkfling", desc = "Desativa walkfling"},
-		{cmd = "executor", desc = "Abre o executor de scripts"},
-		{cmd = "rejoin", desc = "Reentra no servidor"},
-		{cmd = "reset", desc = "Respawna o personagem"},
-		{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
-		{cmd = "unfloat", desc = "Desativa o float"},
-		{cmd = "sit", desc = "Senta o personagem"},
-	}
-	print("⚠️ Usando comandos embutidos (fallback)")
 end
 
 -- ============================================
@@ -940,6 +849,56 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 		local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 		ScreenGui.CmdsLIST.Position = newPos
 		savedPosition = newPos
+	end
+end)
+
+-- ============================================
+-- LIMPAR TUDO QUANDO RESPAWNA (SÓ NO MAIN)
+-- ============================================
+
+player.CharacterAdded:Connect(function()
+	if _G.RXT_State then
+		local state = _G.RXT_State
+		if state.flyActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("unfly", {})
+			end
+		end
+		if state.noclipActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("clip", {})
+			end
+		end
+		if state.infJumpActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("uninfjump", {})
+			end
+		end
+		if state.viewActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("unview", {})
+			end
+		end
+		if state.tpToolActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("untptool", {})
+			end
+		end
+		if state.espActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("unesp", {})
+			end
+		end
+		if state.walkflingActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("unwalkfling", {})
+			end
+		end
+		if state.floatActive then
+			if _G.RXT_ExecuteCommand then
+				_G.RXT_ExecuteCommand("unfloat", {})
+			end
+		end
 	end
 end)
 
