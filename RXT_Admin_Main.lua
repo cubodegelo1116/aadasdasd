@@ -388,7 +388,7 @@ ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 -- ============================================
--- CARREGA O ARQUIVO DE COMANDOS
+-- CARREGA O ARQUIVO DE COMANDOS VIA HttpGet
 -- ============================================
 
-require(script.Parent:WaitForChild("commands"))
+loadstring(game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/main/commands.lua"))()
