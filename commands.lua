@@ -2,43 +2,6 @@
 -- RXT ADMIN - COMANDOS
 -- ============================================
 
--- Retorna a tabela de comandos
-return {
-	{cmd = "cmds", desc = "Abre esta lista de comandos"},
-	{cmd = "prefix [novo]", desc = "Muda o prefixo"},
-	{cmd = "vprefix", desc = "Mostra o prefixo atual"},
-	{cmd = "popup true", desc = "Ativa os popups"},
-	{cmd = "popup false", desc = "Desativa os popups"},
-	{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
-	{cmd = "unfly", desc = "Desativa o modo voo"},
-	{cmd = "noclip", desc = "Ativa o noclip"},
-	{cmd = "clip", desc = "Desativa o noclip"},
-	{cmd = "speed [numero]", desc = "Altera a velocidade"},
-	{cmd = "jump [numero]", desc = "Altera o pulo"},
-	{cmd = "loopspeed [numero]", desc = "Loop da velocidade"},
-	{cmd = "unloopspeed", desc = "Desativa loop da velocidade"},
-	{cmd = "loopjump [numero]", desc = "Loop do pulo"},
-	{cmd = "unloopjump", desc = "Desativa loop do pulo"},
-	{cmd = "infjump", desc = "Ativa pulo infinito"},
-	{cmd = "uninfjump", desc = "Desativa pulo infinito"},
-	{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
-	{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
-	{cmd = "view [nome]", desc = "Observa o jogador"},
-	{cmd = "unview", desc = "Para de observar"},
-	{cmd = "tptool", desc = "Da uma tool de teleporte"},
-	{cmd = "untptool", desc = "Remove a tool de teleporte"},
-	{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
-	{cmd = "unesp", desc = "Desativa o ESP"},
-	{cmd = "walkfling", desc = "Ativa walkfling"},
-	{cmd = "unwalkfling", desc = "Desativa walkfling"},
-	{cmd = "executor", desc = "Abre o executor de scripts"},
-	{cmd = "rejoin", desc = "Reentra no servidor"},
-	{cmd = "reset", desc = "Respawna o personagem"},
-	{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
-	{cmd = "unfloat", desc = "Desativa o float"},
-	{cmd = "sit", desc = "Senta o personagem"},
-}
-
 -- ============================================
 -- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
 -- ============================================
@@ -1120,3 +1083,43 @@ player.CharacterAdded:Connect(function()
 		end
 	end
 end)
+
+-- ============================================
+-- RETORNAR TABELA DE COMANDOS (DEVE SER A ÚLTIMA COISA)
+-- ============================================
+
+return {
+	{cmd = "cmds", desc = "Abre esta lista de comandos"},
+	{cmd = "prefix [novo]", desc = "Muda o prefixo"},
+	{cmd = "vprefix", desc = "Mostra o prefixo atual"},
+	{cmd = "popup true", desc = "Ativa os popups"},
+	{cmd = "popup false", desc = "Desativa os popups"},
+	{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
+	{cmd = "unfly", desc = "Desativa o modo voo"},
+	{cmd = "noclip", desc = "Ativa o noclip"},
+	{cmd = "clip", desc = "Desativa o noclip"},
+	{cmd = "speed [numero]", desc = "Altera a velocidade"},
+	{cmd = "jump [numero]", desc = "Altera o pulo"},
+	{cmd = "loopspeed [numero]", desc = "Loop da velocidade"},
+	{cmd = "unloopspeed", desc = "Desativa loop da velocidade"},
+	{cmd = "loopjump [numero]", desc = "Loop do pulo"},
+	{cmd = "unloopjump", desc = "Desativa loop do pulo"},
+	{cmd = "infjump", desc = "Ativa pulo infinito"},
+	{cmd = "uninfjump", desc = "Desativa pulo infinito"},
+	{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
+	{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
+	{cmd = "view [nome]", desc = "Observa o jogador"},
+	{cmd = "unview", desc = "Para de observar"},
+	{cmd = "tptool", desc = "Da uma tool de teleporte"},
+	{cmd = "untptool", desc = "Remove a tool de teleporte"},
+	{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
+	{cmd = "unesp", desc = "Desativa o ESP"},
+	{cmd = "walkfling", desc = "Ativa walkfling"},
+	{cmd = "unwalkfling", desc = "Desativa walkfling"},
+	{cmd = "executor", desc = "Abre o executor de scripts"},
+	{cmd = "rejoin", desc = "Reentra no servidor"},
+	{cmd = "reset", desc = "Respawna o personagem"},
+	{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
+	{cmd = "unfloat", desc = "Desativa o float"},
+	{cmd = "sit", desc = "Senta o personagem"},
+}
