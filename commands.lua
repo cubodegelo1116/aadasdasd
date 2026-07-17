@@ -3,6 +3,431 @@
 -- ============================================
 
 -- ============================================
+-- VARIÁVEIS GLOBAIS
+-- ============================================
+
+local rspyActive = false
+local rspyConnections = {}
+local rspyLogs = {}
+local rspySelected = nil
+local rspyToggle = false
+local rspyClosed = false
+local rspySideClosed = false
+local rspyMaximized = false
+local rspyLayoutOrderNum = 999999999
+local rspyRemoteLogs = {}
+
+local rspyFrame = _G.RXT_RSpyFrame
+local rspyList = _G.RXT_RSpyList
+local rspyArgs = _G.RXT_RSpyArgs
+local rspyTextBox = _G.RXT_RSpyTextBox
+
+-- ============================================
+-- FUNÇÕES AUXILIARES DO SIMPLESPY
+-- ============================================
+
+local function rawtostring(obj)
+    if type(obj) == "table" or typeof(obj) == "userdata" then
+        local rawmeta = getrawmetatable(obj)
+        local cached = rawmeta and rawget(rawmeta, "__tostring")
+        if cached then
+            local wasReadonly = table.isfrozen and table.isfrozen(rawmeta)
+            if wasReadonly then
+                setreadonly(rawmeta, false)
+            end
+            rawset(rawmeta, "__tostring", nil)
+            local str = tostring(obj)
+            rawset(rawmeta, "__tostring", cached)
+            if wasReadonly then
+                setreadonly(rawmeta, true)
+            end
+            return str
+        end
+    end
+    return tostring(obj)
+end
+
+local function getRemotePath(remote)
+    if not remote then return "nil" end
+    local path = ""
+    local current = remote
+    while current and current ~= game do
+        if current.Name:match("^[%a_][%w_]*$") then
+            path = "." .. current.Name .. path
+        else
+            path = ':FindFirstChild("' .. current.Name .. '")' .. path
+        end
+        current = current.Parent
+    end
+    if path == "" then
+        return "game"
+    end
+    return "game" .. path
+end
+
+local function getPlayerFromInstance(instance)
+    for _, plr in ipairs(game.Players:GetPlayers()) do
+        if plr.Character and (instance:IsDescendantOf(plr.Character) or instance == plr.Character) then
+            return plr
+        end
+    end
+    return nil
+end
+
+local function formatArgs(args)
+    local str = ""
+    for i, v in ipairs(args) do
+        if i > 1 then str = str .. ", " end
+        if type(v) == "string" then
+            str = str .. '"' .. tostring(v) .. '"'
+        elseif type(v) == "number" then
+            str = str .. tostring(v)
+        elseif type(v) == "boolean" then
+            str = str .. tostring(v)
+        elseif typeof(v) == "Instance" then
+            str = str .. getRemotePath(v)
+        else
+            str = str .. tostring(v)
+        end
+    end
+    return str
+end
+
+local function cleanLogs()
+    local max = 300
+    if #rspyRemoteLogs > max then
+        for i = 100, #rspyRemoteLogs do
+            local log = rspyRemoteLogs[i]
+            if log and log[1] then
+                pcall(function() log[1]:Disconnect() end)
+            end
+            if log and log[2] then
+                pcall(function() log[2]:Destroy() end)
+            end
+        end
+        local newLogs = {}
+        for i = 1, 100 do
+            table.insert(newLogs, rspyRemoteLogs[i])
+        end
+        rspyRemoteLogs = newLogs
+    end
+end
+
+-- ============================================
+-- RSPY UI (MESMO DESIGN)
+-- ============================================
+
+local function rspyAddLog(name, remote, args, plr)
+    local color = remote:IsA("RemoteEvent") and "[Event]" or "[Function]"
+    
+    local btn = Instance.new("TextButton")
+    btn.Name = "RSpyLog"
+    btn.Parent = rspyList
+    btn.Size = UDim2.new(1, -4, 0, 20)
+    btn.Position = UDim2.new(0, 2, 0, #rspyLogs * 22 + 2)
+    btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+    btn.BackgroundTransparency = 0.3
+    btn.BorderColor3 = Color3.fromRGB(185,185,185)
+    btn.BorderSizePixel = 3
+    btn.Text = name .. " " .. color
+    btn.TextColor3 = Color3.fromRGB(0,0,0)
+    btn.TextSize = 10
+    btn.Font = Enum.Font.SourceSans
+    btn.ZIndex = 11
+    btn.AutoButtonColor = false
+    btn.TextTruncate = Enum.TextTruncate.AtEnd
+    
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundTransparency = 0
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundTransparency = 0.3
+    end)
+    
+    local logData = {remote = remote, args = args, button = btn, name = name, plr = plr}
+    table.insert(rspyLogs, logData)
+    table.insert(rspyRemoteLogs, {nil, btn})
+    
+    btn.MouseButton1Click:Connect(function()
+        rspySelected = logData
+        local argsStr = formatArgs(args)
+        local plrStr = plr and "Player: " .. plr.Name .. "\n" or ""
+        rspyTextBox.Text = "Remote: " .. name .. "\n" .. plrStr .. "Args: " .. argsStr
+    end)
+    
+    rspyList.CanvasSize = UDim2.new(0, 0, 0, #rspyLogs * 22 + 4)
+    cleanLogs()
+end
+
+-- ============================================
+-- RSPY HOOKS (SIMPLESPY CORE)
+-- ============================================
+
+local function hookRemote(remote)
+    if rspyConnections[remote] then return end
+    
+    local name = remote:GetFullName()
+    local conns = {}
+    
+    if remote:IsA("RemoteEvent") then
+        local conn = remote.OnServerEvent:Connect(function(plr, ...)
+            if not rspyActive then return end
+            local args = {...}
+            rspyAddLog(name, remote, args, plr)
+        end)
+        table.insert(conns, conn)
+    end
+    
+    if remote:IsA("RemoteFunction") then
+        local oldFunc = remote.OnServerInvoke
+        remote.OnServerInvoke = function(plr, ...)
+            if rspyActive then
+                local args = {...}
+                rspyAddLog(name, remote, args, plr)
+            end
+            if oldFunc then
+                return oldFunc(plr, ...)
+            end
+            return nil
+        end
+        table.insert(conns, oldFunc)
+    end
+    
+    if #conns > 0 then
+        rspyConnections[remote] = conns
+    end
+end
+
+local function scanRemotes(parent)
+    for _, child in ipairs(parent:GetChildren()) do
+        if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") or child:IsA("UnreliableRemoteEvent") then
+            hookRemote(child)
+        end
+        if #child:GetChildren() > 0 then
+            scanRemotes(child)
+        end
+    end
+end
+
+-- ============================================
+-- BOTÕES DO RSPY (COPIADO DO SIMPLESPY)
+-- ============================================
+
+local function createRSpyButtons()
+    -- Limpa botões antigos
+    local buttonsFrame = rspyFrame:FindFirstChild("RSpyButtons")
+    if buttonsFrame then
+        buttonsFrame:Destroy()
+    end
+    
+    buttonsFrame = Instance.new("Frame")
+    buttonsFrame.Name = "RSpyButtons"
+    buttonsFrame.Parent = rspyFrame
+    buttonsFrame.Size = UDim2.new(0, 272, 0, 170)
+    buttonsFrame.Position = UDim2.new(0.287617803, 0, 0.42, 0)
+    buttonsFrame.BackgroundTransparency = 1
+    buttonsFrame.ZIndex = 11
+    
+    local buttonNames = {
+        {"Copy Code", "Copia o script gerado"},
+        {"Copy Remote", "Copia o caminho do remote"},
+        {"Run Code", "Executa o remote"},
+        {"Excluir (i)", "Exclui este remote pelo ID"},
+        {"Excluir (n)", "Exclui remotes com este nome"},
+        {"Limpar Logs", "Limpa todos os logs"},
+    }
+    
+    local yOffset = 0
+    for _, btnData in ipairs(buttonNames) do
+        local btn = Instance.new("TextButton")
+        btn.Name = "RSpyBtn" .. btnData[1]
+        btn.Parent = buttonsFrame
+        btn.Size = UDim2.new(0.9, 0, 0, 22)
+        btn.Position = UDim2.new(0.05, 0, 0, yOffset)
+        btn.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        btn.BackgroundTransparency = 0.3
+        btn.BorderColor3 = Color3.fromRGB(185,185,185)
+        btn.BorderSizePixel = 3
+        btn.Text = btnData[1]
+        btn.TextColor3 = Color3.fromRGB(0,0,0)
+        btn.TextSize = 12
+        btn.Font = Enum.Font.SourceSans
+        btn.ZIndex = 11
+        btn.AutoButtonColor = false
+        
+        btn.MouseEnter:Connect(function()
+            btn.BackgroundTransparency = 0
+        end)
+        btn.MouseLeave:Connect(function()
+            btn.BackgroundTransparency = 0.3
+        end)
+        
+        -- Funcionalidades dos botões
+        if btnData[1] == "Copy Code" then
+            btn.MouseButton1Click:Connect(function()
+                if rspySelected then
+                    local argsStr = formatArgs(rspySelected.args)
+                    local code = "local remote = " .. getRemotePath(rspySelected.remote) .. "\n"
+                    if rspySelected.remote:IsA("RemoteEvent") then
+                        code = code .. "remote:FireServer(" .. argsStr .. ")"
+                    else
+                        code = code .. "remote:InvokeServer(" .. argsStr .. ")"
+                    end
+                    setclipboard and setclipboard(code)
+                    _G.RXT_ShowPopup("Código copiado!")
+                else
+                    _G.RXT_ShowPopup("Selecione um remote primeiro!")
+                end
+            end)
+        elseif btnData[1] == "Copy Remote" then
+            btn.MouseButton1Click:Connect(function()
+                if rspySelected then
+                    setclipboard and setclipboard(getRemotePath(rspySelected.remote))
+                    _G.RXT_ShowPopup("Remote copiado!")
+                else
+                    _G.RXT_ShowPopup("Selecione um remote primeiro!")
+                end
+            end)
+        elseif btnData[1] == "Run Code" then
+            btn.MouseButton1Click:Connect(function()
+                if rspySelected then
+                    local argsStr = formatArgs(rspySelected.args)
+                    if rspySelected.remote:IsA("RemoteEvent") then
+                        rspySelected.remote:FireServer(unpack(rspySelected.args))
+                    else
+                        rspySelected.remote:InvokeServer(unpack(rspySelected.args))
+                    end
+                    _G.RXT_ShowPopup("Remote executado!")
+                else
+                    _G.RXT_ShowPopup("Selecione um remote primeiro!")
+                end
+            end)
+        elseif btnData[1] == "Excluir (i)" then
+            btn.MouseButton1Click:Connect(function()
+                if rspySelected then
+                    -- Remove da lista
+                    local remote = rspySelected.remote
+                    for i, log in ipairs(rspyLogs) do
+                        if log.remote == remote then
+                            if log.button then log.button:Destroy() end
+                            table.remove(rspyLogs, i)
+                            break
+                        end
+                    end
+                    -- Reorganiza posições
+                    for i, log in ipairs(rspyLogs) do
+                        if log.button then
+                            log.button.Position = UDim2.new(0, 2, 0, (i-1) * 22 + 2)
+                        end
+                    end
+                    rspyList.CanvasSize = UDim2.new(0, 0, 0, #rspyLogs * 22 + 4)
+                    rspyTextBox.Text = ""
+                    rspySelected = nil
+                    _G.RXT_ShowPopup("Remote excluído!")
+                else
+                    _G.RXT_ShowPopup("Selecione um remote primeiro!")
+                end
+            end)
+        elseif btnData[1] == "Excluir (n)" then
+            btn.MouseButton1Click:Connect(function()
+                if rspySelected then
+                    local name = rspySelected.name
+                    for i = #rspyLogs, 1, -1 do
+                        if rspyLogs[i].name == name then
+                            if rspyLogs[i].button then rspyLogs[i].button:Destroy() end
+                            table.remove(rspyLogs, i)
+                        end
+                    end
+                    for i, log in ipairs(rspyLogs) do
+                        if log.button then
+                            log.button.Position = UDim2.new(0, 2, 0, (i-1) * 22 + 2)
+                        end
+                    end
+                    rspyList.CanvasSize = UDim2.new(0, 0, 0, #rspyLogs * 22 + 4)
+                    rspyTextBox.Text = ""
+                    rspySelected = nil
+                    _G.RXT_ShowPopup("Remotes com nome '" .. name .. "' excluídos!")
+                else
+                    _G.RXT_ShowPopup("Selecione um remote primeiro!")
+                end
+            end)
+        elseif btnData[1] == "Limpar Logs" then
+            btn.MouseButton1Click:Connect(function()
+                for _, child in ipairs(rspyList:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        child:Destroy()
+                    end
+                end
+                rspyLogs = {}
+                rspyRemoteLogs = {}
+                rspyTextBox.Text = ""
+                rspySelected = nil
+                rspyList.CanvasSize = UDim2.new(0, 0, 0, 0)
+                _G.RXT_ShowPopup("Logs limpos!")
+            end)
+        end
+        
+        yOffset = yOffset + 26
+    end
+end
+
+-- ============================================
+-- RSPY TOGGLE
+-- ============================================
+
+function _G.RXT_ToggleRSpy(enable)
+    if enable and not rspyActive then
+        rspyActive = true
+        rspyFrame.Visible = true
+        
+        -- Limpa logs
+        for _, child in ipairs(rspyList:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+        rspyLogs = {}
+        rspyRemoteLogs = {}
+        rspyTextBox.Text = ""
+        rspySelected = nil
+        
+        -- Cria botões
+        createRSpyButtons()
+        
+        -- Escaneia remotes
+        scanRemotes(game)
+        
+        -- Monitora novos remotes
+        local descConn = game.DescendantAdded:Connect(function(desc)
+            if rspyActive and (desc:IsA("RemoteEvent") or desc:IsA("RemoteFunction") or desc:IsA("UnreliableRemoteEvent")) then
+                hookRemote(desc)
+            end
+        end)
+        table.insert(rspyConnections, descConn)
+        
+        _G.RXT_ShowPopup("Remote Spy ativado!")
+        
+    elseif not enable and rspyActive then
+        rspyActive = false
+        rspyFrame.Visible = false
+        
+        -- Desconecta tudo
+        for _, conns in pairs(rspyConnections) do
+            if type(conns) == "table" then
+                for _, conn in ipairs(conns) do
+                    pcall(function() conn:Disconnect() end)
+                end
+            else
+                pcall(function() conns:Disconnect() end)
+            end
+        end
+        rspyConnections = {}
+        
+        _G.RXT_ShowPopup("Remote Spy desativado!")
+    end
+end
+
+-- ============================================
 -- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
 -- ============================================
 
@@ -1073,7 +1498,7 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 end
 
 -- ============================================
--- RETORNAR TABELA DE COMANDOS (MESMA TUDO)
+-- RETORNAR TABELA DE COMANDOS
 -- ============================================
 
 local commandList = {
