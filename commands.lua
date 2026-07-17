@@ -2,6 +2,10 @@
 -- RXT ADMIN - COMANDOS
 -- ============================================
 
+-- ============================================
+-- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
+-- ============================================
+
 _G.RXT_ExecuteCommand = function(cmd, args)
 	local player = _G.RXT_Player
 	local gui = _G.RXT_GUI
@@ -49,10 +53,14 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		
 	elseif cmd == "executor" then
 		local executorFrame = _G.RXT_ExecutorFrame
-		executorFrame.Visible = not executorFrame.Visible
-		if executorFrame.Visible then
-			task.wait(0.1)
-			_G.RXT_ExecutorTextBox:CaptureFocus()
+		if executorFrame then
+			executorFrame.Visible = not executorFrame.Visible
+			if executorFrame.Visible then
+				task.wait(0.1)
+				if _G.RXT_ExecutorTextBox then
+					_G.RXT_ExecutorTextBox:CaptureFocus()
+				end
+			end
 		end
 		return true
 		
@@ -1065,10 +1073,10 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 end
 
 -- ============================================
--- RETORNAR TABELA DE COMANDOS
+-- RETORNAR TABELA DE COMANDOS (MESMA TUDO)
 -- ============================================
 
-return {
+local commandList = {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
 	{cmd = "prefix [novo]", desc = "Muda o prefixo"},
 	{cmd = "vprefix", desc = "Mostra o prefixo atual"},
@@ -1105,3 +1113,5 @@ return {
 	{cmd = "unfloat", desc = "Desativa o float"},
 	{cmd = "sit", desc = "Senta o personagem"},
 }
+
+return commandList
