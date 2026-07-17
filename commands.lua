@@ -1,131 +1,9 @@
 -- ============================================
--- COMMANDS.LUA - RXT ADMIN v1.0
--- ============================================
--- Este arquivo contém toda a lógica dos comandos
--- Facilita a criação e modificação de novos comandos
-
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-local ScreenGui = _G.RXT_ScreenGui
-local Config = _G.RXT_Config
-
--- ============================================
--- FUNÇÕES AUXILIARES
+-- RXT ADMIN - COMANDOS
 -- ============================================
 
-local function showPopup(text)
-	if not Config.Popups then return end
-	
-	local popup = Instance.new("Frame")
-	popup.Parent = ScreenGui.ScreenGui
-	popup.Size = UDim2.new(0, 300, 0, 40)
-	popup.Position = UDim2.new(0.5, -150, 0.15, 0)
-	popup.BackgroundColor3 = Color3.fromRGB(227,227,227)
-	popup.BorderColor3 = Color3.fromRGB(185, 185, 185)
-	popup.BorderSizePixel = 3
-	popup.BackgroundTransparency = 0
-	popup.Visible = true
-	popup.ZIndex = 10
-	
-	local label = Instance.new("TextLabel")
-	label.Parent = popup
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Text = text
-	label.TextColor3 = Color3.fromRGB(0, 0, 0)
-	label.TextSize = 16
-	label.Font = Enum.Font.SourceSansBold
-	label.TextXAlignment = Enum.TextXAlignment.Center
-	label.TextYAlignment = Enum.TextYAlignment.Center
-	label.ZIndex = 11
-	
-	task.spawn(function()
-		task.wait(2)
-		popup:Destroy()
-	end)
-end
-
-local function findPlayer(name)
-	local found = {}
-	local lowerName = string.lower(name)
-	
-	for _, plr in ipairs(game.Players:GetPlayers()) do
-		local lowerPlayerName = string.lower(plr.Name)
-		local lowerDisplayName = string.lower(plr.DisplayName)
-		
-		if lowerPlayerName == lowerName or lowerDisplayName == lowerName then
-			return plr
-		end
-		
-		if string.find(lowerPlayerName, lowerName, 1, true) or string.find(lowerDisplayName, lowerName, 1, true) then
-			table.insert(found, plr)
-		end
-	end
-	
-	if #found == 1 then
-		return found[1]
-	elseif #found > 1 then
-		local names = {}
-		for _, p in ipairs(found) do
-			table.insert(names, p.Name)
-		end
-		showPopup("Varios jogadores encontrados: " .. table.concat(names, ", "))
-		return nil
-	end
-	
-	return nil
-end
-
-local function getRoot(character)
-	if not character then return nil end
-	return character:FindFirstChild("HumanoidRootPart")
-end
-
--- ============================================
--- VARIÁVEIS GLOBAIS DOS COMANDOS
--- ============================================
-
-local flyActive = false
-local flyData = {}
-local flySpeed = 50
-local noclipActive = false
-local noclipConn = nil
-local speedLoopActive = false
-local speedLoopConn = nil
-local speedLoopValue = nil
-local jumpLoopActive = false
-local jumpLoopConn = nil
-local jumpLoopValue = nil
-local infJumpActive = false
-local infJumpData = nil
-local viewActive = false
-local viewConn = nil
-local viewTarget = nil
-local tpToolActive = false
-local tpTool = nil
-local tpToolConn = nil
-
-local espActive = false
-local espConnections = {}
-local espHighlight = {}
-
-local walkflingActive = false
-local walkflingLoop = nil
-local walkflingDiedConn = nil
-
-local floatActive = false
-local floatName = ""
-local floatPart = nil
-local floatValue = -3.1
-local floatConnections = {}
-
-local sitActive = false
-
--- ============================================
--- LISTA DE COMANDOS
--- ============================================
-
-local commands = {
+-- Retorna a tabela de comandos
+return {
 	{cmd = "cmds", desc = "Abre esta lista de comandos"},
 	{cmd = "prefix [novo]", desc = "Muda o prefixo"},
 	{cmd = "vprefix", desc = "Mostra o prefixo atual"},
@@ -162,808 +40,1083 @@ local commands = {
 }
 
 -- ============================================
--- IMPLEMENTAÇÃO DOS COMANDOS
+-- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
 -- ============================================
 
-local function toggleExecutor(enable)
-	local executorFrame = ScreenGui.ScreenGui:FindFirstChild("ExecutorFrame")
-	if executorFrame then
-		executorFrame.Visible = enable
-		if enable then
+_G.RXT_ExecuteCommand = function(cmd, args)
+	local player = _G.RXT_Player
+	local gui = _G.RXT_GUI
+	
+	-- ============================================
+	-- COMANDOS DA MAIN
+	-- ============================================
+	
+	if cmd == "cmds" then
+		_G.RXT_AnimateCmdsList(not gui.CmdsLIST.Visible)
+		return true
+		
+	elseif cmd == "prefix" then
+		if #args > 0 then
+			_G.RXT_Config.Prefix = args[1]
+			_G.RXT_ShowPopup("Prefixo alterado para: " .. args[1])
+		else
+			_G.RXT_ShowPopup("Use: prefix [novo prefixo]")
+		end
+		return true
+		
+	elseif cmd == "vprefix" then
+		_G.RXT_ShowPopup("Prefixo atual: " .. _G.RXT_Config.Prefix)
+		return true
+		
+	elseif cmd == "popup" then
+		if #args > 0 then
+			if args[1] == "true" then
+				_G.RXT_Config.Popups = true
+				_G.RXT_ShowPopup("Popups ativados")
+			elseif args[1] == "false" then
+				_G.RXT_Config.Popups = false
+			else
+				_G.RXT_ShowPopup("Use: popup true ou popup false")
+			end
+		else
+			_G.RXT_ShowPopup("Use: popup true ou popup false")
+		end
+		return true
+		
+	elseif cmd == "executor" then
+		local executorFrame = _G.RXT_ExecutorFrame
+		executorFrame.Visible = not executorFrame.Visible
+		if executorFrame.Visible then
 			task.wait(0.1)
-			local textBox = executorFrame:FindFirstChild("ExecutorTextBox")
-			if textBox then
-				textBox:CaptureFocus()
+			_G.RXT_ExecutorTextBox:CaptureFocus()
+		end
+		return true
+		
+	elseif cmd == "rejoin" then
+		game:GetService("TeleportService"):Teleport(game.PlaceId, player)
+		return true
+		
+	elseif cmd == "reset" then
+		local char = player.Character
+		if char then
+			char:BreakJoints()
+			_G.RXT_ShowPopup("Resetado!")
+		end
+		return true
+		
+	elseif cmd == "sit" then
+		local char = player.Character
+		local humanoid = char and char:FindFirstChild("Humanoid")
+		if not humanoid then return false end
+		
+		_G.RXT_SitActive = not _G.RXT_SitActive
+		humanoid.Sit = _G.RXT_SitActive
+		_G.RXT_ShowPopup(_G.RXT_SitActive and "Sentado" or "Levantado")
+		return true
+	end
+	
+	-- ============================================
+	-- COMANDOS QUE PRECISAM DE ESTADO GLOBAL
+	-- ============================================
+	
+	-- Inicializa estado se não existir
+	if not _G.RXT_State then
+		_G.RXT_State = {
+			flyActive = false,
+			flyData = {},
+			flySpeed = 50,
+			noclipActive = false,
+			noclipConn = nil,
+			speedLoopActive = false,
+			speedLoopConn = nil,
+			speedLoopValue = nil,
+			jumpLoopActive = false,
+			jumpLoopConn = nil,
+			jumpLoopValue = nil,
+			infJumpActive = false,
+			infJumpData = nil,
+			viewActive = false,
+			viewConn = nil,
+			viewTarget = nil,
+			tpToolActive = false,
+			tpTool = nil,
+			tpToolConn = nil,
+			espActive = false,
+			espConnections = {},
+			espHighlight = {},
+			walkflingActive = false,
+			walkflingLoop = nil,
+			walkflingDiedConn = nil,
+			floatActive = false,
+			floatName = "",
+			floatPart = nil,
+			floatValue = -3.1,
+			floatConnections = {},
+			sitActive = false,
+		}
+	end
+	
+	local state = _G.RXT_State
+	
+	-- ============================================
+	-- NOCLIP
+	-- ============================================
+	
+	local function toggleNoclip(enable, noNotify)
+		local character = player.Character
+		if not character then return end
+		
+		if enable and not state.noclipActive then
+			state.noclipActive = true
+			
+			state.noclipConn = game:GetService("RunService").Stepped:Connect(function()
+				if not state.noclipActive or not character or not character.Parent then
+					toggleNoclip(false, true)
+					return
+				end
+				
+				for _, part in ipairs(character:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.CanCollide = false
+					end
+				end
+			end)
+			
+			if not noNotify then
+				_G.RXT_ShowPopup("Noclip ativado")
+			end
+			
+		elseif not enable and state.noclipActive then
+			state.noclipActive = false
+			
+			if state.noclipConn then
+				state.noclipConn:Disconnect()
+				state.noclipConn = nil
+			end
+			
+			if character then
+				for _, part in ipairs(character:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.CanCollide = true
+					end
+				end
+			end
+			
+			if not noNotify then
+				_G.RXT_ShowPopup("Noclip desativado")
 			end
 		end
 	end
-end
-
-local function rejoinServer()
-	game:GetService("TeleportService"):Teleport(game.PlaceId, player)
-end
-
-local function resetCharacter()
-	local char = player.Character
-	if char then
-		char:BreakJoints()
-		showPopup("Resetado!")
-	end
-end
-
-local function toggleSit()
-	local char = player.Character
-	local humanoid = char and char:FindFirstChild("Humanoid")
-	if not humanoid then return end
 	
-	sitActive = not sitActive
-	humanoid.Sit = sitActive
-	showPopup(sitActive and "Sentado" or "Levantado")
-end
-
--- ============================================
--- NOCLIP
--- ============================================
-
-local function toggleNoclip(enable, noNotify)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	if not character then return end
+	-- ============================================
+	-- WALKFLING
+	-- ============================================
 	
-	if enable and not noclipActive then
-		noclipActive = true
+	local function toggleWalkfling(enable)
+		local character = player.Character
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 		
-		noclipConn = game:GetService("RunService").Stepped:Connect(function()
-			if not noclipActive or not character or not character.Parent then
-				toggleNoclip(false, true)
-				return
+		if enable and not state.walkflingActive then
+			if state.walkflingActive then
+				toggleWalkfling(false)
 			end
 			
-			for _, part in ipairs(character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = false
+			state.walkflingActive = true
+			toggleNoclip(true, true)
+			
+			if humanoid then
+				state.walkflingDiedConn = humanoid.Died:Connect(function()
+					toggleWalkfling(false)
+				end)
+			end
+			
+			state.walkflingLoop = game:GetService("RunService").Heartbeat:Connect(function()
+				local character = player.Character
+				local root = _G.RXT_GetRoot(character)
+				local vel, movel = nil, 0.1
+				
+				while not (character and character.Parent and root and root.Parent) do
+					game:GetService("RunService").Heartbeat:Wait()
+					character = player.Character
+					root = _G.RXT_GetRoot(character)
+				end
+				
+				vel = root.Velocity
+				root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+				
+				game:GetService("RunService").RenderStepped:Wait()
+				if character and character.Parent and root and root.Parent then
+					root.Velocity = vel
+				end
+				
+				game:GetService("RunService").Stepped:Wait()
+				if character and character.Parent and root and root.Parent then
+					root.Velocity = vel + Vector3.new(0, movel, 0)
+					movel = movel * -1
+				end
+			end)
+			
+			_G.RXT_ShowPopup("Walkfling ativado")
+			
+		elseif not enable and state.walkflingActive then
+			state.walkflingActive = false
+			
+			if state.walkflingLoop then
+				state.walkflingLoop:Disconnect()
+				state.walkflingLoop = nil
+			end
+			
+			if state.walkflingDiedConn then
+				state.walkflingDiedConn:Disconnect()
+				state.walkflingDiedConn = nil
+			end
+			
+			toggleNoclip(false, true)
+			_G.RXT_ShowPopup("Walkfling desativado")
+		end
+	end
+	
+	-- ============================================
+	-- FLY
+	-- ============================================
+	
+	local function toggleFly(enable)
+		local character = player.Character
+		if not character then return end
+		
+		local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+		local humanoid = character:FindFirstChild("Humanoid")
+		if not torso or not humanoid then return end
+		
+		if enable and not state.flyActive then
+			state.flyActive = true
+			
+			local bg = Instance.new("BodyGyro", torso)
+			local bv = Instance.new("BodyVelocity", torso)
+			
+			bg.P = 9e4
+			bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+			bg.CFrame = torso.CFrame
+			
+			bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+			bv.Velocity = Vector3.new(0, 0, 0)
+			
+			humanoid.PlatformStand = true
+			
+			local ctrl = {f = 0, b = 0, l = 0, r = 0}
+			local spd = state.flySpeed
+			
+			local renderConn = game:GetService("RunService").RenderStepped:Connect(function()
+				if not state.flyActive or not character or not character.Parent then
+					toggleFly(false)
+					return
+				end
+				
+				local cam = workspace.CurrentCamera
+				local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+				if not torso then return end
+				
+				local bg = torso:FindFirstChild("BodyGyro")
+				local bv = torso:FindFirstChild("BodyVelocity")
+				
+				if bg and bv then
+					local forward = cam.CFrame.LookVector * (ctrl.f + ctrl.b)
+					local right = cam.CFrame.RightVector * (ctrl.r + ctrl.l)
+					local up = Vector3.new(0, 0.1, 0)
+					local move = forward + right
+					
+					if ctrl.f == 0 and ctrl.b == 0 and ctrl.l == 0 and ctrl.r == 0 then
+						bv.Velocity = Vector3.new(0, 0, 0)
+					else
+						bv.Velocity = (move * spd) + up
+					end
+					bg.CFrame = cam.CFrame
+				end
+			end)
+			
+			local keyDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.Keyboard then
+					local key = string.lower(input.KeyCode.Name)
+					if key == "w" then ctrl.f = 1 end
+					if key == "s" then ctrl.b = -1 end
+					if key == "a" then ctrl.l = -1 end
+					if key == "d" then ctrl.r = 1 end
+				end
+			end)
+			
+			local keyUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.Keyboard then
+					local key = string.lower(input.KeyCode.Name)
+					if key == "w" then ctrl.f = 0 end
+					if key == "s" then ctrl.b = 0 end
+					if key == "a" then ctrl.l = 0 end
+					if key == "d" then ctrl.r = 0 end
+				end
+			end)
+			
+			state.flyData = {
+				bodyGyro = bg,
+				bodyVelocity = bv,
+				renderConn = renderConn,
+				keyDown = keyDown,
+				keyUp = keyUp,
+				ctrl = ctrl,
+				spd = spd
+			}
+			
+			_G.RXT_ShowPopup("Fly ativado (velocidade: " .. spd .. ")")
+			
+		elseif not enable and state.flyActive then
+			state.flyActive = false
+			
+			if state.flyData.bodyGyro then state.flyData.bodyGyro:Destroy() end
+			if state.flyData.bodyVelocity then state.flyData.bodyVelocity:Destroy() end
+			if state.flyData.renderConn then state.flyData.renderConn:Disconnect() end
+			if state.flyData.keyDown then state.flyData.keyDown:Disconnect() end
+			if state.flyData.keyUp then state.flyData.keyUp:Disconnect() end
+			
+			if character and character:FindFirstChild("Humanoid") then
+				character.Humanoid.PlatformStand = false
+			end
+			
+			state.flyData = {}
+			_G.RXT_ShowPopup("Fly desativado")
+		end
+	end
+	
+	-- ============================================
+	-- SPEED E JUMP
+	-- ============================================
+	
+	local function setSpeed(value)
+		local character = player.Character
+		local humanoid = character and character:FindFirstChild("Humanoid")
+		if not humanoid then return end
+		
+		if value then
+			humanoid.WalkSpeed = value
+			_G.RXT_ShowPopup("Velocidade: " .. value)
+		else
+			humanoid.WalkSpeed = 16
+			_G.RXT_ShowPopup("Velocidade normal")
+		end
+	end
+	
+	local function setJump(value)
+		local character = player.Character
+		local humanoid = character and character:FindFirstChild("Humanoid")
+		if not humanoid then return end
+		
+		if value then
+			humanoid.JumpPower = value
+			_G.RXT_ShowPopup("Pulo: " .. value)
+		else
+			humanoid.JumpPower = 50
+			_G.RXT_ShowPopup("Pulo normal")
+		end
+	end
+	
+	-- ============================================
+	-- LOOP
+	-- ============================================
+	
+	local function toggleSpeedLoop(value)
+		if state.speedLoopActive then
+			if state.speedLoopConn then
+				state.speedLoopConn:Disconnect()
+				state.speedLoopConn = nil
+			end
+			state.speedLoopActive = false
+			state.speedLoopValue = nil
+			_G.RXT_ShowPopup("Loop speed desativado")
+			return
+		end
+		
+		if not value then
+			_G.RXT_ShowPopup("Use: loopspeed [numero]")
+			return
+		end
+		
+		state.speedLoopActive = true
+		state.speedLoopValue = value
+		
+		local function applySpeedLoop()
+			local character = player.Character
+			local humanoid = character and character:FindFirstChild("Humanoid")
+			if humanoid and state.speedLoopActive then
+				humanoid.WalkSpeed = state.speedLoopValue
+			end
+		end
+		
+		state.speedLoopConn = game:GetService("RunService").RenderStepped:Connect(applySpeedLoop)
+		
+		player.CharacterAdded:Connect(function()
+			if state.speedLoopActive and state.speedLoopValue then
+				task.wait(0.1)
+				local character = player.Character
+				local humanoid = character and character:FindFirstChild("Humanoid")
+				if humanoid then
+					humanoid.WalkSpeed = state.speedLoopValue
 				end
 			end
 		end)
 		
-		if not noNotify then
-			showPopup("Noclip ativado")
+		applySpeedLoop()
+		_G.RXT_ShowPopup("Loop speed ativado: " .. value)
+	end
+	
+	local function toggleJumpLoop(value)
+		if state.jumpLoopActive then
+			if state.jumpLoopConn then
+				state.jumpLoopConn:Disconnect()
+				state.jumpLoopConn = nil
+			end
+			state.jumpLoopActive = false
+			state.jumpLoopValue = nil
+			_G.RXT_ShowPopup("Loop jump desativado")
+			return
 		end
 		
-	elseif not enable and noclipActive then
-		noclipActive = false
-		
-		if noclipConn then
-			noclipConn:Disconnect()
-			noclipConn = nil
+		if not value then
+			_G.RXT_ShowPopup("Use: loopjump [numero]")
+			return
 		end
 		
-		if character then
-			for _, part in ipairs(character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = true
-				end
+		state.jumpLoopActive = true
+		state.jumpLoopValue = value
+		
+		local function applyJumpLoop()
+			local character = player.Character
+			local humanoid = character and character:FindFirstChild("Humanoid")
+			if humanoid and state.jumpLoopActive then
+				humanoid.JumpPower = state.jumpLoopValue
 			end
 		end
 		
-		if not noNotify then
-			showPopup("Noclip desativado")
+		state.jumpLoopConn = game:GetService("RunService").RenderStepped:Connect(applyJumpLoop)
+		
+		player.CharacterAdded:Connect(function()
+			if state.jumpLoopActive and state.jumpLoopValue then
+				task.wait(0.1)
+				local character = player.Character
+				local humanoid = character and character:FindFirstChild("Humanoid")
+				if humanoid then
+					humanoid.JumpPower = state.jumpLoopValue
+				end
+			end
+		end)
+		
+		applyJumpLoop()
+		_G.RXT_ShowPopup("Loop jump ativado: " .. value)
+	end
+	
+	-- ============================================
+	-- INFJUMP
+	-- ============================================
+	
+	local function toggleInfJump(enable)
+		local character = player.Character
+		local humanoid = character and character:FindFirstChild("Humanoid")
+		if not humanoid then return end
+		
+		if enable and not state.infJumpActive then
+			state.infJumpActive = true
+			
+			local conn
+			conn = game:GetService("UserInputService").JumpRequest:Connect(function()
+				if state.infJumpActive then
+					local char = player.Character
+					local hum = char and char:FindFirstChild("Humanoid")
+					if hum then
+						hum:ChangeState(Enum.HumanoidStateType.Jumping)
+					end
+				end
+			end)
+			
+			state.infJumpData = conn
+			_G.RXT_ShowPopup("Pulo infinito ativado")
+			
+		elseif not enable and state.infJumpActive then
+			state.infJumpActive = false
+			if state.infJumpData then
+				state.infJumpData:Disconnect()
+				state.infJumpData = nil
+			end
+			_G.RXT_ShowPopup("Pulo infinito desativado")
 		end
 	end
+	
+	-- ============================================
+	-- GOTO, BRING, VIEW
+	-- ============================================
+	
+	local function teleportTo(target)
+		local character = player.Character
+		local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+		if not rootPart then return end
+		
+		local targetChar = target.Character
+		local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+		if not targetRoot then
+			_G.RXT_ShowPopup("Jogador sem personagem")
+			return
+		end
+		
+		rootPart.CFrame = targetRoot.CFrame + Vector3.new(0, 2, 0)
+		_G.RXT_ShowPopup("Teleportado para " .. target.Name)
+	end
+	
+	local function bringPlayer(target)
+		local character = player.Character
+		local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+		if not rootPart then return end
+		
+		local targetChar = target.Character
+		local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+		if not targetRoot then
+			_G.RXT_ShowPopup("Jogador sem personagem")
+			return
+		end
+		
+		targetRoot.CFrame = rootPart.CFrame + Vector3.new(0, 2, 0)
+		_G.RXT_ShowPopup(target.Name .. " trazido ate voce")
+	end
+	
+	local function toggleView(target)
+		local camera = workspace.CurrentCamera
+		
+		if state.viewActive then
+			if state.viewConn then
+				state.viewConn:Disconnect()
+				state.viewConn = nil
+			end
+			state.viewActive = false
+			state.viewTarget = nil
+			camera.CameraSubject = player.Character
+			_G.RXT_ShowPopup("View desativado")
+			return
+		end
+		
+		if not target then
+			_G.RXT_ShowPopup("Use: view [nome]")
+			return
+		end
+		
+		local targetChar = target.Character
+		local targetHead = targetChar and targetChar:FindFirstChild("Head")
+		if not targetHead then
+			_G.RXT_ShowPopup("Jogador sem personagem")
+			return
+		end
+		
+		state.viewActive = true
+		state.viewTarget = target
+		camera.CameraSubject = targetHead
+		
+		state.viewConn = game:GetService("RunService").RenderStepped:Connect(function()
+			if not state.viewActive or not state.viewTarget or not state.viewTarget.Parent then
+				toggleView(nil)
+				return
+			end
+			
+			local char = state.viewTarget.Character
+			local head = char and char:FindFirstChild("Head")
+			if head then
+				camera.CameraSubject = head
+			end
+		end)
+		
+		_G.RXT_ShowPopup("Observando " .. target.Name)
+	end
+	
+	-- ============================================
+	-- ESP
+	-- ============================================
+	
+	local function toggleESP(enable)
+		if enable and not state.espActive then
+			state.espActive = true
+			
+			for _, p in ipairs(game.Players:GetPlayers()) do
+				if p ~= player then
+					local highlight = Instance.new("Highlight")
+					highlight.Name = "ESP_Highlight"
+					highlight.Parent = p.Character or p
+					highlight.FillColor = Color3.fromRGB(255, 0, 0)
+					highlight.FillTransparency = 0.5
+					highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+					highlight.OutlineTransparency = 0
+					highlight.Adornee = p.Character
+					table.insert(state.espHighlight, highlight)
+				end
+			end
+			
+			local function onPlayerAdded(p)
+				if p ~= player then
+					local highlight = Instance.new("Highlight")
+					highlight.Name = "ESP_Highlight"
+					highlight.Parent = p.Character or p
+					highlight.FillColor = Color3.fromRGB(255, 0, 0)
+					highlight.FillTransparency = 0.5
+					highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+					highlight.OutlineTransparency = 0
+					highlight.Adornee = p.Character
+					table.insert(state.espHighlight, highlight)
+				end
+			end
+			
+			local function onPlayerRemoving(p)
+				for i, highlight in ipairs(state.espHighlight) do
+					if highlight and (highlight.Parent == p.Character or highlight.Adornee == p.Character) then
+						highlight:Destroy()
+						table.remove(state.espHighlight, i)
+						break
+					end
+				end
+			end
+			
+			local function onCharacterAdded(character)
+				local p = game.Players:GetPlayerFromCharacter(character)
+				if p and p ~= player then
+					for i, highlight in ipairs(state.espHighlight) do
+						if highlight.Adornee == character then
+							highlight:Destroy()
+							table.remove(state.espHighlight, i)
+							break
+						end
+					end
+					local highlight = Instance.new("Highlight")
+					highlight.Name = "ESP_Highlight"
+					highlight.Parent = character
+					highlight.FillColor = Color3.fromRGB(255, 0, 0)
+					highlight.FillTransparency = 0.5
+					highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+					highlight.OutlineTransparency = 0
+					highlight.Adornee = character
+					table.insert(state.espHighlight, highlight)
+				end
+			end
+			
+			state.espConnections.PlayerAdded = game.Players.PlayerAdded:Connect(onPlayerAdded)
+			state.espConnections.PlayerRemoving = game.Players.PlayerRemoving:Connect(onPlayerRemoving)
+			state.espConnections.CharacterAdded = game.Players.PlayerAdded:Connect(function(p)
+				p.CharacterAdded:Connect(onCharacterAdded)
+			end)
+			
+			_G.RXT_ShowPopup("ESP ativado")
+			
+		elseif not enable and state.espActive then
+			state.espActive = false
+			
+			for _, highlight in ipairs(state.espHighlight) do
+				highlight:Destroy()
+			end
+			state.espHighlight = {}
+			
+			for _, conn in pairs(state.espConnections) do
+				conn:Disconnect()
+			end
+			state.espConnections = {}
+			
+			_G.RXT_ShowPopup("ESP desativado")
+		end
+	end
+	
+	-- ============================================
+	-- TP TOOL
+	-- ============================================
+	
+	local function toggleTPTool(enable)
+		local backpack = player:FindFirstChild("Backpack")
+		
+		if enable and not state.tpToolActive then
+			if state.tpTool then
+				state.tpTool:Destroy()
+				state.tpTool = nil
+			end
+			if state.tpToolConn then
+				state.tpToolConn:Disconnect()
+				state.tpToolConn = nil
+			end
+			
+			local tool = Instance.new("Tool")
+			tool.Name = "TP Tool"
+			tool.RequiresHandle = false
+			tool.CanBeDropped = false
+			tool.ToolTip = "Clique em algum lugar para teleportar"
+			tool.Parent = backpack
+			tool.Grip = CFrame.new(0, 0, 0)
+			
+			local mouse = player:GetMouse()
+			local currentConn = nil
+			
+			local function onMouseClick()
+				local character = player.Character
+				local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+				if not rootPart then return end
+				
+				local target = mouse.Target
+				local hit = mouse.Hit
+				
+				if target and hit then
+					local position = hit.Position
+					rootPart.CFrame = CFrame.new(position.X, position.Y + 2, position.Z)
+				end
+			end
+			
+			tool.Equipped:Connect(function()
+				if currentConn then
+					currentConn:Disconnect()
+					currentConn = nil
+				end
+				currentConn = mouse.Button1Down:Connect(onMouseClick)
+			end)
+			
+			tool.Unequipped:Connect(function()
+				if currentConn then
+					currentConn:Disconnect()
+					currentConn = nil
+				end
+			end)
+			
+			if player.Character and player.Character:FindFirstChild(tool.Name) then
+				currentConn = mouse.Button1Down:Connect(onMouseClick)
+			end
+			
+			state.tpToolConn = currentConn
+			state.tpTool = tool
+			state.tpToolActive = true
+			
+		elseif not enable and state.tpToolActive then
+			if state.tpTool then
+				state.tpTool:Destroy()
+				state.tpTool = nil
+			end
+			if state.tpToolConn then
+				state.tpToolConn:Disconnect()
+				state.tpToolConn = nil
+			end
+			state.tpToolActive = false
+		end
+	end
+	
+	-- ============================================
+	-- FLOAT
+	-- ============================================
+	
+	local function toggleFloat(enable)
+		local char = player.Character
+		local humanoid = char and char:FindFirstChild("Humanoid")
+		
+		if enable and not state.floatActive then
+			state.floatActive = true
+			state.floatName = tostring(math.random(100000, 999999))
+			
+			if char and not char:FindFirstChild(state.floatName) then
+				task.spawn(function()
+					local Float = Instance.new("Part")
+					Float.Name = state.floatName
+					Float.Parent = char
+					Float.Transparency = 1
+					Float.Size = Vector3.new(2, 0.2, 1.5)
+					Float.Anchored = true
+					state.floatValue = -3.1
+					
+					local rootPart = char:FindFirstChild("HumanoidRootPart")
+					if rootPart then
+						Float.CFrame = rootPart.CFrame * CFrame.new(0, state.floatValue, 0)
+					end
+					
+					state.floatPart = Float
+					
+					_G.RXT_ShowPopup("Float ativado (Q desce, E sobe)")
+					
+					local function FloatPadLoop()
+						if char:FindFirstChild(state.floatName) and char:FindFirstChild("HumanoidRootPart") then
+							local root = char:FindFirstChild("HumanoidRootPart")
+							Float.CFrame = root.CFrame * CFrame.new(0, state.floatValue, 0)
+						else
+							if state.floatConnections.FloatingFunc then state.floatConnections.FloatingFunc:Disconnect() end
+							if state.floatConnections.qUp then state.floatConnections.qUp:Disconnect() end
+							if state.floatConnections.eUp then state.floatConnections.eUp:Disconnect() end
+							if state.floatConnections.qDown then state.floatConnections.qDown:Disconnect() end
+							if state.floatConnections.eDown then state.floatConnections.eDown:Disconnect() end
+							if state.floatConnections.floatDied then state.floatConnections.floatDied:Disconnect() end
+							Float:Destroy()
+							state.floatActive = false
+						end
+					end
+					
+					state.floatConnections.qUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.Keyboard then
+							local key = string.lower(input.KeyCode.Name)
+							if key == "q" then
+								state.floatValue = state.floatValue + 0.5
+							end
+						end
+					end)
+					
+					state.floatConnections.eUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.Keyboard then
+							local key = string.lower(input.KeyCode.Name)
+							if key == "e" then
+								state.floatValue = state.floatValue - 1.5
+							end
+						end
+					end)
+					
+					state.floatConnections.qDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.Keyboard then
+							local key = string.lower(input.KeyCode.Name)
+							if key == "q" then
+								state.floatValue = state.floatValue - 0.5
+							end
+						end
+					end)
+					
+					state.floatConnections.eDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
+						if input.UserInputType == Enum.UserInputType.Keyboard then
+							local key = string.lower(input.KeyCode.Name)
+							if key == "e" then
+								state.floatValue = state.floatValue + 1.5
+							end
+						end
+					end)
+					
+					if humanoid then
+						state.floatConnections.floatDied = humanoid.Died:Connect(function()
+							if state.floatConnections.FloatingFunc then state.floatConnections.FloatingFunc:Disconnect() end
+							if state.floatConnections.qUp then state.floatConnections.qUp:Disconnect() end
+							if state.floatConnections.eUp then state.floatConnections.eUp:Disconnect() end
+							if state.floatConnections.qDown then state.floatConnections.qDown:Disconnect() end
+							if state.floatConnections.eDown then state.floatConnections.eDown:Disconnect() end
+							if state.floatConnections.floatDied then state.floatConnections.floatDied:Disconnect() end
+							Float:Destroy()
+							state.floatActive = false
+						end)
+					end
+					
+					state.floatConnections.FloatingFunc = game:GetService("RunService").Heartbeat:Connect(FloatPadLoop)
+				end)
+			end
+			
+		elseif not enable and state.floatActive then
+			state.floatActive = false
+			
+			local char = player.Character
+			if char and char:FindFirstChild(state.floatName) then
+				char:FindFirstChild(state.floatName):Destroy()
+			end
+			
+			if state.floatConnections.FloatingFunc then state.floatConnections.FloatingFunc:Disconnect() end
+			if state.floatConnections.qUp then state.floatConnections.qUp:Disconnect() end
+			if state.floatConnections.eUp then state.floatConnections.eUp:Disconnect() end
+			if state.floatConnections.qDown then state.floatConnections.qDown:Disconnect() end
+			if state.floatConnections.eDown then state.floatConnections.eDown:Disconnect() end
+			if state.floatConnections.floatDied then state.floatConnections.floatDied:Disconnect() end
+			state.floatConnections = {}
+			
+			_G.RXT_ShowPopup("Float desativado")
+		end
+	end
+	
+	-- ============================================
+	-- EXECUTAR COMANDOS
+	-- ============================================
+	
+	if cmd == "noclip" then
+		toggleNoclip(true, false)
+		return true
+		
+	elseif cmd == "clip" then
+		toggleNoclip(false, false)
+		return true
+		
+	elseif cmd == "fly" then
+		if #args > 0 then
+			local speed = tonumber(args[1])
+			if speed and speed > 0 then
+				state.flySpeed = speed
+			end
+		end
+		toggleFly(true)
+		return true
+		
+	elseif cmd == "unfly" then
+		toggleFly(false)
+		return true
+		
+	elseif cmd == "speed" then
+		if #args > 0 then
+			local value = tonumber(args[1])
+			if value then
+				setSpeed(value)
+			else
+				_G.RXT_ShowPopup("Use: speed [numero]")
+			end
+		else
+			setSpeed(nil)
+		end
+		return true
+		
+	elseif cmd == "jump" then
+		if #args > 0 then
+			local value = tonumber(args[1])
+			if value then
+				setJump(value)
+			else
+				_G.RXT_ShowPopup("Use: jump [numero]")
+			end
+		else
+			setJump(nil)
+		end
+		return true
+		
+	elseif cmd == "loopspeed" then
+		if #args > 0 then
+			local value = tonumber(args[1])
+			if value then
+				toggleSpeedLoop(value)
+			else
+				_G.RXT_ShowPopup("Use: loopspeed [numero]")
+			end
+		else
+			toggleSpeedLoop(nil)
+		end
+		return true
+		
+	elseif cmd == "unloopspeed" then
+		toggleSpeedLoop(nil)
+		return true
+		
+	elseif cmd == "loopjump" then
+		if #args > 0 then
+			local value = tonumber(args[1])
+			if value then
+				toggleJumpLoop(value)
+			else
+				_G.RXT_ShowPopup("Use: loopjump [numero]")
+			end
+		else
+			toggleJumpLoop(nil)
+		end
+		return true
+		
+	elseif cmd == "unloopjump" then
+		toggleJumpLoop(nil)
+		return true
+		
+	elseif cmd == "infjump" then
+		toggleInfJump(true)
+		return true
+		
+	elseif cmd == "uninfjump" then
+		toggleInfJump(false)
+		return true
+		
+	elseif cmd == "goto" then
+		if #args > 0 then
+			local target = _G.RXT_FindPlayer(args[1])
+			if target then
+				teleportTo(target)
+			end
+		else
+			_G.RXT_ShowPopup("Use: goto [nome]")
+		end
+		return true
+		
+	elseif cmd == "bring" then
+		if #args > 0 then
+			local target = _G.RXT_FindPlayer(args[1])
+			if target then
+				bringPlayer(target)
+			end
+		else
+			_G.RXT_ShowPopup("Use: bring [nome]")
+		end
+		return true
+		
+	elseif cmd == "view" then
+		if #args > 0 then
+			local target = _G.RXT_FindPlayer(args[1])
+			if target then
+				toggleView(target)
+			end
+		else
+			_G.RXT_ShowPopup("Use: view [nome]")
+		end
+		return true
+		
+	elseif cmd == "unview" then
+		toggleView(nil)
+		return true
+		
+	elseif cmd == "tptool" then
+		toggleTPTool(true)
+		return true
+		
+	elseif cmd == "untptool" then
+		toggleTPTool(false)
+		return true
+		
+	elseif cmd == "esp" then
+		toggleESP(true)
+		return true
+		
+	elseif cmd == "unesp" then
+		toggleESP(false)
+		return true
+		
+	elseif cmd == "walkfling" then
+		toggleWalkfling(true)
+		return true
+		
+	elseif cmd == "unwalkfling" then
+		toggleWalkfling(false)
+		return true
+		
+	elseif cmd == "float" then
+		toggleFloat(true)
+		return true
+		
+	elseif cmd == "unfloat" then
+		toggleFloat(false)
+		return true
+	end
+	
+	return false
 end
 
 -- ============================================
--- WALKFLING
+-- LIMPAR TUDO QUANDO RESPAWNA
 -- ============================================
 
-local function toggleWalkfling(enable)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	
-	if enable and not walkflingActive then
-		if walkflingActive then
+player.CharacterAdded:Connect(function()
+	local state = _G.RXT_State
+	if state then
+		if state.flyActive then
+			toggleFly(false)
+		end
+		if state.noclipActive then
+			toggleNoclip(false, true)
+		end
+		if state.infJumpActive then
+			toggleInfJump(false)
+		end
+		if state.viewActive then
+			toggleView(nil)
+		end
+		if state.tpToolActive then
+			toggleTPTool(false)
+		end
+		if state.espActive then
+			toggleESP(false)
+		end
+		if state.walkflingActive then
 			toggleWalkfling(false)
 		end
-		
-		walkflingActive = true
-		
-		toggleNoclip(true, true)
-		
-		if humanoid then
-			walkflingDiedConn = humanoid.Died:Connect(function()
-				toggleWalkfling(false)
-			end)
-		end
-		
-		walkflingLoop = game:GetService("RunService").Heartbeat:Connect(function()
-			local character = plr.Character
-			local root = getRoot(character)
-			local vel, movel = nil, 0.1
-			
-			while not (character and character.Parent and root and root.Parent) do
-				game:GetService("RunService").Heartbeat:Wait()
-				character = plr.Character
-				root = getRoot(character)
-			end
-			
-			vel = root.Velocity
-			root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
-			
-			game:GetService("RunService").RenderStepped:Wait()
-			if character and character.Parent and root and root.Parent then
-				root.Velocity = vel
-			end
-			
-			game:GetService("RunService").Stepped:Wait()
-			if character and character.Parent and root and root.Parent then
-				root.Velocity = vel + Vector3.new(0, movel, 0)
-				movel = movel * -1
-			end
-		end)
-		
-		showPopup("Walkfling ativado")
-		
-	elseif not enable and walkflingActive then
-		walkflingActive = false
-		
-		if walkflingLoop then
-			walkflingLoop:Disconnect()
-			walkflingLoop = nil
-		end
-		
-		if walkflingDiedConn then
-			walkflingDiedConn:Disconnect()
-			walkflingDiedConn = nil
-		end
-		
-		toggleNoclip(false, true)
-		
-		showPopup("Walkfling desativado")
-	end
-end
-
--- ============================================
--- FLOAT
--- ============================================
-
-local function toggleFloat(enable)
-	local char = player.Character
-	local humanoid = char and char:FindFirstChild("Humanoid")
-	
-	if enable and not floatActive then
-		floatActive = true
-		floatName = tostring(math.random(100000, 999999))
-		
-		if char and not char:FindFirstChild(floatName) then
-			task.spawn(function()
-				local Float = Instance.new("Part")
-				Float.Name = floatName
-				Float.Parent = char
-				Float.Transparency = 1
-				Float.Size = Vector3.new(2, 0.2, 1.5)
-				Float.Anchored = true
-				floatValue = -3.1
-				
-				local rootPart = char:FindFirstChild("HumanoidRootPart")
-				if rootPart then
-					Float.CFrame = rootPart.CFrame * CFrame.new(0, floatValue, 0)
-				end
-				
-				floatPart = Float
-				
-				showPopup("Float ativado (Q desce, E sobe)")
-				
-				local function FloatPadLoop()
-					if char:FindFirstChild(floatName) and char:FindFirstChild("HumanoidRootPart") then
-						local root = char:FindFirstChild("HumanoidRootPart")
-						Float.CFrame = root.CFrame * CFrame.new(0, floatValue, 0)
-					else
-						if floatConnections.FloatingFunc then floatConnections.FloatingFunc:Disconnect() end
-						if floatConnections.qUp then floatConnections.qUp:Disconnect() end
-						if floatConnections.eUp then floatConnections.eUp:Disconnect() end
-						if floatConnections.qDown then floatConnections.qDown:Disconnect() end
-						if floatConnections.eDown then floatConnections.eDown:Disconnect() end
-						if floatConnections.floatDied then floatConnections.floatDied:Disconnect() end
-						Float:Destroy()
-						floatActive = false
-					end
-				end
-				
-				floatConnections.qUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.Keyboard then
-						local key = string.lower(input.KeyCode.Name)
-						if key == "q" then
-							floatValue = floatValue + 0.5
-						end
-					end
-				end)
-				
-				floatConnections.eUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.Keyboard then
-						local key = string.lower(input.KeyCode.Name)
-						if key == "e" then
-							floatValue = floatValue - 1.5
-						end
-					end
-				end)
-				
-				floatConnections.qDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.Keyboard then
-						local key = string.lower(input.KeyCode.Name)
-						if key == "q" then
-							floatValue = floatValue - 0.5
-						end
-					end
-				end)
-				
-				floatConnections.eDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
-					if input.UserInputType == Enum.UserInputType.Keyboard then
-						local key = string.lower(input.KeyCode.Name)
-						if key == "e" then
-							floatValue = floatValue + 1.5
-						end
-					end
-				end)
-				
-				if humanoid then
-					floatConnections.floatDied = humanoid.Died:Connect(function()
-						if floatConnections.FloatingFunc then floatConnections.FloatingFunc:Disconnect() end
-						if floatConnections.qUp then floatConnections.qUp:Disconnect() end
-						if floatConnections.eUp then floatConnections.eUp:Disconnect() end
-						if floatConnections.qDown then floatConnections.qDown:Disconnect() end
-						if floatConnections.eDown then floatConnections.eDown:Disconnect() end
-						if floatConnections.floatDied then floatConnections.floatDied:Disconnect() end
-						Float:Destroy()
-						floatActive = false
-					end)
-				end
-				
-				floatConnections.FloatingFunc = game:GetService("RunService").Heartbeat:Connect(FloatPadLoop)
-			end)
-		end
-		
-	elseif not enable and floatActive then
-		floatActive = false
-		
-		local char = player.Character
-		if char and char:FindFirstChild(floatName) then
-			char:FindFirstChild(floatName):Destroy()
-		end
-		
-		if floatConnections.FloatingFunc then floatConnections.FloatingFunc:Disconnect() end
-		if floatConnections.qUp then floatConnections.qUp:Disconnect() end
-		if floatConnections.eUp then floatConnections.eUp:Disconnect() end
-		if floatConnections.qDown then floatConnections.qDown:Disconnect() end
-		if floatConnections.eDown then floatConnections.eDown:Disconnect() end
-		if floatConnections.floatDied then floatConnections.floatDied:Disconnect() end
-		floatConnections = {}
-		
-		showPopup("Float desativado")
-	end
-end
-
--- ============================================
--- FLY
--- ============================================
-
-local function toggleFly(enable)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	if not character then return end
-	
-	local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
-	local humanoid = character:FindFirstChild("Humanoid")
-	if not torso or not humanoid then return end
-	
-	if enable and not flyActive then
-		flyActive = true
-		
-		local bg = Instance.new("BodyGyro", torso)
-		local bv = Instance.new("BodyVelocity", torso)
-		
-		bg.P = 9e4
-		bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-		bg.CFrame = torso.CFrame
-		
-		bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-		bv.Velocity = Vector3.new(0, 0, 0)
-		
-		humanoid.PlatformStand = true
-		
-		local ctrl = {f = 0, b = 0, l = 0, r = 0}
-		local spd = flySpeed
-		
-		local renderConn = game:GetService("RunService").RenderStepped:Connect(function()
-			if not flyActive or not character or not character.Parent then
-				toggleFly(false)
-				return
-			end
-			
-			local cam = workspace.CurrentCamera
-			local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
-			if not torso then return end
-			
-			local bg = torso:FindFirstChild("BodyGyro")
-			local bv = torso:FindFirstChild("BodyVelocity")
-			
-			if bg and bv then
-				local forward = cam.CFrame.LookVector * (ctrl.f + ctrl.b)
-				local right = cam.CFrame.RightVector * (ctrl.r + ctrl.l)
-				local up = Vector3.new(0, 0.1, 0)
-				local move = forward + right
-				
-				if ctrl.f == 0 and ctrl.b == 0 and ctrl.l == 0 and ctrl.r == 0 then
-					bv.Velocity = Vector3.new(0, 0, 0)
-				else
-					bv.Velocity = (move * spd) + up
-				end
-				bg.CFrame = cam.CFrame
-			end
-		end)
-		
-		local keyDown = game:GetService("UserInputService").InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.Keyboard then
-				local key = string.lower(input.KeyCode.Name)
-				if key == "w" then ctrl.f = 1 end
-				if key == "s" then ctrl.b = -1 end
-				if key == "a" then ctrl.l = -1 end
-				if key == "d" then ctrl.r = 1 end
-			end
-		end)
-		
-		local keyUp = game:GetService("UserInputService").InputEnded:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.Keyboard then
-				local key = string.lower(input.KeyCode.Name)
-				if key == "w" then ctrl.f = 0 end
-				if key == "s" then ctrl.b = 0 end
-				if key == "a" then ctrl.l = 0 end
-				if key == "d" then ctrl.r = 0 end
-			end
-		end)
-		
-		flyData = {
-			bodyGyro = bg,
-			bodyVelocity = bv,
-			renderConn = renderConn,
-			keyDown = keyDown,
-			keyUp = keyUp,
-			ctrl = ctrl,
-			spd = spd
-		}
-		
-		showPopup("Fly ativado (velocidade: " .. spd .. ")")
-		
-	elseif not enable and flyActive then
-		flyActive = false
-		
-		if flyData.bodyGyro then flyData.bodyGyro:Destroy() end
-		if flyData.bodyVelocity then flyData.bodyVelocity:Destroy() end
-		if flyData.renderConn then flyData.renderConn:Disconnect() end
-		if flyData.keyDown then flyData.keyDown:Disconnect() end
-		if flyData.keyUp then flyData.keyUp:Disconnect() end
-		
-		if character and character:FindFirstChild("Humanoid") then
-			character.Humanoid.PlatformStand = false
-		end
-		
-		flyData = {}
-		showPopup("Fly desativado")
-	end
-end
-
--- ============================================
--- SPEED E JUMP
--- ============================================
-
-local function setSpeed(value)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	local humanoid = character and character:FindFirstChild("Humanoid")
-	if not humanoid then return end
-	
-	if value then
-		humanoid.WalkSpeed = value
-		showPopup("Velocidade: " .. value)
-	else
-		humanoid.WalkSpeed = 16
-		showPopup("Velocidade normal")
-	end
-end
-
-local function setJump(value)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	local humanoid = character and character:FindFirstChild("Humanoid")
-	if not humanoid then return end
-	
-	if value then
-		humanoid.JumpPower = value
-		showPopup("Pulo: " .. value)
-	else
-		humanoid.JumpPower = 50
-		showPopup("Pulo normal")
-	end
-end
-
--- ============================================
--- LOOP SPEED
--- ============================================
-
-local function toggleSpeedLoop(value)
-	local plr = game.Players.LocalPlayer
-	
-	if speedLoopActive then
-		if speedLoopConn then
-			speedLoopConn:Disconnect()
-			speedLoopConn = nil
-		end
-		speedLoopActive = false
-		speedLoopValue = nil
-		showPopup("Loop speed desativado")
-		return
-	end
-	
-	if not value then
-		showPopup("Use: loopspeed [numero]")
-		return
-	end
-	
-	speedLoopActive = true
-	speedLoopValue = value
-	
-	local function applySpeedLoop()
-		local character = plr.Character
-		local humanoid = character and character:FindFirstChild("Humanoid")
-		if humanoid and speedLoopActive then
-			humanoid.WalkSpeed = speedLoopValue
+		if state.floatActive then
+			toggleFloat(false)
 		end
 	end
-	
-	speedLoopConn = game:GetService("RunService").RenderStepped:Connect(applySpeedLoop)
-	
-	plr.CharacterAdded:Connect(function()
-		if speedLoopActive and speedLoopValue then
-			task.wait(0.1)
-			setSpeed(speedLoopValue)
-		end
-	end)
-	
-	showPopup("Loop speed ativado: " .. value)
-end
-
--- ============================================
--- LOOP JUMP
--- ============================================
-
-local function toggleJumpLoop(value)
-	local plr = game.Players.LocalPlayer
-	
-	if jumpLoopActive then
-		if jumpLoopConn then
-			jumpLoopConn:Disconnect()
-			jumpLoopConn = nil
-		end
-		jumpLoopActive = false
-		jumpLoopValue = nil
-		showPopup("Loop jump desativado")
-		return
-	end
-	
-	if not value then
-		showPopup("Use: loopjump [numero]")
-		return
-	end
-	
-	jumpLoopActive = true
-	jumpLoopValue = value
-	
-	local function applyJumpLoop()
-		local character = plr.Character
-		local humanoid = character and character:FindFirstChild("Humanoid")
-		if humanoid and jumpLoopActive then
-			humanoid.JumpPower = jumpLoopValue
-		end
-	end
-	
-	jumpLoopConn = game:GetService("RunService").RenderStepped:Connect(applyJumpLoop)
-	
-	plr.CharacterAdded:Connect(function()
-		if jumpLoopActive and jumpLoopValue then
-			task.wait(0.1)
-			setJump(jumpLoopValue)
-		end
-	end)
-	
-	showPopup("Loop jump ativado: " .. value)
-end
-
--- ============================================
--- INFINITE JUMP
--- ============================================
-
-local function toggleInfJump(enable)
-	local plr = game.Players.LocalPlayer
-	local character = plr.Character
-	local humanoid = character and character:FindFirstChild("Humanoid")
-	
-	if enable and not infJumpActive then
-		infJumpActive = true
-		
-		local inputService = game:GetService("UserInputService")
-		
-		infJumpData = inputService.InputBegan:Connect(function(input, gameProcessed)
-			if gameProcessed then return end
-			
-			if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.Space then
-				local humanoid = plr.Character and plr.Character:FindFirstChild("Humanoid")
-				if humanoid then
-					humanoid:Jump()
-				end
-			end
-		end)
-		
-		showPopup("Pulo infinito ativado")
-		
-	elseif not enable and infJumpActive then
-		infJumpActive = false
-		
-		if infJumpData then
-			infJumpData:Disconnect()
-			infJumpData = nil
-		end
-		
-		showPopup("Pulo infinito desativado")
-	end
-end
-
--- ============================================
--- TELEPORT
--- ============================================
-
-local function teleportToPlayer(playerName)
-	local targetPlayer = findPlayer(playerName)
-	if not targetPlayer or not targetPlayer.Character then
-		showPopup("Jogador não encontrado!")
-		return
-	end
-	
-	local root = getRoot(player.Character)
-	local targetRoot = getRoot(targetPlayer.Character)
-	
-	if root and targetRoot then
-		root.CFrame = targetRoot.CFrame + targetRoot.CFrame.LookVector * 5
-		showPopup("Teleportado para " .. targetPlayer.Name)
-	end
-end
-
-local function bringPlayer(playerName)
-	local targetPlayer = findPlayer(playerName)
-	if not targetPlayer or not targetPlayer.Character then
-		showPopup("Jogador não encontrado!")
-		return
-	end
-	
-	local root = getRoot(player.Character)
-	local targetRoot = getRoot(targetPlayer.Character)
-	
-	if root and targetRoot then
-		targetRoot.CFrame = root.CFrame + root.CFrame.LookVector * 5
-		showPopup("Trouxe " .. targetPlayer.Name)
-	end
-end
-
--- ============================================
--- EXECUTAR COMANDOS
--- ============================================
-
-local function executeCommand(input)
-	local prefix = Config.Prefix
-	
-	if not string.sub(input, 1, #prefix) == prefix then
-		return
-	end
-	
-	local cmd = string.sub(input, #prefix + 1)
-	local args = {}
-	
-	for word in cmd:gmatch("%S+") do
-		table.insert(args, word)
-	end
-	
-	if #args == 0 then return end
-	
-	local command = string.lower(args[1])
-	
-	if command == "cmds" then
-		-- Mostrar comandos na interface
-		local scrolling = ScreenGui.ScrollingFrame
-		if scrolling then
-			for _, child in ipairs(scrolling:GetChildren()) do
-				child:Destroy()
-			end
-			
-			local yOffset = 0
-			for _, cmd in ipairs(commands) do
-				local label = Instance.new("TextLabel")
-				label.Parent = scrolling
-				label.Size = UDim2.new(1, -10, 0, 30)
-				label.Position = UDim2.new(0, 5, 0, yOffset)
-				label.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
-				label.BackgroundTransparency = 0
-				label.BorderSizePixel = 0
-				label.Text = prefix .. cmd.cmd .. " - " .. cmd.desc
-				label.TextColor3 = Color3.fromRGB(0, 0, 0)
-				label.TextSize = 12
-				label.Font = Enum.Font.SourceSans
-				label.TextXAlignment = Enum.TextXAlignment.Left
-				label.TextWrapped = true
-				
-				yOffset = yOffset + 35
-			end
-			
-			scrolling.CanvasSize = UDim2.new(0, 0, 0, yOffset)
-		end
-		
-	elseif command == "prefix" then
-		if args[2] then
-			Config.Prefix = args[2]
-			prefix = Config.Prefix
-			showPopup("Prefixo alterado para: " .. prefix)
-		end
-		
-	elseif command == "vprefix" then
-		showPopup("Prefixo atual: " .. Config.Prefix)
-		
-	elseif command == "popup" then
-		if args[2] then
-			if args[2] == "true" then
-				Config.Popups = true
-				showPopup("Popups ativados")
-			elseif args[2] == "false" then
-				Config.Popups = false
-				print("Popups desativados")
-			end
-		end
-		
-	elseif command == "fly" then
-		flySpeed = tonumber(args[2]) or 50
-		toggleFly(true)
-		
-	elseif command == "unfly" then
-		toggleFly(false)
-		
-	elseif command == "noclip" then
-		toggleNoclip(true)
-		
-	elseif command == "clip" then
-		toggleNoclip(false)
-		
-	elseif command == "speed" then
-		setSpeed(tonumber(args[2]))
-		
-	elseif command == "jump" then
-		setJump(tonumber(args[2]))
-		
-	elseif command == "loopspeed" then
-		toggleSpeedLoop(tonumber(args[2]))
-		
-	elseif command == "unloopspeed" then
-		if speedLoopConn then
-			speedLoopConn:Disconnect()
-			speedLoopConn = nil
-		end
-		speedLoopActive = false
-		showPopup("Loop speed desativado")
-		
-	elseif command == "loopjump" then
-		toggleJumpLoop(tonumber(args[2]))
-		
-	elseif command == "unloopjump" then
-		if jumpLoopConn then
-			jumpLoopConn:Disconnect()
-			jumpLoopConn = nil
-		end
-		jumpLoopActive = false
-		showPopup("Loop jump desativado")
-		
-	elseif command == "infjump" then
-		toggleInfJump(true)
-		
-	elseif command == "uninfjump" then
-		toggleInfJump(false)
-		
-	elseif command == "goto" then
-		if args[2] then
-			teleportToPlayer(args[2])
-		end
-		
-	elseif command == "bring" then
-		if args[2] then
-			bringPlayer(args[2])
-		end
-		
-	elseif command == "walkfling" then
-		toggleWalkfling(true)
-		
-	elseif command == "unwalkfling" then
-		toggleWalkfling(false)
-		
-	elseif command == "float" then
-		toggleFloat(true)
-		
-	elseif command == "unfloat" then
-		toggleFloat(false)
-		
-	elseif command == "executor" then
-		toggleExecutor(true)
-		
-	elseif command == "rejoin" then
-		rejoinServer()
-		
-	elseif command == "reset" then
-		resetCharacter()
-		
-	elseif command == "sit" then
-		toggleSit()
-		
-	else
-		showPopup("Comando desconhecido!")
-	end
-end
-
--- ============================================
--- LISTENER DE COMANDOS
--- ============================================
-
-local cmdBox = ScreenGui.CMDBOX
-if cmdBox then
-	cmdBox.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			local input = cmdBox.Text
-			cmdBox.Text = ""
-			executeCommand(input)
-		end
-	end)
-end
-
--- ============================================
--- EXECUTOR DE SCRIPTS
--- ============================================
-
-local executorFrame = ScreenGui.ScreenGui:FindFirstChild("ExecutorFrame")
-if executorFrame then
-	local executeBtn = executorFrame:FindFirstChild("ExecutorExecute")
-	local clearBtn = executorFrame:FindFirstChild("ExecutorClear")
-	local closeBtn = executorFrame:FindFirstChild("ExecutorClose")
-	local textBox = executorFrame:FindFirstChild("ExecutorTextBox")
-	
-	if executeBtn then
-		executeBtn.MouseButton1Click:Connect(function()
-			if textBox and textBox.Text ~= "" then
-				local success, err = pcall(function()
-					loadstring(textBox.Text)()
-				end)
-				if success then
-					showPopup("Script executado com sucesso!")
-				else
-					showPopup("Erro ao executar: " .. tostring(err))
-				end
-			end
-		end)
-	end
-	
-	if clearBtn then
-		clearBtn.MouseButton1Click:Connect(function()
-			if textBox then
-				textBox.Text = ""
-			end
-		end)
-	end
-	
-	if closeBtn then
-		closeBtn.MouseButton1Click:Connect(function()
-			toggleExecutor(false)
-		end)
-	end
-end
+end)
