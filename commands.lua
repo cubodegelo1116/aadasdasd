@@ -49,14 +49,24 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		
 	elseif cmd == "executor" then
 		local executorFrame = _G.RXT_ExecutorFrame
-		if executorFrame then
-			executorFrame.Visible = not executorFrame.Visible
-			if executorFrame.Visible then
-				task.wait(0.1)
-				if _G.RXT_ExecutorTextBox then
-					_G.RXT_ExecutorTextBox:CaptureFocus()
-				end
-			end
+		executorFrame.Visible = not executorFrame.Visible
+		if executorFrame.Visible then
+			task.wait(0.1)
+			_G.RXT_ExecutorTextBox:CaptureFocus()
+		end
+		return true
+		
+	elseif cmd == "rspy" then
+		if _G.RXT_ToggleRSpy then
+			_G.RXT_ToggleRSpy(true)
+		else
+			_G.RXT_ShowPopup("Erro: Remote Spy não carregado!")
+		end
+		return true
+		
+	elseif cmd == "unrspy" then
+		if _G.RXT_ToggleRSpy then
+			_G.RXT_ToggleRSpy(false)
 		end
 		return true
 		
@@ -1087,6 +1097,8 @@ return {
 	{cmd = "walkfling", desc = "Ativa walkfling"},
 	{cmd = "unwalkfling", desc = "Desativa walkfling"},
 	{cmd = "executor", desc = "Abre o executor de scripts"},
+	{cmd = "rspy", desc = "Abre o Remote Spy"},
+	{cmd = "unrspy", desc = "Fecha o Remote Spy"},
 	{cmd = "rejoin", desc = "Reentra no servidor"},
 	{cmd = "reset", desc = "Respawna o personagem"},
 	{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
