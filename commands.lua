@@ -158,9 +158,7 @@ local function toggleInvisible()
             local pos = root.Position
             local posString = tostring(pos)
             local posSeperate = posString:split(', ')
-            local X = tonumber(posSeperate[1])
             local Y = tonumber(posSeperate[2])
-            local Z = tonumber(posSeperate[3])
             
             if IsInteger == true then
                 if Y <= Void then
