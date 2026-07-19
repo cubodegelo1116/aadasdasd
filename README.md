@@ -40,6 +40,8 @@ Script de admin para Roblox com diversos comandos utilitários.
 | `unfloat` | Desativa o float |
 | `sit` | Senta o personagem |
 | `rspy` | Abre o RemoteSpy |
+| `invisible` | Te deixa invisivel |
+| `visible` | Te deixa visivel|
 
 ## 🎮 Configurações
 
