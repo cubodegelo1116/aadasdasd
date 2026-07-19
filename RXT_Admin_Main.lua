@@ -1,5 +1,5 @@
 -- ============================================
--- RXT ADMIN - MAIN
+-- RXT ADMIN - MAIN LOADER
 -- ============================================
 
 -- ============================================
@@ -16,9 +16,31 @@ for _, gui in ipairs(playerGui:GetChildren()) do
 end
 
 -- ============================================
--- CARREGAR COMANDOS
+-- CARREGAR INTERFACES E COMANDOS
 -- ============================================
 
+-- Carregar Interfaces
+local function loadInterfaces()
+	local success, result = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
+	end)
+	
+	if success and result then
+		local fn, err = loadstring(result)
+		if fn then
+			fn()
+			print("✅ Interfaces carregadas!")
+			return true
+		else
+			warn("Erro ao compilar interfaces.lua: " .. tostring(err))
+		end
+	else
+		warn("Falha ao baixar interfaces.lua")
+	end
+	return false
+end
+
+-- Carregar Comandos
 local function loadCommands()
 	local success, result = pcall(function()
 		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
@@ -32,8 +54,6 @@ local function loadCommands()
 				_G.RXT_Commands = cmdTable
 				print("✅ Comandos carregados: " .. #cmdTable)
 				return true
-			else
-				warn("commands.lua retornou: " .. type(cmdTable))
 			end
 		else
 			warn("Erro ao compilar commands.lua: " .. tostring(err))
@@ -44,47 +64,9 @@ local function loadCommands()
 	return false
 end
 
--- Tenta carregar, se falhar usa fallback
-if not loadCommands() then
-	_G.RXT_Commands = {
-		{cmd = "cmds", desc = "Abre esta lista de comandos"},
-		{cmd = "prefix [novo]", desc = "Muda o prefixo"},
-		{cmd = "vprefix", desc = "Mostra o prefixo atual"},
-		{cmd = "popup true", desc = "Ativa os popups"},
-		{cmd = "popup false", desc = "Desativa os popups"},
-		{cmd = "fly [velocidade]", desc = "Ativa o modo voo"},
-		{cmd = "unfly", desc = "Desativa o modo voo"},
-		{cmd = "noclip", desc = "Ativa o noclip"},
-		{cmd = "clip", desc = "Desativa o noclip"},
-		{cmd = "speed [numero]", desc = "Altera a velocidade"},
-		{cmd = "jump [numero]", desc = "Altera o pulo"},
-		{cmd = "loopspeed [numero]", desc = "Loop da velocidade"},
-		{cmd = "unloopspeed", desc = "Desativa loop da velocidade"},
-		{cmd = "loopjump [numero]", desc = "Loop do pulo"},
-		{cmd = "unloopjump", desc = "Desativa loop do pulo"},
-		{cmd = "infjump", desc = "Ativa pulo infinito"},
-		{cmd = "uninfjump", desc = "Desativa pulo infinito"},
-		{cmd = "goto [nome]", desc = "Teleporta ate o jogador"},
-		{cmd = "bring [nome]", desc = "Puxa o jogador ate voce"},
-		{cmd = "view [nome]", desc = "Observa o jogador"},
-		{cmd = "unview", desc = "Para de observar"},
-		{cmd = "tptool", desc = "Da uma tool de teleporte"},
-		{cmd = "untptool", desc = "Remove a tool de teleporte"},
-		{cmd = "esp", desc = "Ativa o ESP (wallhack)"},
-		{cmd = "unesp", desc = "Desativa o ESP"},
-		{cmd = "walkfling", desc = "Ativa walkfling"},
-		{cmd = "unwalkfling", desc = "Desativa walkfling"},
-		{cmd = "executor", desc = "Abre o executor de scripts"},
-		{cmd = "rspy", desc = "Abre o Remote Spy"},
-		{cmd = "unrspy", desc = "Fecha o Remote Spy"},
-		{cmd = "rejoin", desc = "Reentra no servidor"},
-		{cmd = "reset", desc = "Respawna o personagem"},
-		{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
-		{cmd = "unfloat", desc = "Desativa o float"},
-		{cmd = "sit", desc = "Senta o personagem"},
-	}
-	print("⚠️ Usando comandos embutidos (fallback)")
-end
+-- Carrega interfaces e comandos
+loadInterfaces()
+loadCommands()
 
 -- ============================================
 -- CONFIGURAÇÕES
@@ -96,7 +78,7 @@ _G.RXT_Config = {
 }
 
 -- ============================================
--- CRIAR GUI
+-- CRIAR GUI (CMDBAR)
 -- ============================================
 
 local ScreenGui = {
@@ -203,222 +185,6 @@ autocompleteList.CanvasSize = UDim2.new(0, 0, 0, 0)
 
 _G.RXT_AutocompleteList = autocompleteList
 _G.RXT_AutocompleteFrame = autocompleteFrame
-
--- ============================================
--- EXECUTOR
--- ============================================
-
-local executorFrame = Instance.new("Frame")
-executorFrame.Name = "ExecutorFrame"
-executorFrame.Parent = ScreenGui.ScreenGui
-executorFrame.Size = UDim2.new(0, 382, 0, 299)
-executorFrame.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
-executorFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
-executorFrame.BackgroundTransparency = 0
-executorFrame.BorderColor3 = Color3.fromRGB(185,185,185)
-executorFrame.BorderSizePixel = 3
-executorFrame.Visible = false
-executorFrame.ZIndex = 10
-executorFrame.ClipsDescendants = false
-
-local executorDragbar = Instance.new("Frame")
-executorDragbar.Name = "DRAGBAR"
-executorDragbar.Parent = executorFrame
-executorDragbar.Size = UDim2.new(0, 382, 0, 29)
-executorDragbar.Position = UDim2.new(0, 0, 0, 0)
-executorDragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
-executorDragbar.BackgroundTransparency = 0
-executorDragbar.BorderColor3 = Color3.fromRGB(185,185,185)
-executorDragbar.BorderSizePixel = 3
-executorDragbar.ZIndex = 11
-
-local executorClose = Instance.new("TextButton")
-executorClose.Name = "CloseButton"
-executorClose.Parent = executorDragbar
-executorClose.Size = UDim2.new(0, 22, 0, 22)
-executorClose.Position = UDim2.new(0.931999981, 0, 0.0799999982, 0)
-executorClose.BackgroundColor3 = Color3.fromRGB(177,0,0)
-executorClose.BackgroundTransparency = 0
-executorClose.BorderSizePixel = 0
-executorClose.Text = ""
-executorClose.TextColor3 = Color3.fromRGB(0,0,0)
-executorClose.TextSize = 14
-executorClose.Font = Enum.Font.SourceSans
-executorClose.ZIndex = 11
-
-local executorTitle = Instance.new("TextLabel")
-executorTitle.Name = "TextLabel"
-executorTitle.Parent = executorDragbar
-executorTitle.Size = UDim2.new(0, 115, 0, 29)
-executorTitle.Position = UDim2.new(0.0185540486, 0, -0.068965517, 0)
-executorTitle.BackgroundTransparency = 1
-executorTitle.Text = "Executor"
-executorTitle.TextColor3 = Color3.fromRGB(0,0,0)
-executorTitle.TextSize = 30
-executorTitle.Font = Enum.Font.SourceSans
-executorTitle.TextXAlignment = Enum.TextXAlignment.Left
-executorTitle.TextYAlignment = Enum.TextYAlignment.Center
-executorTitle.ZIndex = 11
-
-local executorTextBox = Instance.new("TextBox")
-executorTextBox.Name = "TextBox"
-executorTextBox.Parent = executorFrame
-executorTextBox.Size = UDim2.new(0, 365, 0, 195)
-executorTextBox.Position = UDim2.new(0.018324608, 0, 0.133779258, 0)
-executorTextBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
-executorTextBox.BackgroundTransparency = 0
-executorTextBox.BorderColor3 = Color3.fromRGB(185,185,185)
-executorTextBox.BorderSizePixel = 3
-executorTextBox.Text = ""
-executorTextBox.TextColor3 = Color3.fromRGB(0,0,0)
-executorTextBox.TextSize = 14
-executorTextBox.Font = Enum.Font.SourceSans
-executorTextBox.TextXAlignment = Enum.TextXAlignment.Left
-executorTextBox.TextYAlignment = Enum.TextYAlignment.Top
-executorTextBox.ClearTextOnFocus = true
-executorTextBox.MultiLine = true
-executorTextBox.PlaceholderText = "Digite o script aqui..."
-executorTextBox.ZIndex = 11
-
-local executorExecute = Instance.new("TextButton")
-executorExecute.Name = "ExecuteButton"
-executorExecute.Parent = executorFrame
-executorExecute.Size = UDim2.new(0, 159, 0, 47)
-executorExecute.Position = UDim2.new(0.0183873996, 0, 0.819130361, 0)
-executorExecute.BackgroundColor3 = Color3.fromRGB(227,227,227)
-executorExecute.BackgroundTransparency = 0
-executorExecute.BorderColor3 = Color3.fromRGB(185,185,185)
-executorExecute.BorderSizePixel = 3
-executorExecute.Text = "Execute"
-executorExecute.TextColor3 = Color3.fromRGB(0,0,0)
-executorExecute.TextSize = 46
-executorExecute.Font = Enum.Font.SourceSans
-executorExecute.ZIndex = 11
-
-local executorClear = Instance.new("TextButton")
-executorClear.Name = "Clearbutton"
-executorClear.Parent = executorFrame
-executorClear.Size = UDim2.new(0, 159, 0, 47)
-executorClear.Position = UDim2.new(0.555036604, 0, 0.819130361, 0)
-executorClear.BackgroundColor3 = Color3.fromRGB(227,227,227)
-executorClear.BackgroundTransparency = 0
-executorClear.BorderColor3 = Color3.fromRGB(185,185,185)
-executorClear.BorderSizePixel = 3
-executorClear.Text = "Clear"
-executorClear.TextColor3 = Color3.fromRGB(0,0,0)
-executorClear.TextSize = 46
-executorClear.Font = Enum.Font.SourceSans
-executorClear.ZIndex = 11
-
-_G.RXT_ExecutorFrame = executorFrame
-_G.RXT_ExecutorTextBox = executorTextBox
-
--- ============================================
--- REMOTE SPY
--- ============================================
-
-local rspyFrame = Instance.new("Frame")
-rspyFrame.Name = "REMOTESPYFRAME"
-rspyFrame.Parent = ScreenGui.ScreenGui
-rspyFrame.Size = UDim2.new(0, 382, 0, 299)
-rspyFrame.Position = UDim2.new(0.311619729, 0, 0.246329531, 0)
-rspyFrame.BackgroundColor3 = Color3.fromRGB(227,227,227)
-rspyFrame.BackgroundTransparency = 0
-rspyFrame.BorderColor3 = Color3.fromRGB(185,185,185)
-rspyFrame.BorderSizePixel = 3
-rspyFrame.Visible = false
-rspyFrame.ZIndex = 10
-rspyFrame.ClipsDescendants = false
-
-local rspyDragbar = Instance.new("Frame")
-rspyDragbar.Name = "RSPY_DRAGBAR"
-rspyDragbar.Parent = rspyFrame
-rspyDragbar.Size = UDim2.new(0, 382, 0, 29)
-rspyDragbar.Position = UDim2.new(0, 0, 0, 0)
-rspyDragbar.BackgroundColor3 = Color3.fromRGB(227,227,227)
-rspyDragbar.BackgroundTransparency = 0
-rspyDragbar.BorderColor3 = Color3.fromRGB(185,185,185)
-rspyDragbar.BorderSizePixel = 3
-rspyDragbar.ZIndex = 11
-
-local rspyClose = Instance.new("TextButton")
-rspyClose.Name = "CloseButton"
-rspyClose.Parent = rspyDragbar
-rspyClose.Size = UDim2.new(0, 22, 0, 22)
-rspyClose.Position = UDim2.new(0.931999981, 0, 0.0799999982, 0)
-rspyClose.BackgroundColor3 = Color3.fromRGB(177,0,0)
-rspyClose.BackgroundTransparency = 0
-rspyClose.BorderSizePixel = 0
-rspyClose.Text = ""
-rspyClose.TextColor3 = Color3.fromRGB(0,0,0)
-rspyClose.TextSize = 14
-rspyClose.Font = Enum.Font.SourceSans
-rspyClose.ZIndex = 11
-
-local rspyTitle = Instance.new("TextLabel")
-rspyTitle.Name = "TextLabel"
-rspyTitle.Parent = rspyDragbar
-rspyTitle.Size = UDim2.new(0, 115, 0, 29)
-rspyTitle.Position = UDim2.new(0.0185540486, 0, -0.068965517, 0)
-rspyTitle.BackgroundTransparency = 1
-rspyTitle.Text = "Remote spy"
-rspyTitle.TextColor3 = Color3.fromRGB(0,0,0)
-rspyTitle.TextSize = 30
-rspyTitle.Font = Enum.Font.SourceSans
-rspyTitle.TextXAlignment = Enum.TextXAlignment.Left
-rspyTitle.TextYAlignment = Enum.TextYAlignment.Center
-rspyTitle.ZIndex = 11
-
-local rspyList = Instance.new("ScrollingFrame")
-rspyList.Name = "REMOTELIST"
-rspyList.Parent = rspyFrame
-rspyList.Size = UDim2.new(0, 104, 0, 267)
-rspyList.Position = UDim2.new(0, 0, 0.10702341, 0)
-rspyList.BackgroundColor3 = Color3.fromRGB(227,227,227)
-rspyList.BackgroundTransparency = 0
-rspyList.BorderColor3 = Color3.fromRGB(185,185,185)
-rspyList.BorderSizePixel = 3
-rspyList.ScrollBarThickness = 8
-rspyList.CanvasSize = UDim2.new(0, 0, 0, 0)
-rspyList.ZIndex = 11
-
-local rspyArgs = Instance.new("ScrollingFrame")
-rspyArgs.Name = "ARGREMOTE"
-rspyArgs.Parent = rspyFrame
-rspyArgs.Size = UDim2.new(0, 272, 0, 105)
-rspyArgs.Position = UDim2.new(0.287617803, 0, 0.106999934, 0)
-rspyArgs.BackgroundColor3 = Color3.fromRGB(227,227,227)
-rspyArgs.BackgroundTransparency = 0
-rspyArgs.BorderColor3 = Color3.fromRGB(185,185,185)
-rspyArgs.BorderSizePixel = 3
-rspyArgs.ScrollBarThickness = 8
-rspyArgs.CanvasSize = UDim2.new(0, 0, 0, 0)
-rspyArgs.ZIndex = 11
-
-local rspyTextBox = Instance.new("TextBox")
-rspyTextBox.Name = "TextBox"
-rspyTextBox.Parent = rspyArgs
-rspyTextBox.Size = UDim2.new(0, 256, 0, 104)
-rspyTextBox.Position = UDim2.new(0, 0, 0, 0)
-rspyTextBox.BackgroundColor3 = Color3.fromRGB(255,255,255)
-rspyTextBox.BackgroundTransparency = 0
-rspyTextBox.BorderColor3 = Color3.fromRGB(185,185,185)
-rspyTextBox.BorderSizePixel = 3
-rspyTextBox.Text = ""
-rspyTextBox.TextColor3 = Color3.fromRGB(0,0,0)
-rspyTextBox.TextSize = 14
-rspyTextBox.Font = Enum.Font.SourceSans
-rspyTextBox.TextXAlignment = Enum.TextXAlignment.Left
-rspyTextBox.TextYAlignment = Enum.TextYAlignment.Top
-rspyTextBox.ClearTextOnFocus = true
-rspyTextBox.MultiLine = true
-rspyTextBox.PlaceholderText = "Args aparecerão aqui..."
-rspyTextBox.ZIndex = 11
-
-_G.RXT_RSpyFrame = rspyFrame
-_G.RXT_RSpyList = rspyList
-_G.RXT_RSpyArgs = rspyArgs
-_G.RXT_RSpyTextBox = rspyTextBox
 
 -- ============================================
 -- ANIMAÇÃO DA CMDBOX
@@ -866,148 +632,6 @@ game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
 end)
 
 -- ============================================
--- EXECUTOR - BOTÕES
--- ============================================
-
-executorExecute.MouseButton1Click:Connect(function()
-	local scriptText = executorTextBox.Text
-	if scriptText and scriptText ~= "" then
-		local success, err = pcall(function()
-			loadstring(scriptText)()
-		end)
-		if not success then
-			_G.RXT_ShowPopup("Erro no script: " .. err)
-		else
-			_G.RXT_ShowPopup("Script executado!")
-		end
-	end
-end)
-
-executorClear.MouseButton1Click:Connect(function()
-	executorTextBox.Text = ""
-end)
-
-executorClose.MouseButton1Click:Connect(function()
-	executorFrame.Visible = false
-end)
-
--- ============================================
--- EXECUTOR - DRAG
--- ============================================
-
-local execDragging = false
-local execDragInput, execDragStart, execStartPos
-
-executorDragbar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		execDragging = true
-		execDragStart = input.Position
-		execStartPos = executorFrame.Position
-		
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				execDragging = false
-			end
-		end)
-	end
-end)
-
-executorDragbar.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-		execDragInput = input
-	end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-	if input == execDragInput and execDragging then
-		local delta = input.Position - execDragStart
-		executorFrame.Position = UDim2.new(execStartPos.X.Scale, execStartPos.X.Offset + delta.X, execStartPos.Y.Scale, execStartPos.Y.Offset + delta.Y)
-	end
-end)
-
--- ============================================
--- REMOTE SPY - FUNÇÕES
--- ============================================
-
-local rspyActive = false
-local rspyConnections = {}
-local rspyLogs = {}
-local rspySelected = nil
-
-function _G.RXT_ToggleRSpy(enable)
-	if enable and not rspyActive then
-		rspyActive = true
-		rspyFrame.Visible = true
-		
-		for _, child in ipairs(rspyList:GetChildren()) do
-			if child:IsA("TextButton") then
-				child:Destroy()
-			end
-		end
-		rspyLogs = {}
-		rspyTextBox.Text = ""
-		rspySelected = nil
-		
-		_G.RXT_ShowPopup("Remote Spy ativado!")
-		
-	elseif not enable and rspyActive then
-		rspyActive = false
-		rspyFrame.Visible = false
-		
-		for _, conns in pairs(rspyConnections) do
-			if type(conns) == "table" then
-				for _, conn in ipairs(conns) do
-					pcall(function() conn:Disconnect() end)
-				end
-			else
-				pcall(function() conns:Disconnect() end)
-			end
-		end
-		rspyConnections = {}
-		
-		_G.RXT_ShowPopup("Remote Spy desativado!")
-	end
-end
-
--- ============================================
--- REMOTE SPY - DRAG
--- ============================================
-
-local rspyDragging = false
-local rspyDragInput, rspyDragStart, rspyStartPos
-
-rspyDragbar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		rspyDragging = true
-		rspyDragStart = input.Position
-		rspyStartPos = rspyFrame.Position
-		
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				rspyDragging = false
-			end
-		end)
-	end
-end)
-
-rspyDragbar.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-		rspyDragInput = input
-	end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-	if input == rspyDragInput and rspyDragging then
-		local delta = input.Position - rspyDragStart
-		rspyFrame.Position = UDim2.new(rspyStartPos.X.Scale, rspyStartPos.X.Offset + delta.X, rspyStartPos.Y.Scale, rspyStartPos.Y.Offset + delta.Y)
-	end
-end)
-
-rspyClose.MouseButton1Click:Connect(function()
-	_G.RXT_ToggleRSpy(false)
-end)
-
--- ============================================
 -- FECHAR GUI
 -- ============================================
 
@@ -1100,20 +724,6 @@ player.CharacterAdded:Connect(function()
 		end
 	end
 end)
-
--- ============================================
--- CARREGAR EXECUTE COMMAND
--- ============================================
-
--- A função _G.RXT_ExecuteCommand é definida no commands.lua
--- Se não foi carregada, usa um fallback simples
-if not _G.RXT_ExecuteCommand then
-	_G.RXT_ExecuteCommand = function(cmd, args)
-		_G.RXT_ShowPopup("Comando não disponível: " .. cmd)
-		return false
-	end
-	print("⚠️ _G.RXT_ExecuteCommand não encontrado, usando fallback")
-end
 
 print("✅ RXT ADMIN carregado!")
 print("💡 Comandos carregados: " .. (#(_G.RXT_Commands or {}) or 0))
