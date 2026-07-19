@@ -13,6 +13,7 @@ local Character = nil
 local invisDied = nil
 local invisFix = nil
 local IsRunning = false
+local CF = nil
 
 local function Respawn()
     local player = _G.RXT_Player
@@ -60,6 +61,9 @@ function TurnVisible()
         pcall(function() invisDied:Disconnect() end)
         invisDied = nil
     end
+    
+    CF = workspace.CurrentCamera.CFrame
+    Character = Character
     
     local character = player.Character
     local rootPart = character and character:FindFirstChild("HumanoidRootPart")
@@ -139,20 +143,31 @@ local function toggleInvisible()
     
     invisFix = game:GetService("RunService").Stepped:Connect(function()
         pcall(function()
+            local IsInteger
+            if tostring(Void):find('-') then
+                IsInteger = true
+            else
+                IsInteger = false
+            end
+            
             local char = player.Character
             if not char then return end
             local root = char:FindFirstChild("HumanoidRootPart")
             if not root then return end
-            local pos = root.Position
-            local y = pos.Y
-            local voidNum = Void
             
-            if tostring(voidNum):find("-") then
-                if y <= voidNum then
+            local pos = root.Position
+            local posString = tostring(pos)
+            local posSeperate = posString:split(', ')
+            local X = tonumber(posSeperate[1])
+            local Y = tonumber(posSeperate[2])
+            local Z = tonumber(posSeperate[3])
+            
+            if IsInteger == true then
+                if Y <= Void then
                     Respawn()
                 end
-            else
-                if y >= voidNum then
+            elseif IsInteger == false then
+                if Y >= Void then
                     Respawn()
                 end
             end
@@ -217,6 +232,7 @@ local function toggleInvisible()
     IsInvis = true
     Character = character
     
+    CF = workspace.CurrentCamera.CFrame
     local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
     local CF_1 = rootPart and rootPart.CFrame or CFrame.new(0,0,0)
     
@@ -226,10 +242,11 @@ local function toggleInvisible()
     task.wait(0.2)
     workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
     
+    InvisibleCharacter = InvisibleCharacter
     character.Parent = game:GetService("Lighting")
+    InvisibleCharacter.Parent = workspace
     
     if InvisibleCharacter then
-        InvisibleCharacter.Parent = workspace
         local invRoot = InvisibleCharacter:FindFirstChild("HumanoidRootPart")
         if invRoot then
             invRoot.CFrame = CF_1
@@ -237,7 +254,6 @@ local function toggleInvisible()
         player.Character = InvisibleCharacter
     end
     
-    task.wait()
     if player.Character then
         local animate = player.Character:FindFirstChild("Animate")
         if animate then
