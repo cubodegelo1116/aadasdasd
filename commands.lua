@@ -2,6 +2,257 @@
 -- RXT ADMIN - COMANDOS
 -- ============================================
 
+-- ============================================
+-- INVISIBLE / VISIBLE
+-- ============================================
+
+local invisRunning = false
+local IsInvis = false
+local InvisibleCharacter = nil
+local Character = nil
+local invisDied = nil
+local invisFix = nil
+local IsRunning = false
+
+local function Respawn()
+    local player = _G.RXT_Player
+    if not player then return end
+    
+    IsRunning = false
+    if IsInvis == true then
+        pcall(function()
+            player.Character = Character
+            task.wait()
+            if Character then
+                Character.Parent = workspace
+                local hum = Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum:Destroy() end
+                IsInvis = false
+                if InvisibleCharacter then InvisibleCharacter.Parent = nil end
+                invisRunning = false
+            end
+        end)
+    elseif IsInvis == false then
+        pcall(function()
+            player.Character = Character
+            task.wait()
+            if Character then
+                Character.Parent = workspace
+                local hum = Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum:Destroy() end
+                TurnVisible()
+            end
+        end)
+    end
+end
+
+function TurnVisible()
+    local player = _G.RXT_Player
+    if not player then return end
+    
+    if IsInvis == false then return end
+    
+    if invisFix then
+        pcall(function() invisFix:Disconnect() end)
+        invisFix = nil
+    end
+    if invisDied then
+        pcall(function() invisDied:Disconnect() end)
+        invisDied = nil
+    end
+    
+    local character = player.Character
+    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+    local CF_1 = rootPart and rootPart.CFrame or CFrame.new(0,0,0)
+    
+    if Character then
+        local charRoot = Character:FindFirstChild("HumanoidRootPart")
+        if charRoot then
+            charRoot.CFrame = CF_1
+        end
+    end
+    
+    if InvisibleCharacter then
+        InvisibleCharacter:Destroy()
+        InvisibleCharacter = nil
+    end
+    
+    player.Character = Character
+    if Character then
+        Character.Parent = workspace
+    end
+    IsInvis = false
+    
+    if player.Character then
+        local animate = player.Character:FindFirstChild("Animate")
+        if animate then
+            animate.Disabled = true
+            animate.Disabled = false
+        end
+    end
+    
+    if Character then
+        local hum = Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            invisDied = hum.Died:Connect(function()
+                Respawn()
+                if invisDied then
+                    pcall(function() invisDied:Disconnect() end)
+                    invisDied = nil
+                end
+            end)
+        end
+    end
+    
+    invisRunning = false
+    _G.RXT_ShowPopup("Visível novamente")
+end
+
+local function toggleInvisible()
+    local player = _G.RXT_Player
+    if not player then return end
+    
+    if invisRunning then
+        _G.RXT_ShowPopup("Já está invisível!")
+        return
+    end
+    
+    invisRunning = true
+    
+    repeat task.wait(0.1) until player.Character
+    
+    local character = player.Character
+    if not character then
+        invisRunning = false
+        return
+    end
+    
+    character.Archivable = true
+    IsInvis = false
+    IsRunning = true
+    
+    InvisibleCharacter = character:Clone()
+    InvisibleCharacter.Parent = game:GetService("Lighting")
+    InvisibleCharacter.Name = ""
+    
+    local Void = workspace.FallenPartsDestroyHeight or -500
+    
+    invisFix = game:GetService("RunService").Stepped:Connect(function()
+        pcall(function()
+            local char = player.Character
+            if not char then return end
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if not root then return end
+            local pos = root.Position
+            local y = pos.Y
+            local voidNum = Void
+            
+            if tostring(voidNum):find("-") then
+                if y <= voidNum then
+                    Respawn()
+                end
+            else
+                if y >= voidNum then
+                    Respawn()
+                end
+            end
+        end)
+    end)
+    
+    for _, v in ipairs(InvisibleCharacter:GetDescendants()) do
+        if v:IsA("BasePart") then
+            if v.Name == "HumanoidRootPart" then
+                v.Transparency = 1
+            else
+                v.Transparency = 0.5
+            end
+        end
+    end
+    
+    local function localRespawn()
+        IsRunning = false
+        if IsInvis == true then
+            pcall(function()
+                player.Character = Character
+                task.wait()
+                if Character then
+                    Character.Parent = workspace
+                    local hum = Character:FindFirstChildOfClass("Humanoid")
+                    if hum then hum:Destroy() end
+                    IsInvis = false
+                    if InvisibleCharacter then InvisibleCharacter.Parent = nil end
+                    invisRunning = false
+                end
+            end)
+        elseif IsInvis == false then
+            pcall(function()
+                player.Character = Character
+                task.wait()
+                if Character then
+                    Character.Parent = workspace
+                    local hum = Character:FindFirstChildOfClass("Humanoid")
+                    if hum then hum:Destroy() end
+                    TurnVisible()
+                end
+            end)
+        end
+    end
+    
+    local cloneHum = InvisibleCharacter:FindFirstChildOfClass("Humanoid")
+    if cloneHum then
+        invisDied = cloneHum.Died:Connect(function()
+            localRespawn()
+            if invisDied then
+                pcall(function() invisDied:Disconnect() end)
+                invisDied = nil
+            end
+        end)
+    end
+    
+    if IsInvis == true then
+        invisRunning = false
+        return
+    end
+    
+    IsInvis = true
+    Character = character
+    
+    local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    local CF_1 = rootPart and rootPart.CFrame or CFrame.new(0,0,0)
+    
+    character:MoveTo(Vector3.new(0, math.pi * 1000000, 0))
+    
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+    task.wait(0.2)
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+    
+    character.Parent = game:GetService("Lighting")
+    
+    if InvisibleCharacter then
+        InvisibleCharacter.Parent = workspace
+        local invRoot = InvisibleCharacter:FindFirstChild("HumanoidRootPart")
+        if invRoot then
+            invRoot.CFrame = CF_1
+        end
+        player.Character = InvisibleCharacter
+    end
+    
+    task.wait()
+    if player.Character then
+        local animate = player.Character:FindFirstChild("Animate")
+        if animate then
+            animate.Disabled = true
+            animate.Disabled = false
+        end
+    end
+    
+    _G.RXT_ShowPopup("Invisível ativado!")
+end
+
+-- ============================================
+-- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
+-- ============================================
+
 _G.RXT_ExecuteCommand = function(cmd, args)
 	local player = _G.RXT_Player
 	local gui = _G.RXT_GUI
@@ -65,6 +316,14 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		else
 			_G.RXT_ShowPopup("SimpleSpy V3 carregado!")
 		end
+		return true
+		
+	elseif cmd == "invisible" or cmd == "invis" then
+		toggleInvisible()
+		return true
+		
+	elseif cmd == "visible" or cmd == "vis" or cmd == "uninvisible" then
+		TurnVisible()
 		return true
 		
 	elseif cmd == "rejoin" then
@@ -1095,6 +1354,8 @@ local commandList = {
 	{cmd = "unwalkfling", desc = "Desativa walkfling"},
 	{cmd = "executor", desc = "Abre o executor"},
 	{cmd = "rspy", desc = "Abre o SimpleSpy V3"},
+	{cmd = "invisible", desc = "Fica invisível para outros jogadores"},
+	{cmd = "visible", desc = "Fica visível novamente"},
 	{cmd = "rejoin", desc = "Reentra no servidor"},
 	{cmd = "reset", desc = "Respawna o personagem"},
 	{cmd = "float", desc = "Ativa o float (Q desce, E sobe)"},
