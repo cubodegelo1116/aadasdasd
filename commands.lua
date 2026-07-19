@@ -3,7 +3,7 @@
 -- ============================================
 
 -- ============================================
--- INVISIBLE / VISIBLE
+-- INVISIBLE / VISIBLE (CÓDIGO ORIGINAL)
 -- ============================================
 
 local invisRunning = false
@@ -14,7 +14,6 @@ local invisDied = nil
 local invisFix = nil
 local IsRunning = false
 local CF = nil
-local viewConn = nil
 
 local function Respawn()
     local player = _G.RXT_Player
@@ -62,10 +61,6 @@ function TurnVisible()
         pcall(function() invisDied:Disconnect() end)
         invisDied = nil
     end
-    if viewConn then
-        pcall(function() viewConn:Disconnect() end)
-        viewConn = nil
-    end
     
     CF = workspace.CurrentCamera.CFrame
     Character = Character
@@ -91,8 +86,6 @@ function TurnVisible()
         Character.Parent = workspace
     end
     IsInvis = false
-    
-    workspace.CurrentCamera.CameraSubject = player.Character
     
     if player.Character then
         local animate = player.Character:FindFirstChild("Animate")
@@ -243,6 +236,11 @@ local function toggleInvisible()
     
     character:MoveTo(Vector3.new(0, math.pi * 1000000, 0))
     
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+    task.wait(0.2)
+    workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+    
+    InvisibleCharacter = InvisibleCharacter
     character.Parent = game:GetService("Lighting")
     InvisibleCharacter.Parent = workspace
     
@@ -254,13 +252,8 @@ local function toggleInvisible()
         player.Character = InvisibleCharacter
     end
     
-    -- IGUAL AO VIEW: coloca no HEAD do clone
-    if InvisibleCharacter then
-        local head = InvisibleCharacter:FindFirstChild("Head")
-        if head then
-            workspace.CurrentCamera.CameraSubject = head
-        end
-    end
+    -- FIXCAM (igual ao original)
+    workspace.CurrentCamera.CameraSubject = player.Character
     
     if player.Character then
         local animate = player.Character:FindFirstChild("Animate")
