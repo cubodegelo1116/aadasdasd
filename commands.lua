@@ -2,10 +2,6 @@
 -- RXT ADMIN - COMANDOS
 -- ============================================
 
--- ============================================
--- FUNÇÃO PRINCIPAL QUE EXECUTA OS COMANDOS
--- ============================================
-
 _G.RXT_ExecuteCommand = function(cmd, args)
 	local player = _G.RXT_Player
 	local gui = _G.RXT_GUI
@@ -14,10 +10,6 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		warn("RXT: Player ou GUI não inicializados")
 		return false
 	end
-	
-	-- ============================================
-	-- COMANDOS DA MAIN
-	-- ============================================
 	
 	if cmd == "cmds" then
 		_G.RXT_AnimateCmdsList(not gui.CmdsLIST.Visible)
@@ -65,7 +57,6 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 		return true
 		
 	elseif cmd == "rspy" then
-		-- Executa o SimpleSpy V3 original
 		local success, err = pcall(function()
 			loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
 		end)
@@ -748,7 +739,8 @@ _G.RXT_ExecuteCommand = function(cmd, args)
 			end
 			
 			tool.Equipped:Connect(function()
-				if currentConn then					currentConn:Disconnect()
+				if currentConn then
+					currentConn:Disconnect()
 					currentConn = nil
 				end
 				currentConn = mouse.Button1Down:Connect(onMouseClick)
