@@ -16,59 +16,6 @@ for _, gui in ipairs(playerGui:GetChildren()) do
 end
 
 -- ============================================
--- CARREGAR INTERFACES E COMANDOS
--- ============================================
-
--- Carregar Interfaces
-local function loadInterfaces()
-	local success, result = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
-	end)
-	
-	if success and result then
-		local fn, err = loadstring(result)
-		if fn then
-			fn()
-			print("✅ Interfaces carregadas!")
-			return true
-		else
-			warn("Erro ao compilar interfaces.lua: " .. tostring(err))
-		end
-	else
-		warn("Falha ao baixar interfaces.lua")
-	end
-	return false
-end
-
--- Carregar Comandos
-local function loadCommands()
-	local success, result = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
-	end)
-	
-	if success and result then
-		local fn, err = loadstring(result)
-		if fn then
-			local cmdTable = fn()
-			if type(cmdTable) == "table" then
-				_G.RXT_Commands = cmdTable
-				print("✅ Comandos carregados: " .. #cmdTable)
-				return true
-			end
-		else
-			warn("Erro ao compilar commands.lua: " .. tostring(err))
-		end
-	else
-		warn("Falha ao baixar commands.lua")
-	end
-	return false
-end
-
--- Carrega interfaces e comandos
-loadInterfaces()
-loadCommands()
-
--- ============================================
 -- CONFIGURAÇÕES
 -- ============================================
 
@@ -78,7 +25,7 @@ _G.RXT_Config = {
 }
 
 -- ============================================
--- CRIAR GUI (CMDBAR)
+-- CRIAR GUI (CMDBAR) PRIMEIRO
 -- ============================================
 
 local ScreenGui = {
@@ -185,6 +132,61 @@ autocompleteList.CanvasSize = UDim2.new(0, 0, 0, 0)
 
 _G.RXT_AutocompleteList = autocompleteList
 _G.RXT_AutocompleteFrame = autocompleteFrame
+
+-- ============================================
+-- CARREGAR INTERFACES (DEPOIS DA GUI)
+-- ============================================
+
+local function loadInterfaces()
+	local success, result = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
+	end)
+	
+	if success and result then
+		local fn, err = loadstring(result)
+		if fn then
+			fn()
+			print("✅ Interfaces carregadas!")
+			return true
+		else
+			warn("Erro ao compilar interfaces.lua: " .. tostring(err))
+		end
+	else
+		warn("Falha ao baixar interfaces.lua")
+	end
+	return false
+end
+
+-- ============================================
+-- CARREGAR COMANDOS
+-- ============================================
+
+local function loadCommands()
+	local success, result = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
+	end)
+	
+	if success and result then
+		local fn, err = loadstring(result)
+		if fn then
+			local cmdTable = fn()
+			if type(cmdTable) == "table" then
+				_G.RXT_Commands = cmdTable
+				print("✅ Comandos carregados: " .. #cmdTable)
+				return true
+			end
+		else
+			warn("Erro ao compilar commands.lua: " .. tostring(err))
+		end
+	else
+		warn("Falha ao baixar commands.lua")
+	end
+	return false
+end
+
+-- Carrega interfaces e comandos (AGORA DEPOIS DA GUI)
+loadInterfaces()
+loadCommands()
 
 -- ============================================
 -- ANIMAÇÃO DA CMDBOX
