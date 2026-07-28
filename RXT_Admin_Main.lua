@@ -352,15 +352,16 @@ ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 -- ============================================
--- POPUP NOTIFICATION (CORRIGIDO)
+-- POPUP NOTIFICATION (FINAL - AJUSTADO)
 -- ============================================
 
-local popupQueue = {}
-local popupActive = false
-local popupSpacing = 45
-local popupList = {}
+local TweenService = game:GetService("TweenService")
+local TextService = game:GetService("TextService")
 
-local function updatePopupPositions()
+local popupList = {}
+local popupSpacing = 4
+
+local function updatePopupPositions(animate)
 	local sorted = {}
 	for _, popup in ipairs(popupList) do
 		if popup and popup.Parent then
@@ -368,15 +369,27 @@ local function updatePopupPositions()
 		end
 	end
 	
-	local viewportSize = workspace.CurrentCamera.ViewportSize
-	local centerY = viewportSize.Y / 2
+	if #sorted == 0 then return end
 	
-	local totalHeight = #sorted * popupSpacing
-	local startY = centerY - (totalHeight / 2)
+	local viewportSize = workspace.CurrentCamera.ViewportSize
+	local startY = viewportSize.Y * 0.42
+	
+	local currentY = startY
 	
 	for i, popup in ipairs(sorted) do
-		local targetY = startY + (i - 1) * popupSpacing
-		popup.Position = UDim2.new(0, 20, 0, targetY)
+		local height = popup.AbsoluteSize.Y or 26
+		local currentX = popup.Position.X.Offset
+		
+		if animate then
+			local tween = TweenService:Create(popup, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Position = UDim2.new(0, currentX, 0, currentY)
+			})
+			tween:Play()
+		else
+			popup.Position = UDim2.new(0, currentX, 0, currentY)
+		end
+		
+		currentY = currentY + height + popupSpacing
 	end
 end
 
@@ -388,27 +401,28 @@ local function removePopup(popup)
 		end
 	end
 	popup:Destroy()
-	updatePopupPositions()
+	updatePopupPositions(true)
 end
 
-local function processPopupQueue()
-	if popupActive or #popupQueue == 0 then return end
+function _G.RXT_ShowPopup(text)
+	if not _G.RXT_Config.Popups then return end
 	
-	popupActive = true
-	local data = table.remove(popupQueue, 1)
-	local text = data.text
+	local textSize = TextService:GetTextSize(text, 13, Enum.Font.SourceSans, Vector2.new(800, 26))
+	local width = math.clamp(textSize.X + 18, 100, 320)
+	local targetX = 20
 	
 	local popup = Instance.new("Frame")
 	popup.Parent = ScreenGui.ScreenGui
-	popup.Size = UDim2.new(0, 280, 0, 35)
+	popup.Size = UDim2.new(0, width, 0, 26)
 	popup.BackgroundColor3 = Color3.fromRGB(227,227,227)
 	popup.BorderColor3 = Color3.fromRGB(185,185,185)
 	popup.BorderSizePixel = 3
 	popup.BackgroundTransparency = 0
 	popup.Visible = true
 	popup.ZIndex = 10
-	popup.ClipsDescendants = true
-	popup.Position = UDim2.new(0, -280, 0, 0)
+	popup.ClipsDescendants = false
+	popup.Position = UDim2.new(0, -width, 0, 0)
+	popup:SetAttribute("TargetX", targetX)
 	
 	local sideBar = Instance.new("Frame")
 	sideBar.Parent = popup
@@ -417,69 +431,43 @@ local function processPopupQueue()
 	sideBar.BackgroundColor3 = Color3.fromRGB(100,100,100)
 	sideBar.BackgroundTransparency = 0
 	sideBar.BorderSizePixel = 0
+	sideBar.ZIndex = 11
 	
 	local label = Instance.new("TextLabel")
 	label.Parent = popup
-	label.Size = UDim2.new(1, -12, 1, 0)
-	label.Position = UDim2.new(0, 10, 0, 0)
+	label.Size = UDim2.new(1, -16, 1, 0)
+	label.Position = UDim2.new(0, 8, 0, 0)
 	label.BackgroundTransparency = 1
 	label.Text = text
 	label.TextColor3 = Color3.fromRGB(0, 0, 0)
-	label.TextSize = 14
+	label.TextSize = 13
 	label.Font = Enum.Font.SourceSans
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.TextYAlignment = Enum.TextYAlignment.Center
 	label.TextTransparency = 0
+	label.ClipsDescendants = false
+	label.ZIndex = 11
 	
-	table.insert(popupList, popup)
-	updatePopupPositions()
+	table.insert(popupList, 1, popup)
+	updatePopupPositions(false)
 	
-	-- Animação de entrada (só slide)
-	local startTime = tick()
-	local duration = 0.3
-	local startPos = -280
-	local endPos = 20
+	local tweenIn = TweenService:Create(popup, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Position = UDim2.new(0, targetX, 0, popup.Position.Y.Offset)
+	})
+	tweenIn:Play()
 	
-	repeat
-		local elapsed = tick() - startTime
-		local progress = math.min(elapsed / duration, 1)
-		local eased = 1 - (1 - progress) * (1 - progress)
-		local currentX = startPos + (endPos - startPos) * eased
-		popup.Position = UDim2.new(0, currentX, 0, popup.Position.Y.Offset)
-		task.wait()
-	until progress >= 1
-	
-	popup.Position = UDim2.new(0, endPos, 0, popup.Position.Y.Offset)
-	
-	task.wait(2)
-	
-	-- Animação de saída (slide pra esquerda)
-	local fadeStart = tick()
-	local fadeDuration = 0.3
-	
-	repeat
-		local elapsed = tick() - fadeStart
-		local progress = math.min(elapsed / fadeDuration, 1)
-		local eased = progress * progress
-		local currentX = endPos - (endPos + 280) * eased
-		popup.Position = UDim2.new(0, currentX, 0, popup.Position.Y.Offset)
-		task.wait()
-	until progress >= 1
-	
-	removePopup(popup)
-	
-	popupActive = false
-	processPopupQueue()
-end
-
-function _G.RXT_ShowPopup(text)
-	if not _G.RXT_Config.Popups then return end
-	
-	table.insert(popupQueue, {text = text})
-	
-	if not popupActive then
-		processPopupQueue()
-	end
+	tweenIn.Completed:Connect(function()
+		task.wait(2)
+		
+		local tweenOut = TweenService:Create(popup, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+			Position = UDim2.new(0, -width, 0, popup.Position.Y.Offset)
+		})
+		tweenOut:Play()
+		
+		tweenOut.Completed:Connect(function()
+			removePopup(popup)
+		end)
+	end)
 end
 
 -- ============================================
