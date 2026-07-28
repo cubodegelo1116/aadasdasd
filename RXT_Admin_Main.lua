@@ -134,62 +134,7 @@ _G.RXT_AutocompleteList = autocompleteList
 _G.RXT_AutocompleteFrame = autocompleteFrame
 
 -- ============================================
--- CARREGAR INTERFACES (DEPOIS DA GUI)
--- ============================================
-
-local function loadInterfaces()
-	local success, result = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
-	end)
-	
-	if success and result then
-		local fn, err = loadstring(result)
-		if fn then
-			fn()
-			print("✅ Interfaces carregadas!")
-			return true
-		else
-			warn("Erro ao compilar interfaces.lua: " .. tostring(err))
-		end
-	else
-		warn("Falha ao baixar interfaces.lua")
-	end
-	return false
-end
-
--- ============================================
--- CARREGAR COMANDOS
--- ============================================
-
-local function loadCommands()
-	local success, result = pcall(function()
-		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
-	end)
-	
-	if success and result then
-		local fn, err = loadstring(result)
-		if fn then
-			local cmdTable = fn()
-			if type(cmdTable) == "table" then
-				_G.RXT_Commands = cmdTable
-				print("✅ Comandos carregados: " .. #cmdTable)
-				return true
-			end
-		else
-			warn("Erro ao compilar commands.lua: " .. tostring(err))
-		end
-	else
-		warn("Falha ao baixar commands.lua")
-	end
-	return false
-end
-
--- Carrega interfaces e comandos (AGORA DEPOIS DA GUI)
-loadInterfaces()
-loadCommands()
-
--- ============================================
--- ANIMAÇÃO DA CMDBOX
+-- ANIMAÇÃO DA CMDBOX (EXECUTA IMEDIATAMENTE)
 -- ============================================
 
 task.spawn(function()
@@ -217,6 +162,61 @@ task.spawn(function()
 	cmbbox.BackgroundTransparency = 0
 	cmbbox.TextTransparency = 0
 	cmbbox.Size = UDim2.new(0, 218, 0, 25)
+end)
+
+-- ============================================
+-- CARREGAR INTERFACES E COMANDOS (EM BACKGROUND)
+-- ============================================
+
+task.spawn(function()
+	local function loadInterfaces()
+		local success, result = pcall(function()
+			return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
+		end)
+		
+		if success and result then
+			local fn, err = loadstring(result)
+			if fn then
+				fn()
+				print("✅ Interfaces carregadas!")
+				return true
+			else
+				warn("Erro ao compilar interfaces.lua: " .. tostring(err))
+			end
+		else
+			warn("Falha ao baixar interfaces.lua")
+		end
+		return false
+	end
+
+	local function loadCommands()
+		local success, result = pcall(function()
+			return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
+		end)
+		
+		if success and result then
+			local fn, err = loadstring(result)
+			if fn then
+				local cmdTable = fn()
+				if type(cmdTable) == "table" then
+					_G.RXT_Commands = cmdTable
+					print("✅ Comandos carregados: " .. #cmdTable)
+					return true
+				end
+			else
+				warn("Erro ao compilar commands.lua: " .. tostring(err))
+			end
+		else
+			warn("Falha ao baixar commands.lua")
+		end
+		return false
+	end
+
+	loadInterfaces()
+	loadCommands()
+	
+	-- Cria botões da CmdsLIST depois que os comandos forem carregados
+	createCommandButtons()
 end)
 
 -- ============================================
@@ -432,7 +432,7 @@ end
 -- CRIAR BOTÕES DA CMDLIST
 -- ============================================
 
-local function createCommandButtons()
+function createCommandButtons()
 	local commands = _G.RXT_Commands or {}
 	local yOffset = 5
 	local buttonHeight = 25
@@ -476,7 +476,10 @@ local function createCommandButtons()
 	ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset + 10)
 end
 
-createCommandButtons()
+-- Tenta criar os botões imediatamente se os comandos já estiverem carregados
+if _G.RXT_Commands then
+	createCommandButtons()
+end
 
 -- ============================================
 -- AUTOCOMPLETE FUNCTION
