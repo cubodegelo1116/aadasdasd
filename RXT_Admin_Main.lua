@@ -429,11 +429,12 @@ local function processPopupQueue()
 	label.Font = Enum.Font.SourceSans
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.TextYAlignment = Enum.TextYAlignment.Center
+	label.TextTransparency = 0
 	
 	table.insert(popupList, popup)
 	updatePopupPositions()
 	
-	-- Animação de entrada
+	-- Animação de entrada (só slide)
 	local startTime = tick()
 	local duration = 0.3
 	local startPos = -280
@@ -445,22 +446,14 @@ local function processPopupQueue()
 		local eased = 1 - (1 - progress) * (1 - progress)
 		local currentX = startPos + (endPos - startPos) * eased
 		popup.Position = UDim2.new(0, currentX, 0, popup.Position.Y.Offset)
-		
-		label.TextTransparency = 1 - eased
-		popup.BackgroundTransparency = 1 - eased * 0.8
-		sideBar.BackgroundTransparency = 1 - eased * 0.8
-		
 		task.wait()
 	until progress >= 1
 	
 	popup.Position = UDim2.new(0, endPos, 0, popup.Position.Y.Offset)
-	label.TextTransparency = 0
-	popup.BackgroundTransparency = 0
-	sideBar.BackgroundTransparency = 0
 	
 	task.wait(2)
 	
-	-- Animação de saída (voltando pra esquerda)
+	-- Animação de saída (slide pra esquerda)
 	local fadeStart = tick()
 	local fadeDuration = 0.3
 	
@@ -469,12 +462,7 @@ local function processPopupQueue()
 		local progress = math.min(elapsed / fadeDuration, 1)
 		local eased = progress * progress
 		local currentX = endPos - (endPos + 280) * eased
-		
 		popup.Position = UDim2.new(0, currentX, 0, popup.Position.Y.Offset)
-		label.TextTransparency = eased
-		popup.BackgroundTransparency = eased * 0.8
-		sideBar.BackgroundTransparency = eased * 0.8
-		
 		task.wait()
 	until progress >= 1
 	
