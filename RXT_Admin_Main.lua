@@ -809,5 +809,17 @@ player.CharacterAdded:Connect(function()
 	end
 end)
 
-print("✅ RXT ADMIN carregado!")
-print("💡 Comandos carregados: " .. (#(_G.RXT_Commands or {}) or 0))
+task.wait(0.5)
+
+_G.RXT_ShowPopup("RXT Admin loaded!")
+
+task.wait(0.8)
+
+local cmdCount = #(_G.RXT_Commands or {})
+_G.RXT_ShowPopup(cmdCount .. " commands loaded!")
+
+task.wait(0.8)
+
+_G.RXT_ShowPopup("Welcome " .. game.Players.LocalPlayer.Name)
+
+
