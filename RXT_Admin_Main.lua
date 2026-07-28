@@ -352,13 +352,44 @@ ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 -- ============================================
--- POPUP NOTIFICATION (NOVO)
+-- POPUP NOTIFICATION (CORRIGIDO)
 -- ============================================
 
 local popupQueue = {}
 local popupActive = false
 local popupSpacing = 45
-local popupStartY = 100
+local popupList = {}
+
+local function updatePopupPositions()
+	local sorted = {}
+	for _, popup in ipairs(popupList) do
+		if popup and popup.Parent then
+			table.insert(sorted, popup)
+		end
+	end
+	
+	local viewportSize = workspace.CurrentCamera.ViewportSize
+	local centerY = viewportSize.Y / 2
+	
+	local totalHeight = #sorted * popupSpacing
+	local startY = centerY - (totalHeight / 2)
+	
+	for i, popup in ipairs(sorted) do
+		local targetY = startY + (i - 1) * popupSpacing
+		popup.Position = UDim2.new(0, 20, 0, targetY)
+	end
+end
+
+local function removePopup(popup)
+	for i, p in ipairs(popupList) do
+		if p == popup then
+			table.remove(popupList, i)
+			break
+		end
+	end
+	popup:Destroy()
+	updatePopupPositions()
+end
 
 local function processPopupQueue()
 	if popupActive or #popupQueue == 0 then return end
@@ -369,8 +400,7 @@ local function processPopupQueue()
 	
 	local popup = Instance.new("Frame")
 	popup.Parent = ScreenGui.ScreenGui
-	popup.Size = UDim2.new(0, 250, 0, 35)
-	popup.Position = UDim2.new(0, 20, 0, popupStartY)
+	popup.Size = UDim2.new(0, 280, 0, 35)
 	popup.BackgroundColor3 = Color3.fromRGB(227,227,227)
 	popup.BorderColor3 = Color3.fromRGB(185,185,185)
 	popup.BorderSizePixel = 3
@@ -378,8 +408,8 @@ local function processPopupQueue()
 	popup.Visible = true
 	popup.ZIndex = 10
 	popup.ClipsDescendants = true
+	popup.Position = UDim2.new(0, -280, 0, 0)
 	
-	-- Borda lateral
 	local sideBar = Instance.new("Frame")
 	sideBar.Parent = popup
 	sideBar.Size = UDim2.new(0, 4, 1, 0)
@@ -400,50 +430,58 @@ local function processPopupQueue()
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.TextYAlignment = Enum.TextYAlignment.Center
 	
+	table.insert(popupList, popup)
+	updatePopupPositions()
+	
 	-- Animação de entrada
-	popup.Position = UDim2.new(0, -250, 0, popupStartY)
+	local startTime = tick()
+	local duration = 0.3
+	local startPos = -280
+	local endPos = 20
 	
-	local function animateIn()
-		local startTime = tick()
-		local duration = 0.3
-		local startPos = -250
-		local endPos = 20
+	repeat
+		local elapsed = tick() - startTime
+		local progress = math.min(elapsed / duration, 1)
+		local eased = 1 - (1 - progress) * (1 - progress)
+		local currentX = startPos + (endPos - startPos) * eased
+		popup.Position = UDim2.new(0, currentX, 0, popup.Position.Y.Offset)
 		
-		repeat
-			local elapsed = tick() - startTime
-			local progress = math.min(elapsed / duration, 1)
-			local eased = 1 - (1 - progress) * (1 - progress)
-			local currentX = startPos + (endPos - startPos) * eased
-			popup.Position = UDim2.new(0, currentX, 0, popupStartY)
-			task.wait()
-		until progress >= 1
+		label.TextTransparency = 1 - eased
+		popup.BackgroundTransparency = 1 - eased * 0.8
+		sideBar.BackgroundTransparency = 1 - eased * 0.8
 		
-		popup.Position = UDim2.new(0, endPos, 0, popupStartY)
-		
-		task.wait(2)
-		
-		-- Animação de saída
-		local fadeStart = tick()
-		local fadeDuration = 0.3
-		
-		repeat
-			local elapsed = tick() - fadeStart
-			local progress = math.min(elapsed / fadeDuration, 1)
-			local eased = progress * progress
-			local currentX = endPos + (250) * eased
-			popup.BackgroundTransparency = eased * 0.5
-			label.TextTransparency = eased
-			sideBar.BackgroundTransparency = eased * 0.5
-			popup.Position = UDim2.new(0, currentX, 0, popupStartY)
-			task.wait()
-		until progress >= 1
-		
-		popup:Destroy()
-		popupActive = false
-		processPopupQueue()
-	end
+		task.wait()
+	until progress >= 1
 	
-	task.spawn(animateIn)
+	popup.Position = UDim2.new(0, endPos, 0, popup.Position.Y.Offset)
+	label.TextTransparency = 0
+	popup.BackgroundTransparency = 0
+	sideBar.BackgroundTransparency = 0
+	
+	task.wait(2)
+	
+	-- Animação de saída (voltando pra esquerda)
+	local fadeStart = tick()
+	local fadeDuration = 0.3
+	
+	repeat
+		local elapsed = tick() - fadeStart
+		local progress = math.min(elapsed / fadeDuration, 1)
+		local eased = progress * progress
+		local currentX = endPos - (endPos + 280) * eased
+		
+		popup.Position = UDim2.new(0, currentX, 0, popup.Position.Y.Offset)
+		label.TextTransparency = eased
+		popup.BackgroundTransparency = eased * 0.8
+		sideBar.BackgroundTransparency = eased * 0.8
+		
+		task.wait()
+	until progress >= 1
+	
+	removePopup(popup)
+	
+	popupActive = false
+	processPopupQueue()
 end
 
 function _G.RXT_ShowPopup(text)
@@ -796,3 +834,4 @@ player.CharacterAdded:Connect(function()
 end)
 
 print("✅ RXT ADMIN carregado!")
+print("💡 Comandos carregados: " .. (#(_G.RXT_Commands or {}) or 0))
