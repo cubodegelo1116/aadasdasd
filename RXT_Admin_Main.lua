@@ -134,7 +134,7 @@ _G.RXT_AutocompleteList = autocompleteList
 _G.RXT_AutocompleteFrame = autocompleteFrame
 
 -- ============================================
--- ANIMAÇÃO DA CMDBOX (EXECUTA IMEDIATAMENTE)
+-- ANIMAÇÃO DA CMDBOX
 -- ============================================
 
 task.spawn(function()
@@ -165,59 +165,54 @@ task.spawn(function()
 end)
 
 -- ============================================
--- CARREGAR INTERFACES E COMANDOS (EM BACKGROUND)
+-- CARREGAR INTERFACES E COMANDOS
 -- ============================================
 
-task.spawn(function()
-	local function loadInterfaces()
-		local success, result = pcall(function()
-			return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
-		end)
-		
-		if success and result then
-			local fn, err = loadstring(result)
-			if fn then
-				fn()
-				print("✅ Interfaces carregadas!")
-				return true
-			else
-				warn("Erro ao compilar interfaces.lua: " .. tostring(err))
-			end
-		else
-			warn("Falha ao baixar interfaces.lua")
-		end
-		return false
-	end
-
-	local function loadCommands()
-		local success, result = pcall(function()
-			return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
-		end)
-		
-		if success and result then
-			local fn, err = loadstring(result)
-			if fn then
-				local cmdTable = fn()
-				if type(cmdTable) == "table" then
-					_G.RXT_Commands = cmdTable
-					print("✅ Comandos carregados: " .. #cmdTable)
-					return true
-				end
-			else
-				warn("Erro ao compilar commands.lua: " .. tostring(err))
-			end
-		else
-			warn("Falha ao baixar commands.lua")
-		end
-		return false
-	end
-
-	loadInterfaces()
-	loadCommands()
+local function loadInterfaces()
+	local success, result = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/interfaces.lua")
+	end)
 	
-	-- Cria botões da CmdsLIST depois que os comandos forem carregados
-	createCommandButtons()
-end)
+	if success and result then
+		local fn, err = loadstring(result)
+		if fn then
+			fn()
+			print("✅ Interfaces carregadas!")
+			return true
+		else
+			warn("Erro ao compilar interfaces.lua: " .. tostring(err))
+		end
+	else
+		warn("Falha ao baixar interfaces.lua")
+	end
+	return false
+end
+
+local function loadCommands()
+	local success, result = pcall(function()
+		return game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/aadasdasd/refs/heads/main/commands.lua")
+	end)
+	
+	if success and result then
+		local fn, err = loadstring(result)
+		if fn then
+			local cmdTable = fn()
+			if type(cmdTable) == "table" then
+				_G.RXT_Commands = cmdTable
+				print("✅ Comandos carregados: " .. #cmdTable)
+				return true
+			end
+		else
+			warn("Erro ao compilar commands.lua: " .. tostring(err))
+		end
+	else
+		warn("Falha ao baixar commands.lua")
+	end
+	return false
+end
+
+loadInterfaces()
+loadCommands()
 
 -- ============================================
 -- CmdsLIST
@@ -357,40 +352,113 @@ ScreenGui.ScrollingFrame.BorderColor3 = Color3.fromRGB(185,185,185)
 ScreenGui.ScrollingFrame.BorderSizePixel = 3
 
 -- ============================================
--- FUNÇÕES AUXILIARES
+-- POPUP NOTIFICATION (NOVO)
 -- ============================================
 
-function _G.RXT_ShowPopup(text)
-	if not _G.RXT_Config.Popups then return end
+local popupQueue = {}
+local popupActive = false
+local popupSpacing = 45
+local popupStartY = 100
+
+local function processPopupQueue()
+	if popupActive or #popupQueue == 0 then return end
+	
+	popupActive = true
+	local data = table.remove(popupQueue, 1)
+	local text = data.text
 	
 	local popup = Instance.new("Frame")
 	popup.Parent = ScreenGui.ScreenGui
-	popup.Size = UDim2.new(0, 300, 0, 40)
-	popup.Position = UDim2.new(0.5, -150, 0.15, 0)
+	popup.Size = UDim2.new(0, 250, 0, 35)
+	popup.Position = UDim2.new(0, 20, 0, popupStartY)
 	popup.BackgroundColor3 = Color3.fromRGB(227,227,227)
-	popup.BorderColor3 = Color3.fromRGB(185, 185, 185)
+	popup.BorderColor3 = Color3.fromRGB(185,185,185)
 	popup.BorderSizePixel = 3
 	popup.BackgroundTransparency = 0
 	popup.Visible = true
 	popup.ZIndex = 10
+	popup.ClipsDescendants = true
+	
+	-- Borda lateral
+	local sideBar = Instance.new("Frame")
+	sideBar.Parent = popup
+	sideBar.Size = UDim2.new(0, 4, 1, 0)
+	sideBar.Position = UDim2.new(0, 0, 0, 0)
+	sideBar.BackgroundColor3 = Color3.fromRGB(100,100,100)
+	sideBar.BackgroundTransparency = 0
+	sideBar.BorderSizePixel = 0
 	
 	local label = Instance.new("TextLabel")
 	label.Parent = popup
-	label.Size = UDim2.new(1, 0, 1, 0)
+	label.Size = UDim2.new(1, -12, 1, 0)
+	label.Position = UDim2.new(0, 10, 0, 0)
 	label.BackgroundTransparency = 1
 	label.Text = text
 	label.TextColor3 = Color3.fromRGB(0, 0, 0)
-	label.TextSize = 16
-	label.Font = Enum.Font.SourceSansBold
-	label.TextXAlignment = Enum.TextXAlignment.Center
+	label.TextSize = 14
+	label.Font = Enum.Font.SourceSans
+	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.TextYAlignment = Enum.TextYAlignment.Center
-	label.ZIndex = 11
 	
-	task.spawn(function()
+	-- Animação de entrada
+	popup.Position = UDim2.new(0, -250, 0, popupStartY)
+	
+	local function animateIn()
+		local startTime = tick()
+		local duration = 0.3
+		local startPos = -250
+		local endPos = 20
+		
+		repeat
+			local elapsed = tick() - startTime
+			local progress = math.min(elapsed / duration, 1)
+			local eased = 1 - (1 - progress) * (1 - progress)
+			local currentX = startPos + (endPos - startPos) * eased
+			popup.Position = UDim2.new(0, currentX, 0, popupStartY)
+			task.wait()
+		until progress >= 1
+		
+		popup.Position = UDim2.new(0, endPos, 0, popupStartY)
+		
 		task.wait(2)
+		
+		-- Animação de saída
+		local fadeStart = tick()
+		local fadeDuration = 0.3
+		
+		repeat
+			local elapsed = tick() - fadeStart
+			local progress = math.min(elapsed / fadeDuration, 1)
+			local eased = progress * progress
+			local currentX = endPos + (250) * eased
+			popup.BackgroundTransparency = eased * 0.5
+			label.TextTransparency = eased
+			sideBar.BackgroundTransparency = eased * 0.5
+			popup.Position = UDim2.new(0, currentX, 0, popupStartY)
+			task.wait()
+		until progress >= 1
+		
 		popup:Destroy()
-	end)
+		popupActive = false
+		processPopupQueue()
+	end
+	
+	task.spawn(animateIn)
 end
+
+function _G.RXT_ShowPopup(text)
+	if not _G.RXT_Config.Popups then return end
+	
+	table.insert(popupQueue, {text = text})
+	
+	if not popupActive then
+		processPopupQueue()
+	end
+end
+
+-- ============================================
+-- FUNÇÕES AUXILIARES
+-- ============================================
 
 function _G.RXT_FindPlayer(name)
 	local found = {}
@@ -432,7 +500,7 @@ end
 -- CRIAR BOTÕES DA CMDLIST
 -- ============================================
 
-function createCommandButtons()
+local function createCommandButtons()
 	local commands = _G.RXT_Commands or {}
 	local yOffset = 5
 	local buttonHeight = 25
@@ -476,10 +544,7 @@ function createCommandButtons()
 	ScreenGui.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, yOffset + 10)
 end
 
--- Tenta criar os botões imediatamente se os comandos já estiverem carregados
-if _G.RXT_Commands then
-	createCommandButtons()
-end
+createCommandButtons()
 
 -- ============================================
 -- AUTOCOMPLETE FUNCTION
@@ -731,4 +796,3 @@ player.CharacterAdded:Connect(function()
 end)
 
 print("✅ RXT ADMIN carregado!")
-print("💡 Comandos carregados: " .. (#(_G.RXT_Commands or {}) or 0))
