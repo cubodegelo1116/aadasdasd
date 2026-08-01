@@ -173,4 +173,4 @@ end)
 -- Se quiser manter a interface RXT pro Remote Spy, 
 -- mantém o código aqui. Mas o comando rspy já carrega o SimpleSpy V3.
 
-print("✅ Interfaces carregadas!")
+
